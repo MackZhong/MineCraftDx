@@ -8,7 +8,8 @@ namespace MC {
 	{
 		boost::filesystem::path m_BaseDir;
 
-		CompoundTag* getDataTagFor(const std::wstring& levelId) {
+	public:
+		CompoundTag * getDataTagFor(const std::wstring& levelId) {
 			boost::filesystem::path levelPath = m_BaseDir.append(levelId);
 			if (!FS::exists(levelPath)) {
 				return nullptr;
@@ -23,7 +24,7 @@ namespace MC {
 					return tag;
 				}
 				catch (std::exception e) {
-					std::cerr << e.what() << std::endl;
+					std::cerr << "Error: " << e.what() << std::endl;
 				}
 			}
 
@@ -36,7 +37,7 @@ namespace MC {
 					return tag;
 				}
 				catch (std::exception e) {
-					std::cerr << e.what() << std::endl;
+					std::cerr << "Error: " << e.what() << std::endl;
 				}
 			}
 			return nullptr;

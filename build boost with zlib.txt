@@ -1,7 +1,7 @@
 
 b2.exe --with-iostreams -sZLIB_SOURCE=D:/Documents/VS2017/repos/zlib-1.2.11 [other options]
 
-b2 --with-iostreams -sZLIB_SOURCE=D:/Documents/VS2017/repos/zlib-1.2.11 --build-type=complete --prefix=D:/Documents\VS2017\repos\ArchInd --exec-prefix=D:\Documents\VS2017\repos\ArchDep --build-dir=D:\Documents\VS2017\repos\Build_VS15 install
+b2 --with-iostreams -sZLIB_SOURCE=E:/Dev/VSRepos/zlib-1.2.11 --build-type=complete --prefix=E:/Dev/VSRepos/ArchInd --exec-prefix=E:/Dev/VSRepos/ArchDep --build-dir=E:/Dev/VSRepos/Build_VS15 install
 
 
 b2 --help-options

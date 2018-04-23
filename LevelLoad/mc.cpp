@@ -16,6 +16,94 @@ namespace MC {
 	const wchar_t* NETHER_FOLDER = L"DIM-1";
 	const wchar_t* ENDER_FOLDER = L"DIM1";
 
+	std::wostream& operator<<(std::wostream& stm, const NbtTag* tag) {
+		stm << tag->m_Name << L": ";
+
+		switch (tag->getId()) {
+		case TAG_End:
+		{
+			EndTag * ptag = (EndTag*)tag;
+			stm << *ptag;
+			break;
+		}
+		case TAG_Byte:
+		{
+			ByteTag * ptag = (ByteTag*)(tag);
+			stm << *ptag;
+			break;
+		}
+		case TAG_Short:
+		{
+			ShortTag * ptag = (ShortTag*)(tag);
+			stm << *ptag;
+			break;
+		}
+		case TAG_Int:
+		{
+			IntTag * ptag = (IntTag*)(tag);
+			stm << *ptag;
+			break;
+		}
+		case TAG_Long:
+		{
+			LongTag * ptag = (LongTag*)(tag);
+			stm << *ptag;
+			break;
+		}
+		case TAG_Float:
+		{
+			FloatTag * ptag = (FloatTag*)(tag);
+			stm << *ptag;
+			break;
+		}
+		case TAG_Double:
+		{
+			DoubleTag * ptag = (DoubleTag*)(tag);
+			stm << *ptag;
+			break;
+		}
+		case TAG_Byte_Array:
+		{
+			ByteArrayTag * ptag = (ByteArrayTag*)(tag);
+			stm << *ptag;
+			break;
+		}
+		case TAG_String:
+		{
+			StringTag * ptag = (StringTag*)(tag);
+			stm << *ptag;
+			break;
+		}
+		case TAG_List:
+		{
+			ListTag<NbtTag> * ptag = (ListTag<NbtTag>*)(tag);
+			stm << *ptag;
+			break;
+		}
+		case TAG_Compound:
+		{
+			CompoundTag * ptag = (CompoundTag*)(tag);
+			stm << *ptag;
+			break;
+		}
+		case TAG_Int_Array:
+		{
+			IntArrayTag * ptag = (IntArrayTag*)(tag);
+			stm << *ptag;
+			break;
+		}
+		case TAG_Long_Array: {
+			LongArrayTag * ptag = (LongArrayTag*)(tag);
+			stm << *ptag;
+
+			break;
+		}
+		}
+		stm << std::endl;
+		stm.flush();
+		return stm;
+	}
+
 	NbtTag* NbtTag::createTag(TAG_TYPE type, const std::wstring& name) {
 		switch (type) {
 		case TAG_End:
@@ -107,13 +195,15 @@ namespace MC {
 			return "TAG_Compound";
 		case TAG_Int_Array:
 			return "TAG_Int_Array";
+		case TAG_Long_Array:
+			return "TAG_Long_Array";
 		}
 		return "UNKNOWN";
 	}
 
 	CompoundTag* NbtIo::readCompressed(FS::ifstream& in) {
 		IFilteringStream sbin;
-			sbin.set_auto_close(true);
+		sbin.set_auto_close(true);
 		sbin.push(boost::iostreams::gzip_decompressor());
 		sbin.push(in);
 
@@ -123,7 +213,7 @@ namespace MC {
 			return tag;
 		}
 		catch (std::exception& err) {
-			std::cout << err.what() << std::endl;
+			std::cerr << "Error: " << err.what() << std::endl;
 			throw err;
 		}
 		//dis.Close();

@@ -54,6 +54,9 @@ namespace MC {
 		static void writeNamedTag(const NbtTag* tag, NbtWriter* dos);
 
 		static const char* getTagName(__int8 type);
+
+		friend std::wostream& operator<<(std::wostream& stm, const NbtTag* tag);
+
 	};
 
 	class EndTag :public NbtTag {
@@ -66,7 +69,7 @@ namespace MC {
 	public:
 		EndTag() :super(L"") {};
 		virtual TAG_TYPE getId() const override { return TAG_End; };
-		friend std::ostream& operator<<(std::ostream& stm, const EndTag& tag) {
+		friend std::wostream& operator<<(std::wostream& stm, const EndTag& tag) {
 			stm << "END";
 			return stm;
 		}
@@ -85,7 +88,7 @@ namespace MC {
 		ByteTag(const std::wstring& name) : super(name), m_Data(0) {};
 		ByteTag(const std::wstring& name, __int8 data) : super(name), m_Data(data) {};
 		virtual TAG_TYPE getId() const override { return TAG_Byte; };
-		friend std::ostream& operator<<(std::ostream& stm, const ByteTag& tag) {
+		friend std::wostream& operator<<(std::wostream& stm, const ByteTag& tag) {
 			stm << tag.m_Data;
 			return stm;
 		}
@@ -116,7 +119,7 @@ namespace MC {
 		ShortTag(const std::wstring& name) : super(name), m_Data(0) {};
 		ShortTag(const std::wstring& name, __int16 data) : super(name), m_Data(data) {};
 		virtual TAG_TYPE getId() const override { return TAG_Short; };
-		friend std::ostream& operator<<(std::ostream& stm, const ShortTag& tag) {
+		friend std::wostream& operator<<(std::wostream& stm, const ShortTag& tag) {
 			stm << tag.m_Data;
 			return stm;
 		}
@@ -146,7 +149,7 @@ namespace MC {
 		IntTag(const std::wstring& name) : super(name), m_Data(0) {};
 		IntTag(const std::wstring& name, __int32 data) : super(name), m_Data(data) {};
 		virtual TAG_TYPE getId() const override { return TAG_Int; };
-		friend std::ostream& operator<<(std::ostream& stm, const IntTag& tag) {
+		friend std::wostream& operator<<(std::wostream& stm, const IntTag& tag) {
 			stm << tag.m_Data;
 			return stm;
 		}
@@ -176,7 +179,7 @@ namespace MC {
 		LongTag(const std::wstring& name) : super(name), m_Data(0) {};
 		LongTag(const std::wstring& name, __int64 data) : super(name), m_Data(data) {};
 		virtual TAG_TYPE getId() const override { return TAG_Long; };
-		friend std::ostream& operator<<(std::ostream& stm, const LongTag& tag) {
+		friend std::wostream& operator<<(std::wostream& stm, const LongTag& tag) {
 			stm << tag.m_Data;
 			return stm;
 		}
@@ -206,7 +209,7 @@ namespace MC {
 		FloatTag(const std::wstring& name) : super(name), m_Data(0) {};
 		FloatTag(const std::wstring& name, float data) : super(name), m_Data(data) {};
 		virtual TAG_TYPE getId() const override { return TAG_Float; };
-		friend std::ostream& operator<<(std::ostream& stm, const FloatTag& tag) {
+		friend std::wostream& operator<<(std::wostream& stm, const FloatTag& tag) {
 			stm << tag.m_Data;
 			return stm;
 		}
@@ -236,7 +239,7 @@ namespace MC {
 		DoubleTag(const std::wstring& name) : super(name), m_Data(0) {};
 		DoubleTag(const std::wstring& name, double data) : super(name), m_Data(data) {};
 		virtual TAG_TYPE getId() const override { return TAG_Double; };
-		friend std::ostream& operator<<(std::ostream& stm, const DoubleTag& tag) {
+		friend std::wostream& operator<<(std::wostream& stm, const DoubleTag& tag) {
 			stm << tag.m_Data;
 			return stm;
 		}
@@ -276,7 +279,7 @@ namespace MC {
 			m_Data = data;
 		};
 		virtual TAG_TYPE getId() const override { return TAG_Byte_Array; };
-		friend std::ostream& operator<<(std::ostream& stm, const ByteArrayTag& tag) {
+		friend std::wostream& operator<<(std::wostream& stm, const ByteArrayTag& tag) {
 			stm << "[" << tag.m_Size << " bytes]";
 			return stm;
 		}
@@ -320,7 +323,7 @@ namespace MC {
 			m_Data = data;
 		};
 		virtual TAG_TYPE getId() const override { return TAG_Int_Array; };
-		friend std::ostream& operator<<(std::ostream& stm, const IntArrayTag& tag) {
+		friend std::wostream& operator<<(std::wostream& stm, const IntArrayTag& tag) {
 			stm << "[" << tag.m_Data.size() << " integers]";
 			return stm;
 		}
@@ -364,8 +367,8 @@ namespace MC {
 			m_Data = data;
 		};
 		virtual TAG_TYPE getId() const override { return TAG_Long_Array; };
-		friend std::ostream& operator<<(std::ostream& stm, const LongArrayTag& tag) {
-			stm << "[" << tag.m_Data.size() << " integers]";
+		friend std::wostream& operator<<(std::wostream& stm, const LongArrayTag& tag) {
+			stm << "[" << tag.m_Data.size() << " longlong]";
 			return stm;
 		}
 		inline bool operator==(const LongArrayTag& oth) const {
@@ -402,7 +405,7 @@ namespace MC {
 		};
 		virtual TAG_TYPE getId() const override { return TAG_String; };
 		friend std::wostream& operator<<(std::wostream& stm, const StringTag& tag) {
-			stm << tag.m_Data;
+			stm << "\"" << tag.m_Data << "\"";
 			return stm;
 		}
 		inline bool operator==(const StringTag& oth) const {
@@ -443,8 +446,15 @@ namespace MC {
 		};
 		virtual TAG_TYPE getId() const override { return TAG_Compound; };
 		bool isEmpty() const { return m_Tags.empty(); }
-		friend std::ostream& operator<<(std::ostream& stm, const CompoundTag& tag) {
-			stm << tag.m_Tags.size() << " entries";
+		friend std::wostream& operator<<(std::wostream& stm, const CompoundTag& tag) {
+			stm << tag.m_Tags.size() << " entries:" << std::endl;
+			for (auto t = tag.m_Tags.begin(); t != tag.m_Tags.end(); t++) {
+				//t->second->operator<<(stm, );
+				//auto tg = t->second.get();
+				//int id = .getId();
+				//id = tg->getId();
+				stm << t->second << std::endl;
+			}
 			return stm;
 		}
 		inline bool operator==(const CompoundTag& oth) const {
@@ -614,8 +624,8 @@ namespace MC {
 		ListTag(const std::wstring& name) : super(name) {
 		};
 		virtual TAG_TYPE getId() const override { return TAG_List; };
-		friend std::ostream& operator<<(std::ostream& stm, const ListTag& tag) {
-			stm << tag.m_TagsList.size() << " entries of type " << NbtTag::getTagName(tag.m_Type);
+		friend std::wostream& operator<<(std::wostream& stm, const ListTag<T>& tag) {
+			//stm << tag.m_TagsList.size() << " entries of type " << NbtTag::getTagName(tag.m_Type);
 			return stm;
 		}
 		void add(const T* tag) {

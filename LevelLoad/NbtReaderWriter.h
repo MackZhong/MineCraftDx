@@ -15,6 +15,8 @@ namespace MC {
 		{}
 		NbtReader(const std::ifstream& stream) :m_Buffer(stream.rdbuf())
 		{}
+		NbtReader(std::streambuf* buf) :m_Buffer(buf)
+		{}
 
 		ByteBuffer read(size_t size) {
 			ByteBuffer ptr = std::make_unique<__int8[]>(size);
@@ -131,6 +133,13 @@ namespace MC {
 			m_Buffer->sputn((char*)&value, sizeof(value));
 		};
 		void writeUTF(const std::wstring& str) {
+			//using Utf8Conv = boost::locale::utf8_codecvt<wchar_t>;
+			//Utf8Conv::state_type st;
+			//Utf8Conv::to_unicode(Utf8Conv::to_unicode_state, )
+			//	auto state = conv.initial_state(boost::locale::generic_codecvt_base::to_unicode_state);
+			//auto buf = str.c_str(); boost::locale::utf8_codecvt
+			//	auto pt = conv.to_unicode(state, );
+
 		}
 	};
 }

@@ -13,6 +13,8 @@
 #include <boost/filesystem.hpp>
 #include <fstream>
 #include <iostream>
+#include <boost/locale/utf8_codecvt.hpp>
+#include <sstream>
 
 namespace MC {
 	namespace FS = boost::filesystem;
@@ -31,4 +33,16 @@ namespace MC {
 	using IntArray = std::vector<__int32>;
 	using LongArray = std::vector<__int64>;
 
+	inline int DebugMessage(const wchar_t* _Format, ...) {
+		int _Result = 0;
+#ifdef _DEBUG
+		static wchar_t _Buffer[128];
+		va_list _ArgList;
+		__crt_va_start(_ArgList, _Format);
+		_Result = __vswprintf_l(_Buffer, _Format, NULL, _ArgList);
+		__crt_va_end(_ArgList);
+		std::_Debug_message(_Buffer, __FILEW__, __LINE__);
+#endif
+		return _Result;
+	}
 }
