@@ -36,6 +36,15 @@
     <ClInclude Include="AnvilLevelStorage.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="ChunkDataLayer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="mc.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="RegionFile.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -44,7 +53,7 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Nbt.cpp">
+    <ClCompile Include="mc.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

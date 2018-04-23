@@ -1,41 +1,14 @@
 #pragma once
-#include <string>
-#include <vector>
-#include <boost/iostreams/filter/gzip.hpp>
-#include <boost/iostreams/device/array.hpp>
-#include <boost/iostreams/filtering_streambuf.hpp>
-#include <boost/iostreams/filtering_stream.hpp>
-//using ByteDevice = boost::iostreams::basic_array_source<__int8>;
-//using ByteBuffer = boost::iostreams::stream_buffer<ByteDevice>;
-#include <boost/iostreams/stream.hpp>
-//#include <boost/archive/binary_iarchive.hpp>
-#include <boost/archive/basic_binary_iprimitive.hpp>
-#include <boost/archive/binary_iarchive_impl.hpp>
-#include <boost/archive/binary_oarchive_impl.hpp>
-//using ByteStream = boost::archive::binary_iarchive;
-#include <boost/iostreams/filter/gzip.hpp>
-#include <boost/filesystem/fstream.hpp>
-#include <boost/filesystem.hpp>
-namespace FS = boost::filesystem;
-namespace IO = boost::iostreams;
-
-//#pragma comment(lib, "libboost_zlib-vc141-mt-gd-x64-1_67.lib")
-#include <boost/iostreams/filtering_stream.hpp>
-using IFilteringStream = boost::iostreams::filtering_istream;
-using OFilteringStream = boost::iostreams::filtering_ostream;
-#include <fstream>
-#include <iostream>
+#include "mc.h"
 
 // https://docs.oracle.com/javase/7/docs/api/java/io/DataInput.html#modified-utf-8
 
 namespace MC {
-	using ByteArray = std::vector<__int8>;
-	using ByteBuffer = std::shared_ptr<__int8[]>;
-	using IntArray = std::vector<__int32>;
 
 	class NbtReader
 	{
-		std::shared_ptr<std::streambuf> m_Buffer;
+		//std::shared_ptr<std::streambuf> m_Buffer;
+		std::streambuf* m_Buffer;
 
 	public:
 		NbtReader(const IFilteringStream& stream) : m_Buffer(stream.rdbuf())

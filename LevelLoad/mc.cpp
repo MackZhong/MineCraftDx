@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "mc.h"
 #include "NbtReaderWriter.h"
 #include "NbtIo.h"
 #include "NbtTag.h"
@@ -10,6 +11,10 @@
 #include <zlib.h>
 
 namespace MC {
+	const int MCREGION_VERSION_ID = 0x4abc;
+	const int ANVIL_VERSION_ID = 0x4abd;
+	const wchar_t* NETHER_FOLDER = L"DIM-1";
+	const wchar_t* ENDER_FOLDER = L"DIM1";
 
 	NbtTag* NbtTag::createTag(TAG_TYPE type, const std::wstring& name) {
 		switch (type) {
@@ -37,6 +42,8 @@ namespace MC {
 			return new CompoundTag(name);
 		case TAG_Int_Array:
 			return new IntArrayTag(name);
+		case TAG_Long_Array:
+			return new LongArrayTag(name);
 		}
 		return nullptr;
 	}
@@ -106,13 +113,13 @@ namespace MC {
 
 	CompoundTag* NbtIo::readCompressed(FS::ifstream& in) {
 		IFilteringStream sbin;
+			sbin.set_auto_close(true);
 		sbin.push(boost::iostreams::gzip_decompressor());
 		sbin.push(in);
 
 		NbtReader dis(sbin);
 		try {
 			CompoundTag* tag = NbtIo::readFrom(&dis);
-			sbin.set_auto_close(true);
 			return tag;
 		}
 		catch (std::exception& err) {

@@ -20,6 +20,7 @@ namespace MC {
 		TAG_List = 9,
 		TAG_Compound = 10,
 		TAG_Int_Array = 11,
+		TAG_Long_Array = 12,
 		TAG_Max
 	};
 
@@ -330,6 +331,50 @@ namespace MC {
 			return this->m_Data == oth.m_Data;
 		}
 		inline IntArrayTag& operator=(const IntArrayTag& oth) {
+			this->setName(oth.getName());
+			this->m_Data = oth.m_Data;
+			return *this;
+		}
+	};
+
+	class LongArrayTag :public NbtTag {
+		friend class CompoundTag;
+		LongArray m_Data;
+		using super = NbtTag;
+
+		// Í¨¹ý NbtTag ¼Ì³Ð
+		virtual void Write(NbtWriter* pdos) const override {
+			pdos->writeInt((__int32)m_Data.size());
+			for (int i = 0; i < (int)m_Data.size(); i++) {
+				pdos->writeLong(m_Data[i]);
+			}
+		};
+		virtual void Load(NbtReader* pdis) override {
+			__int32 length = pdis->readInt();
+			m_Data.reserve(length);
+			for (int i = 0; i < (int)m_Data.size(); i++) {
+				m_Data[i] = pdis->readInt();
+			}
+		};
+
+	public:
+		LongArrayTag(const std::wstring& name) : super(name) {
+		};
+		LongArrayTag(const std::wstring& name, const LongArray& data) : super(name) {
+			m_Data = data;
+		};
+		virtual TAG_TYPE getId() const override { return TAG_Long_Array; };
+		friend std::ostream& operator<<(std::ostream& stm, const LongArrayTag& tag) {
+			stm << "[" << tag.m_Data.size() << " integers]";
+			return stm;
+		}
+		inline bool operator==(const LongArrayTag& oth) const {
+			if (!super::operator==(oth)) {
+				return false;
+			}
+			return this->m_Data == oth.m_Data;
+		}
+		inline LongArrayTag& operator=(const LongArrayTag& oth) {
 			this->setName(oth.getName());
 			this->m_Data = oth.m_Data;
 			return *this;

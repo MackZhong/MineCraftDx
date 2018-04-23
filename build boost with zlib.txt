@@ -1,0 +1,277 @@
+
+b2.exe --with-iostreams -sZLIB_SOURCE=D:/Documents/VS2017/repos/zlib-1.2.11 [other options]
+
+b2 --with-iostreams -sZLIB_SOURCE=D:/Documents/VS2017/repos/zlib-1.2.11 --build-type=complete --prefix=D:/Documents\VS2017\repos\ArchInd --exec-prefix=D:\Documents\VS2017\repos\ArchDep --build-dir=D:\Documents\VS2017\repos\Build_VS15 install
+
+
+b2 --help-options
+Boost.Build Usage:
+
+  b2 [ options... ] targets...
+
+  * -a; Build all targets, even if they are current.
+  * -fx; Read 'x' as the Jamfile for building instead of searching for the
+    Boost.Build system.
+  * -jx; Run up to 'x' commands concurrently.
+  * -n; Do not execute build commands. Instead print out the commands as they
+    would be executed if building.
+  * -ox; Output the used build commands to file 'x'.
+  * -q; Quit as soon as a build failure is encountered. Without this option
+    Boost.Jam will continue building as many targets as it can.
+  * -sx=y; Sets a Jam variable 'x' to the value 'y', overriding any value that
+    variable would have from the environment.
+  * -tx; Rebuild the target 'x', even if it is up-to-date.
+  * -v; Display the version of b2.
+  * --x; Any option not explicitly handled by Boost.Build remains available to
+    build scripts using the 'ARGV' variable.
+  * --abbreviate-paths; Use abbreviated paths for targets.
+  * --hash; Shorten target paths by using an MD5 hash.
+  * -dconsole; Run the interactive debugger. Cannot be used with any other
+    option.
+  * -dn; Enables output of diagnostic messages. The debug level 'n' and all
+    below it are enabled by this option.
+  * -d+n; Enables output of diagnostic messages. Only the output for debug
+    level 'n' is enabled.
+
+Debug Levels:
+
+  Each debug level shows a different set of information. Usually with higher
+  levels producing more verbose information. The following levels are supported:
+
+  * 0; Turn off all diagnostic output. Only errors are reported.
+  * 1; Show the actions taken for building targets, as they are executed.
+  * 2; Show quiet actions and display all action text, as they are executed.
+  * 3; Show dependency analysis, and target/source timestamps/paths.
+  * 4; Show arguments of shell invocations.
+  * 5; Show rule invocations and variable expansions.
+  * 6; Show directory/header file/archive scans, and attempts at binding to
+    targets.
+  * 7; Show variable settings.
+  * 8; Show variable fetches, variable expansions, and evaluation of 'if'
+    expressions.
+  * 9; Show variable manipulation, scanner tokens, and memory usage.
+  * 10; Show execution times for rules.
+  * 11; Show parsing progress of Jamfiles.
+  * 12; Show graph for target dependencies.
+  * 13; Show changes in target status (fate).
+
+
+  b2 --help-internal
+Modules:
+
+  These are all the known modules. Use --help <module> to get more detailed
+  information.
+
+  * ac:
+  * acc:
+  * alias:
+  * asciidoctor:
+  * assert:
+  * auto-index:
+  * bison:
+  * boost:
+  * boostbook:
+  * boostbook-config:
+  * borland:
+  * build-request:
+  * build-system: This file is part of Boost Build version 2.
+  * builtin:
+  * bzip2:
+  * cast:
+  * clang: This is a generic 'clang' toolset.
+  * clang-darwin:
+  * clang-linux:
+  * clang-vxworks:
+  * clang-win:
+  * class:
+  * common:
+  * como:
+  * como-linux:
+  * como-win: The following #// line will be used by the regression test table
+    generation program as the column heading for HTML tables.
+  * config-cache:
+  * configure:
+  * container:
+  * convert:
+  * cray:
+  * cw:
+  * cw-config:
+  * cygwin:
+  * darwin:
+  * diab:
+  * dmc: The following #// line will be used by the regression test table
+    generation program as the column heading for HTML tables.
+  * doc:
+  * docutils:
+  * doxygen:
+  * doxygen-config:
+  * emscripten:
+  * errors:
+  * feature:
+  * flags:
+  * fop:
+  * fortran:
+  * gcc:
+  * generate:
+  * generators:
+  * gettext:
+  * gfortran:
+  * hp_cxx:
+  * hpfortran:
+  * ifort:
+  * indirect:
+  * intel:
+  * intel-darwin:
+  * intel-linux:
+  * intel-vxworks:
+  * intel-win:
+  * lex:
+  * libjpeg:
+  * libpng:
+  * libtiff:
+  * link:
+  * lzma:
+  * make:
+  * mc:
+  * message:
+  * midl:
+  * mipspro:
+  * modular:
+  * modules:
+  * mpi:
+  * msvc:
+  * msvc-config:
+  * notfile:
+  * numbers:
+  * option:
+  * order:
+  * os:
+  * package: Example usage: package.install boost : <properties> : <binaries> :
+    <libraries> : <headers> ; This will install binaries, libraries and headers
+    to the 'proper' location, given by command line options --prefix,
+    --exec-prefix, --bindir, --libdir and --includedir.
+  * param:
+  * path:
+  * pathscale:
+  * pch:
+  * pgi:
+  * print:
+  * project:
+  * property:
+  * property-set:
+  * python-config:
+  * qcc:
+  * qt:
+  * qt3:
+  * qt4:
+  * qt5: The .qrc processing utility supports various command line option (see
+    http://qt-project.org/doc/qt-5.0/rcc.html for a complete list).
+  * quickbook:
+  * quickbook-config:
+  * rc:
+  * regex:
+  * sass:
+  * scanner:
+  * sequence:
+  * stage:
+  * string:
+  * sun:
+  * symlink:
+  * targets:
+  * testing-aux:
+  * tntnet:
+  * toolset:
+  * type:
+  * unix:
+  * utility:
+  * vacpp:
+  * version:
+  * virtual-target:
+  * vmsdecc:
+  * whale: This module implements support for Whale/Dolphin/WD parser/lexer
+    tools.
+  * wxFormBuilder:
+
+  * xlcpp:
+  * xlf:
+  * xsltproc:
+  * xsltproc-config:
+  * zlib:
+  * zstd: Supports the zstd library After 'using zstd', the following targets
+    are available: /zstd//zstd -- The zstd library.
+
+
+
+b2 --help zlib
+Module 'zlib':
+
+  Supports the zlib library
+
+  After 'using zlib', the following targets are available:
+
+  /zlib//zlib -- The zlib library
+
+Module 'zlib' rules:
+
+  Use --help zlib.<rule-name> to get more information.
+
+  * init: Initializes the zlib library.
+
+
+
+b2 --help zlib.init
+Rule 'zlib.init ( version ? : options * : requirements * : is-default ? )':
+
+  Initializes the zlib library.
+
+  zlib can be configured either to use pre-existing binaries or to build the
+  library from source.
+
+  Options for configuring a prebuilt zlib:
+
+    <search>
+        The directory containing the zlib binaries.
+    <name>
+        Overrides the default library name.
+    <include>
+        The directory containing the zlib headers.
+
+  If none of these options is specified, then the environmental variables
+  ZLIB_LIBRARY_PATH, ZLIB_NAME, and ZLIB_INCLUDE will be used instead.
+
+  Options for building zlib from source:
+
+    <source>
+        The zlib source directory.  Defaults to the environmental variable
+        ZLIB_SOURCE.
+    <tag>
+        A rule which computes the actual name of the compiled
+        libraries based on the build properties.  Ignored
+        when using precompiled binaries.
+    <build-name>
+        The base name to use for the compiled library.  Ignored
+        when using precompiled binaries.
+
+  Examples:
+
+    # Find zlib in the default system location
+    using zlib ;
+    # Build zlib from source
+    using zlib : 1.2.7 : <source>/home/steven/zlib-1.2.7 ;
+    # Find zlib in /usr/local
+    using zlib : 1.2.7
+      : <include>/usr/local/include <search>/usr/local/lib ;
+    # Build zlib from source for msvc and find
+    # prebuilt binaries for gcc.
+    using zlib : 1.2.7 : <source>C:/Devel/src/zlib-1.2.7 : <toolset>msvc ;
+    using zlib : 1.2.7 : : <toolset>gcc ;
+
+  * version: The zlib version (currently ignored)
+  * options: A list of the options to use
+  * requirements: The requirements for the zlib target
+  * is-default: Default configurations are only used when zlib has not yet been
+    configured. This option is deprecated. A configuration will be treated as a
+    default when none of <include>, <search>, <name>, and <source> are present.
+
+
+

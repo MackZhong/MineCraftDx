@@ -7,6 +7,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "blockViewer", "blockViewer\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LevelLoad", "LevelLoad\LevelLoad.vcxproj", "{7D5747A1-23A5-4803-89D2-117340ECBA4D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1DD82AA1-6D34-4D3E-B3A1-68E225F17348}"
+	ProjectSection(SolutionItems) = preProject
+		build boost with zlib.txt = build boost with zlib.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
