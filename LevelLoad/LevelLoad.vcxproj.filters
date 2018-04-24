@@ -33,9 +33,6 @@
     <ClInclude Include="NbtReaderWriter.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="AnvilLevelStorage.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="ChunkDataLayer.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -43,6 +40,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="RegionFile.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelStorage.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="NbtFile.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

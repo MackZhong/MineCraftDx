@@ -3,105 +3,101 @@
 #include "NbtReaderWriter.h"
 #include "NbtIo.h"
 #include "NbtTag.h"
-#include <iostream>
-#include <string>
-#include <memory>
-#include <vector>
-#include <map>
-#include <zlib.h>
 
 namespace MC {
+	char DataConversionBuffer[_CVTBUFSIZE];
+
 	const int MCREGION_VERSION_ID = 0x4abc;
 	const int ANVIL_VERSION_ID = 0x4abd;
 	const wchar_t* NETHER_FOLDER = L"DIM-1";
 	const wchar_t* ENDER_FOLDER = L"DIM1";
 
-	std::wostream& operator<<(std::wostream& stm, const NbtTag* tag) {
-		stm << tag->m_Name << L": ";
+	std::wostream& operator<<(std::wostream& ostm, const NbtTag* tag) {
+		ostm << NbtTag::getTagName(tag->getId()) << ":" << tag->m_Name << L"=";
 
 		switch (tag->getId()) {
 		case TAG_End:
 		{
 			EndTag * ptag = (EndTag*)tag;
-			stm << *ptag;
+			ostm << *ptag;
 			break;
 		}
 		case TAG_Byte:
 		{
 			ByteTag * ptag = (ByteTag*)(tag);
-			stm << *ptag;
+			ostm << *ptag;
 			break;
 		}
 		case TAG_Short:
 		{
 			ShortTag * ptag = (ShortTag*)(tag);
-			stm << *ptag;
+			ostm << *ptag;
 			break;
 		}
 		case TAG_Int:
 		{
 			IntTag * ptag = (IntTag*)(tag);
-			stm << *ptag;
+			ostm << *ptag;
 			break;
 		}
 		case TAG_Long:
 		{
 			LongTag * ptag = (LongTag*)(tag);
-			stm << *ptag;
+			ostm << *ptag;
 			break;
 		}
 		case TAG_Float:
 		{
 			FloatTag * ptag = (FloatTag*)(tag);
-			stm << *ptag;
+			ostm << *ptag;
 			break;
 		}
 		case TAG_Double:
 		{
 			DoubleTag * ptag = (DoubleTag*)(tag);
-			stm << *ptag;
+			ostm << *ptag;
 			break;
 		}
 		case TAG_Byte_Array:
 		{
 			ByteArrayTag * ptag = (ByteArrayTag*)(tag);
-			stm << *ptag;
+			ostm << *ptag;
 			break;
 		}
 		case TAG_String:
 		{
 			StringTag * ptag = (StringTag*)(tag);
-			stm << *ptag;
+			ostm << *ptag;
 			break;
 		}
 		case TAG_List:
 		{
-			ListTag<NbtTag> * ptag = (ListTag<NbtTag>*)(tag);
-			stm << *ptag;
+			ListTag * ptag = (ListTag*)(tag);
+			ostm << *ptag;
 			break;
 		}
 		case TAG_Compound:
 		{
 			CompoundTag * ptag = (CompoundTag*)(tag);
-			stm << *ptag;
+			ostm << *ptag;
 			break;
 		}
 		case TAG_Int_Array:
 		{
 			IntArrayTag * ptag = (IntArrayTag*)(tag);
-			stm << *ptag;
+			ostm << *ptag;
 			break;
 		}
 		case TAG_Long_Array: {
 			LongArrayTag * ptag = (LongArrayTag*)(tag);
-			stm << *ptag;
+			ostm << *ptag;
 
 			break;
 		}
 		}
-		stm << std::endl;
-		stm.flush();
-		return stm;
+		ostm << std::endl;
+		ostm.flush();
+		return ostm;
 	}
 
 	NbtTag* NbtTag::createTag(TAG_TYPE type, const std::wstring& name) {
@@ -125,7 +121,7 @@ namespace MC {
 		case TAG_String:
 			return new StringTag(name);
 		case TAG_List:
-			return new ListTag<NbtTag>(name);
+			return new ListTag(name);
 		case TAG_Compound:
 			return new CompoundTag(name);
 		case TAG_Int_Array:

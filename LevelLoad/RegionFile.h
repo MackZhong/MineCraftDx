@@ -2,6 +2,8 @@
 #include "mc.h"
 #include "NbtReaderWriter.h"
 
+// https://minecraft.gamepedia.com/Region_file_format
+
 namespace MC {
 	class RegionFile
 	{
@@ -13,15 +15,15 @@ namespace MC {
 		const int VERSION_DEFLATE = 2;
 
 		const int SECTOR_BYTES = 4096;
-		const int SECTOR_INTS = SECTOR_BYTES / 4;
+		const int SECTOR_INTS = 1024;
 
 		const int CHUNK_HEADER_SIZE = 5;
 		//static ByteBuffer emptySector[] = new byte[4096];
 
 		FS::path m_FileName;
 		FS::fstream m_File;
-		IntArray m_Offsets;
-		IntArray m_ChunkTimestamps;
+		std::array<__int32, 1024> m_Offsets;
+		std::array<__int32, 1024> m_ChunkTimestamps;
 		BoolArray m_SectorFree;
 		int m_SizeDelta;
 		time_t m_LastModified = 0;
@@ -50,11 +52,10 @@ namespace MC {
 		}
 
 	public:
-		RegionFile(FS::path filePath) : m_FileName(filePath), m_SizeDelta(0) {
-			m_Offsets.reserve(SECTOR_INTS);
-			m_ChunkTimestamps.reserve(SECTOR_INTS);
-			_DEBUG_ERROR("Region Load:");
-			std::_Debug_message(m_FileName.wstring().c_str(), __FILEW__, __LINE__);
+		RegionFile(const FS::path& filePath) : m_FileName(filePath), m_SizeDelta(0) {
+			//m_Offsets.reserve(SECTOR_INTS);
+			//m_ChunkTimestamps.reserve(SECTOR_INTS);
+			//DebugMessage(L"Region Load:");
 
 			try {
 				if (FS::exists(m_FileName)) {
@@ -119,6 +120,10 @@ namespace MC {
 		time_t LastModified() const { return m_LastModified; }
 
 		int GetSizeDelta() { int ret = m_SizeDelta; m_SizeDelta = 0; return ret; }
+
+		CompoundTag* readRegion() {
+			return nullptr;
+		}
 
 		std::shared_ptr<NbtReader> GetChunkDataReader(int x, int z) {
 			if (this->outofBounds(x, z)) {

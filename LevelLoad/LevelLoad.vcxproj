@@ -163,7 +163,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="AnvilLevelStorage.h" />
+    <ClInclude Include="LevelStorage.h" />
+    <ClInclude Include="NbtFile.h" />
     <ClInclude Include="ChunkDataLayer.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="mc.h" />

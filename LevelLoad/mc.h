@@ -1,6 +1,14 @@
 #pragma once
+#include <conio.h>
+#include <stdio.h>
+#include <memory>
 #include <string>
 #include <vector>
+#include <array>
+#include <map>
+#include <sstream>
+#include <fstream>
+#include <iostream>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/device/array.hpp>
 #include <boost/iostreams/filtering_streambuf.hpp>
@@ -11,12 +19,14 @@
 //#include <boost/archive/binary_iarchive.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/filesystem.hpp>
-#include <fstream>
-#include <iostream>
 #include <boost/locale/utf8_codecvt.hpp>
-#include <sstream>
+//#include <zlib.h>
 
 namespace MC {
+	using NbtTagPtr = std::shared_ptr<class NbtTag>;
+	using TagArray = std::vector<NbtTagPtr>;
+	//using TagList = std::vector<const NbtTag*>;
+
 	namespace FS = boost::filesystem;
 	namespace IO = boost::iostreams;
 	using IFilteringStream = boost::iostreams::filtering_istream;
@@ -32,6 +42,7 @@ namespace MC {
 	using ByteBuffer = std::shared_ptr<__int8[]>;
 	using IntArray = std::vector<__int32>;
 	using LongArray = std::vector<__int64>;
+	using StringArray = std::vector<std::wstring>;
 
 	inline int DebugMessage(const wchar_t* _Format, ...) {
 		int _Result = 0;
@@ -41,7 +52,8 @@ namespace MC {
 		__crt_va_start(_ArgList, _Format);
 		_Result = __vswprintf_l(_Buffer, _Format, NULL, _ArgList);
 		__crt_va_end(_ArgList);
-		std::_Debug_message(_Buffer, __FILEW__, __LINE__);
+		//std::_Debug_message(_Buffer, __FILEW__, __LINE__);
+		std::wcerr << _Buffer;
 #endif
 		return _Result;
 	}

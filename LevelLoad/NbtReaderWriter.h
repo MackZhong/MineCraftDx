@@ -96,7 +96,6 @@ namespace MC {
 			//__super::load(readed);
 			//char buf[10];
 			//__super::load_binary(buf, 10);
-			std::wcout << str << std::endl;
 			return str;
 		}
 	};

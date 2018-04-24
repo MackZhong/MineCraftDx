@@ -1,9 +1,5 @@
 #pragma once
-#include <string>
-#include <memory>
-#include <vector>
-#include <map>
-
+#include "mc.h"
 #include "NbtReaderWriter.h"
 
 namespace MC {
@@ -24,7 +20,7 @@ namespace MC {
 		TAG_Max
 	};
 
-	using NbtTagPtr = std::shared_ptr<class NbtTag>;
+	extern char DataConversionBuffer[_CVTBUFSIZE];
 
 	class NbtTag
 	{
@@ -55,7 +51,7 @@ namespace MC {
 
 		static const char* getTagName(__int8 type);
 
-		friend std::wostream& operator<<(std::wostream& stm, const NbtTag* tag);
+		friend std::wostream& operator<<(std::wostream& wos, const NbtTag* tag);
 
 	};
 
@@ -69,9 +65,9 @@ namespace MC {
 	public:
 		EndTag() :super(L"") {};
 		virtual TAG_TYPE getId() const override { return TAG_End; };
-		friend std::wostream& operator<<(std::wostream& stm, const EndTag& tag) {
-			stm << "END";
-			return stm;
+		friend std::wostream& operator<<(std::wostream& wos, const EndTag& tag) {
+			wos << "END";
+			return wos;
 		}
 	};
 
@@ -88,9 +84,10 @@ namespace MC {
 		ByteTag(const std::wstring& name) : super(name), m_Data(0) {};
 		ByteTag(const std::wstring& name, __int8 data) : super(name), m_Data(data) {};
 		virtual TAG_TYPE getId() const override { return TAG_Byte; };
-		friend std::wostream& operator<<(std::wostream& stm, const ByteTag& tag) {
-			stm << tag.m_Data;
-			return stm;
+		friend std::wostream& operator<<(std::wostream& wos, const ByteTag& tag) {
+			_itoa_s(tag.m_Data, DataConversionBuffer, _CVTBUFSIZE, 10);
+			wos << DataConversionBuffer;
+			return wos;
 		}
 		inline bool operator==(const ByteTag& oth) const {
 			if (!super::operator==(oth)) {
@@ -119,9 +116,10 @@ namespace MC {
 		ShortTag(const std::wstring& name) : super(name), m_Data(0) {};
 		ShortTag(const std::wstring& name, __int16 data) : super(name), m_Data(data) {};
 		virtual TAG_TYPE getId() const override { return TAG_Short; };
-		friend std::wostream& operator<<(std::wostream& stm, const ShortTag& tag) {
-			stm << tag.m_Data;
-			return stm;
+		friend std::wostream& operator<<(std::wostream& wos, const ShortTag& tag) {
+			_itoa_s(tag.m_Data, DataConversionBuffer, _CVTBUFSIZE, 10);
+			wos << DataConversionBuffer;
+			return wos;
 		}
 		inline bool operator==(const ShortTag& oth) const {
 			if (!super::operator==(oth)) {
@@ -149,9 +147,10 @@ namespace MC {
 		IntTag(const std::wstring& name) : super(name), m_Data(0) {};
 		IntTag(const std::wstring& name, __int32 data) : super(name), m_Data(data) {};
 		virtual TAG_TYPE getId() const override { return TAG_Int; };
-		friend std::wostream& operator<<(std::wostream& stm, const IntTag& tag) {
-			stm << tag.m_Data;
-			return stm;
+		friend std::wostream& operator<<(std::wostream& wos, const IntTag& tag) {
+			_itoa_s(tag.m_Data, DataConversionBuffer, _CVTBUFSIZE, 10);
+			wos << DataConversionBuffer;
+			return wos;
 		}
 		inline bool operator==(const IntTag& oth) const {
 			if (!super::operator==(oth)) {
@@ -179,9 +178,10 @@ namespace MC {
 		LongTag(const std::wstring& name) : super(name), m_Data(0) {};
 		LongTag(const std::wstring& name, __int64 data) : super(name), m_Data(data) {};
 		virtual TAG_TYPE getId() const override { return TAG_Long; };
-		friend std::wostream& operator<<(std::wostream& stm, const LongTag& tag) {
-			stm << tag.m_Data;
-			return stm;
+		friend std::wostream& operator<<(std::wostream& wos, const LongTag& tag) {
+			_i64toa_s(tag.m_Data, DataConversionBuffer, _CVTBUFSIZE, 10);
+			wos << DataConversionBuffer;
+			return wos;
 		}
 		inline bool operator==(const LongTag& oth) const {
 			if (!super::operator==(oth)) {
@@ -209,9 +209,10 @@ namespace MC {
 		FloatTag(const std::wstring& name) : super(name), m_Data(0) {};
 		FloatTag(const std::wstring& name, float data) : super(name), m_Data(data) {};
 		virtual TAG_TYPE getId() const override { return TAG_Float; };
-		friend std::wostream& operator<<(std::wostream& stm, const FloatTag& tag) {
-			stm << tag.m_Data;
-			return stm;
+		friend std::wostream& operator<<(std::wostream& wos, const FloatTag& tag) {
+			_gcvt_s(DataConversionBuffer, _CVTBUFSIZE, tag.m_Data, 64);
+			wos << DataConversionBuffer;
+			return wos;
 		}
 		inline bool operator==(const FloatTag& oth) const {
 			if (!super::operator==(oth)) {
@@ -236,12 +237,14 @@ namespace MC {
 		virtual void Load(NbtReader* pdis) override { m_Data = pdis->readDouble(); };
 
 	public:
+		double getData()const { return m_Data; }
 		DoubleTag(const std::wstring& name) : super(name), m_Data(0) {};
 		DoubleTag(const std::wstring& name, double data) : super(name), m_Data(data) {};
 		virtual TAG_TYPE getId() const override { return TAG_Double; };
-		friend std::wostream& operator<<(std::wostream& stm, const DoubleTag& tag) {
-			stm << tag.m_Data;
-			return stm;
+		friend std::wostream& operator<<(std::wostream& wos, const DoubleTag& tag) {
+			_gcvt_s(DataConversionBuffer, _CVTBUFSIZE, tag.m_Data, 64);
+			wos << DataConversionBuffer;
+			return wos;
 		}
 		inline bool operator==(const DoubleTag& oth) const {
 			if (!super::operator==(oth)) {
@@ -279,9 +282,9 @@ namespace MC {
 			m_Data = data;
 		};
 		virtual TAG_TYPE getId() const override { return TAG_Byte_Array; };
-		friend std::wostream& operator<<(std::wostream& stm, const ByteArrayTag& tag) {
-			stm << "[" << tag.m_Size << " bytes]";
-			return stm;
+		friend std::wostream& operator<<(std::wostream& wos, const ByteArrayTag& tag) {
+			wos << "[" << tag.m_Size << " bytes]";
+			return wos;
 		}
 		inline bool operator==(const ByteArrayTag& oth) const {
 			if (!super::operator==(oth)) {
@@ -323,9 +326,9 @@ namespace MC {
 			m_Data = data;
 		};
 		virtual TAG_TYPE getId() const override { return TAG_Int_Array; };
-		friend std::wostream& operator<<(std::wostream& stm, const IntArrayTag& tag) {
-			stm << "[" << tag.m_Data.size() << " integers]";
-			return stm;
+		friend std::wostream& operator<<(std::wostream& wos, const IntArrayTag& tag) {
+			wos << "[" << tag.m_Data.size() << " integers]";
+			return wos;
 		}
 		inline bool operator==(const IntArrayTag& oth) const {
 			if (!super::operator==(oth)) {
@@ -367,9 +370,9 @@ namespace MC {
 			m_Data = data;
 		};
 		virtual TAG_TYPE getId() const override { return TAG_Long_Array; };
-		friend std::wostream& operator<<(std::wostream& stm, const LongArrayTag& tag) {
-			stm << "[" << tag.m_Data.size() << " longlong]";
-			return stm;
+		friend std::wostream& operator<<(std::wostream& wos, const LongArrayTag& tag) {
+			wos << "[" << tag.m_Data.size() << " longlong]";
+			return wos;
 		}
 		inline bool operator==(const LongArrayTag& oth) const {
 			if (!super::operator==(oth)) {
@@ -404,9 +407,9 @@ namespace MC {
 			m_Data = data;
 		};
 		virtual TAG_TYPE getId() const override { return TAG_String; };
-		friend std::wostream& operator<<(std::wostream& stm, const StringTag& tag) {
-			stm << "\"" << tag.m_Data << "\"";
-			return stm;
+		friend std::wostream& operator<<(std::wostream& wos, const StringTag& tag) {
+			wos << "\"" << tag.m_Data << "\"";
+			return wos;
 		}
 		inline bool operator==(const StringTag& oth) const {
 			if (!super::operator==(oth)) {
@@ -421,8 +424,83 @@ namespace MC {
 		}
 	};
 
+	class ListTag : public NbtTag {
+		friend class CompoundTag;
+		TagArray m_TagsList;
+		TAG_TYPE m_ElemType;
+		using super = NbtTag;
+
+		// 通过 NbtTag 继承
+		virtual void Write(NbtWriter* pdos) const override {
+			__int8  type;
+			if (m_TagsList.empty()) {
+				type = TAG_Byte;
+			}
+			else {
+				type = m_TagsList[0]->getId();
+			}
+
+			if (type < TAG_End || type >= TAG_Max) {
+				throw "Invalid type";
+			}
+			pdos->writeByte(type);
+			pdos->writeInt((__int32)m_TagsList.size());
+			for (auto t = m_TagsList.begin(); t != m_TagsList.end(); t++) {
+				(*t)->Write(pdos);
+			}
+		};
+		virtual void Load(NbtReader* pdis) override {
+			__int8 type = pdis->readByte();
+			if (type < TAG_End || type >= TAG_Max) {
+				throw "Invalid type";
+			}
+			m_ElemType = (TAG_TYPE)type;
+			int size = pdis->readInt();
+			//m_TagList.reserve(size);
+			m_TagsList.clear();
+			for (int i = 0; i < size; i++) {
+				NbtTag* tag = NbtTag::createTag(m_ElemType, L"");
+				tag->Load(pdis);
+				m_TagsList.push_back(std::shared_ptr<NbtTag>(tag));
+			}
+		};
+
+	public:
+		ListTag(const std::wstring& name) : super(name) {
+		};
+		virtual TAG_TYPE getId() const override { return TAG_List; };
+		friend std::wostream& operator<<(std::wostream& wos, const ListTag& tag) {
+			wos << tag.m_TagsList.size() << " entries of type " << NbtTag::getTagName(tag.m_ElemType);
+			for (int i = 0; i < tag.m_TagsList.size(); i++) {
+				wos << tag.m_TagsList[i];
+			}
+			return wos;
+		}
+		void add(NbtTag* tag) {
+			m_ElemType = tag->getId();
+			m_TagsList.push_back(std::shared_ptr< NbtTag>(tag));
+		}
+		const NbtTagPtr get(int index) {
+			return m_TagsList[index];
+		}
+		__int32 size() const {
+			return (__int32)m_TagsList.size();
+		}
+		inline bool operator==(const ListTag& oth) const {
+			if (!super::operator==(oth)) {
+				return false;
+			}
+			return this->m_TagsList == oth.m_TagsList;
+		}
+		inline ListTag& operator=(const ListTag& oth) {
+			this->setName(oth.getName());
+			this->m_TagsList = oth.m_TagsList;
+			return *this;
+		}
+	};
+
 	class CompoundTag :public NbtTag {
-		using CompoundTagMap = std::map<std::wstring, NbtTagPtr>;
+		using CompoundTagMap = std::unordered_map<std::wstring, NbtTagPtr>;
 		CompoundTagMap m_Tags;
 		using super = NbtTag;
 
@@ -446,16 +524,19 @@ namespace MC {
 		};
 		virtual TAG_TYPE getId() const override { return TAG_Compound; };
 		bool isEmpty() const { return m_Tags.empty(); }
-		friend std::wostream& operator<<(std::wostream& stm, const CompoundTag& tag) {
-			stm << tag.m_Tags.size() << " entries:" << std::endl;
+		void Output(std::wostream& out) {
+			out << m_Tags.size() << " tags:" << std::endl;
+		}
+		void Output(std::wostringstream& out) {
+			out << m_Tags.size() << " tags:" << std::endl;
+		}
+		friend std::wostream& operator<<(std::wostream& wos, const CompoundTag& tag) {
+			wos << "CompoundTag have " << tag.m_Tags.size() << " entries:" << std::endl;
+			//for (int i = 0; i < tag.m_Tags.size(); i++)
 			for (auto t = tag.m_Tags.begin(); t != tag.m_Tags.end(); t++) {
-				//t->second->operator<<(stm, );
-				//auto tg = t->second.get();
-				//int id = .getId();
-				//id = tg->getId();
-				stm << t->second << std::endl;
+				wos << t->second;
 			}
-			return stm;
+			return wos;
 		}
 		inline bool operator==(const CompoundTag& oth) const {
 			if (!super::operator==(oth)) {
@@ -511,143 +592,77 @@ namespace MC {
 		void putBoolean(const std::wstring& name, bool val) {
 			putByte(name, val ? (__int8)1 : 0);
 		}
-		NbtTagPtr get(const std::wstring& name) {
-			return m_Tags.at(name);
-		}
-		bool contains(const std::wstring& name) {
+		//NbtTagPtr get(const std::wstring& name) const {
+		//	return m_Tags.at(name);
+		//}
+		bool contains(const std::wstring& name) const {
 			return m_Tags.find(name) != m_Tags.end();
 		}
-		__int8 getByte(const std::wstring& name) {
+		__int8 getByte(const std::wstring& name) const {
 			if (!contains(name)) return (__int8)0;
 			ByteTag* tag = reinterpret_cast<ByteTag*>(m_Tags.at(name).get());
 			return tag->m_Data;
 		}
-		__int16 getShort(const std::wstring& name) {
+		__int16 getShort(const std::wstring& name) const {
 			if (!contains(name)) return (__int16)0;
 			ShortTag* tag = reinterpret_cast<ShortTag*>(m_Tags.at(name).get());
 			return tag->m_Data;
 		}
-		__int32 getInt(const std::wstring& name) {
+		__int32 getInt(const std::wstring& name)  const {
 			if (!contains(name)) return (__int32)0;
 			IntTag* tag = reinterpret_cast<IntTag *> (m_Tags.at(name).get());
 			return tag->m_Data;
 		}
-		__int64 getLong(const std::wstring& name) {
+		__int64 getLong(const std::wstring& name) const {
 			if (!contains(name)) return (__int64)0;
 			LongTag* tag = reinterpret_cast<LongTag*>(m_Tags.at(name).get());
 			return tag->m_Data;
 		}
-		float getFloat(const std::wstring& name) {
+		float getFloat(const std::wstring& name) const {
 			if (!contains(name)) return (float)0;
 			FloatTag* tag = reinterpret_cast<FloatTag*>(m_Tags.at(name).get());
 			return tag->m_Data;
 		}
-		double getDouble(const std::wstring& name) {
+		double getDouble(const std::wstring& name) const {
 			if (!contains(name)) return (double)0;
 			DoubleTag* tag = reinterpret_cast<DoubleTag*>(m_Tags.at(name).get());
 			return tag->m_Data;
 		}
-		const std::wstring& getString(const std::wstring& name) {
+		const std::wstring& getString(const std::wstring& name) const {
 			if (!contains(name)) return L"";
 			StringTag* tag = reinterpret_cast<StringTag*>(m_Tags.at(name).get());
 			return tag->m_Data;
 		}
-		ByteBuffer getByteArray(const std::wstring& name) {
+		ByteBuffer getByteArray(const std::wstring& name) const {
 			if (!contains(name)) return nullptr;
 			ByteArrayTag* tag = reinterpret_cast<ByteArrayTag*>(m_Tags.at(name).get());
 			return tag->m_Data;
 		}
-		IntArray getIntArray(const std::wstring& name) {
+		IntArray getIntArray(const std::wstring& name) const {
 			if (!contains(name)) return IntArray();
 			IntArrayTag* tag = reinterpret_cast<IntArrayTag*>(m_Tags.at(name).get());
 			return tag->m_Data;
 		}
-		CompoundTag* getCompound(const std::wstring& name) {
+		CompoundTag* getCompound(const std::wstring& name) const {
 			if (!contains(name)) return new CompoundTag(name);
 			CompoundTag* tag = reinterpret_cast<CompoundTag*>(m_Tags.at(name).get());
 			return tag;
 		}
-		using TagList = std::vector<NbtTagPtr>;
-		TagList getList(const std::wstring& name) {
-			TagList tags;
-			for (auto t = m_Tags.begin(); t != m_Tags.end(); t++) {
-				if (t->second->getName() == name) {
-					tags.push_back(t->second);
-				}
-			}
-			return tags;
+		ListTag* getList(const std::wstring& name)  const {
+			if (!contains(name)) return new ListTag(name);
+			ListTag* tag = reinterpret_cast<ListTag*>(m_Tags.at(name).get());
+			return tag;
+			//TagArray tags;
+			//for (auto t = m_Tags.begin(); t != m_Tags.end(); t++) {
+			//	if (t->second->getName() == name) {
+			//		tags.push_back(t->second);
+			//	}
+			//}
+			//return tags;
 		}
-		bool getBoolean(const std::wstring& string) {
+		bool getBoolean(const std::wstring& string) const {
 			return getByte(string) != 0;
 		}
 	};
 	//using CompoundTagPtr = std::shared_ptr<CompoundTag>;
-
-	template<class T> class ListTag : public NbtTag {
-		friend class CompoundTag;
-		std::vector<T*> m_TagList;
-		TAG_TYPE m_Type;
-		using super = NbtTag;
-
-		// 通过 NbtTag 继承
-		virtual void Write(NbtWriter* pdos) const override {
-			if (m_TagList.empty()) {
-				return;
-			}
-			__int8 t1 = m_TagList[0]->getId();
-			if (t1 < TAG_End || t1 >= TAG_Max) {
-				throw "Invalid type";
-			}
-			pdos->writeByte(t1);
-			pdos->writeInt((__int32)m_TagList.size());
-			for (auto t = m_TagList.begin(); t != m_TagList.end(); t++) {
-				(*t)->Write(pdos);
-			}
-		};
-		virtual void Load(NbtReader* pdis) override {
-			__int8 t = pdis->readByte();
-			if (t < TAG_End || t >= TAG_Max) {
-				throw "Invalid type";
-			}
-			m_Type = (TAG_TYPE)t;
-			int size = pdis->readInt();
-			//m_TagList.reserve(size);
-			m_TagList.clear();
-			for (int i = 0; i < size; i++) {
-				T* tag = NbtTag::createTag(m_Type, L"");
-				tag->Load(pdis);
-				m_TagList.push_back(tag);
-			}
-		};
-
-	public:
-		ListTag(const std::wstring& name) : super(name) {
-		};
-		virtual TAG_TYPE getId() const override { return TAG_List; };
-		friend std::wostream& operator<<(std::wostream& stm, const ListTag<T>& tag) {
-			//stm << tag.m_TagsList.size() << " entries of type " << NbtTag::getTagName(tag.m_Type);
-			return stm;
-		}
-		void add(const T* tag) {
-			m_Type = tag->getId();
-			m_TagList.push_back(tag);
-		}
-		const T* get(int index) {
-			return m_TagList[index];
-		}
-		__int32 size() const {
-			return (__int32)m_TagList.size();
-		}
-		inline bool operator==(const ListTag& oth) const {
-			if (!super::operator==(oth)) {
-				return false;
-			}
-			return this->m_Data == oth.m_Data;
-		}
-		inline ListTag& operator=(const ListTag& oth) {
-			this->setName(oth.getName());
-			this->m_Data = oth.m_Data;
-			return *this;
-		}
-	};
 }
