@@ -234,10 +234,13 @@ namespace MC {
 		//}
 	}
 
-	CompoundTag* NbtIo::decompress(const ByteBuffer& buffer, size_t size) {
+	CompoundTag* NbtIo::decompress(const char* buffer, size_t size, COMPRESSION_SCHEME scheme) {
 		IFilteringStream sbin;
-		sbin.push(boost::iostreams::gzip_decompressor());
-		boost::iostreams::array_source data(buffer.get(), size);
+		if (COMPRESSION_SCHEME_GZIP == scheme)
+			sbin.push(boost::iostreams::gzip_decompressor());
+		else
+			sbin.push(boost::iostreams::zlib_decompressor());
+		boost::iostreams::array_source data(buffer, size);
 		sbin.push(data);
 
 		NbtReader dis(sbin);
@@ -247,13 +250,11 @@ namespace MC {
 		catch (std::exception& err) {
 			throw err;
 		}
-		//finally{
-		//	dis.Close();
-		//}
+
 		return nullptr;
 	}
 
-	ByteBuffer NbtIo::compress(CompoundTag* tag) {
+	std::unique_ptr<char[]> NbtIo::compress(CompoundTag* tag) {
 		OFilteringStream sbout;
 		//sbout.push(boost::iostreams::gzip_compressor(boost::iostreams::gzip_params(boost::iostreams::gzip::best_compression)));
 		//boost::iostreams::stream_buffer<boost::iostreams::basic_array_source<__int8>> sbuf;

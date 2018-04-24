@@ -18,10 +18,10 @@ namespace MC {
 		NbtReader(std::streambuf* buf) :m_Buffer(buf)
 		{}
 
-		ByteBuffer read(size_t size) {
-			ByteBuffer ptr = std::make_unique<__int8[]>(size);
-			m_Buffer->sgetn(ptr.get(), size);
-			return ptr;
+		const std::shared_ptr<char> read(size_t size) {
+			auto ptr = new char[size];
+			m_Buffer->sgetn(ptr, size);
+			return std::shared_ptr<char>(ptr);
 		}
 		__int8 readByte() {
 			__int8 v;
@@ -110,8 +110,8 @@ namespace MC {
 		NbtWriter(const std::ofstream& stream) : m_Buffer(stream.rdbuf())
 		{}
 
-		void write(const ByteBuffer& buffer, size_t size) {
-			m_Buffer->sputn(buffer.get(), size);
+		void write(const char* buffer, size_t size) {
+			m_Buffer->sputn(buffer, size);
 		};
 		void writeByte(__int8 value) {
 			m_Buffer->sputn((char*)&value, sizeof(value));

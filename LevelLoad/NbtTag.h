@@ -261,14 +261,14 @@ namespace MC {
 
 	class ByteArrayTag :public NbtTag {
 		friend class CompoundTag;
-		ByteBuffer m_Data;
+		std::shared_ptr<const char> m_Data;
 		__int32 m_Size;
 		using super = NbtTag;
 
 		// Í¨¹ý NbtTag ¼Ì³Ð
 		virtual void Write(NbtWriter* pdos) const override {
 			pdos->writeInt((__int32)m_Size);
-			pdos->write(m_Data, m_Size);
+			pdos->write(m_Data.get(), m_Size);
 		};
 		virtual void Load(NbtReader* pdis) override {
 			m_Size = pdis->readInt();
@@ -278,8 +278,7 @@ namespace MC {
 	public:
 		ByteArrayTag(const std::wstring& name) : super(name) {
 		};
-		ByteArrayTag(const std::wstring& name, const ByteBuffer& data) : super(name) {
-			m_Data = data;
+		ByteArrayTag(const std::wstring& name,const char* data) : super(name), m_Data(data) {
 		};
 		virtual TAG_TYPE getId() const override { return TAG_Byte_Array; };
 		friend std::wostream& operator<<(std::wostream& wos, const ByteArrayTag& tag) {
@@ -580,7 +579,7 @@ namespace MC {
 		void putString(const std::wstring& name, const std::wstring& value) {
 			m_Tags.emplace(name, new StringTag(name, value));
 		}
-		void putByteArray(const std::wstring& name, const ByteBuffer& value) {
+		void putByteArray(const std::wstring& name,  char* value) {
 			m_Tags.emplace(name, new ByteArrayTag(name, value));
 		}
 		void putIntArray(const std::wstring& name, IntArray value) {
@@ -633,7 +632,7 @@ namespace MC {
 			StringTag* tag = reinterpret_cast<StringTag*>(m_Tags.at(name).get());
 			return tag->m_Data;
 		}
-		ByteBuffer getByteArray(const std::wstring& name) const {
+		const std::shared_ptr<const char> getByteArray(const std::wstring& name) const {
 			if (!contains(name)) return nullptr;
 			ByteArrayTag* tag = reinterpret_cast<ByteArrayTag*>(m_Tags.at(name).get());
 			return tag->m_Data;

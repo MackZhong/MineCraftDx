@@ -37,7 +37,10 @@ namespace MC {
 			return files;
 		}
 
-		FS::path getRegionFile(int regionX, int regionZ) const {
+		FS::path getRegionFile(int chunkX, int chunkZ) const {
+			int regionX = chunkX >> 5;
+			int regionZ = chunkZ >> 5;
+
 			FS::path regionFile(m_LevelDir);
 			regionFile.append(L"region");
 

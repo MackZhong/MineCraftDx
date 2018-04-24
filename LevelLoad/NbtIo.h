@@ -10,9 +10,9 @@ namespace MC {
 
 		static void writeCompressed(const CompoundTag* tag, FS::ofstream& out);
 
-		static class CompoundTag* decompress(const ByteBuffer& buffer, size_t size);
+		static class CompoundTag* decompress(const char* buffer, size_t size, COMPRESSION_SCHEME scheme = COMPRESSION_SCHEME_GZIP);
 
-		static ByteBuffer compress(CompoundTag* tag);
+		static std::unique_ptr<char[]> compress(CompoundTag* tag);
 
 		inline static void writeTo(const CompoundTag* tag, NbtWriter* pdos) {
 			NbtTag::writeNamedTag(tag, pdos);

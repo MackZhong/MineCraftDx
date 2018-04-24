@@ -6,12 +6,12 @@
 namespace MC {
 	class NbtFile
 	{
-		FS::path m_File;
+		FS::path m_FileHandle;
 
 	public:
 		TagArray getRegions(const std::wstring& levelId) {
 			TagArray regions;
-			FS::path regionPath = m_File.append(levelId).append(L"region");
+			FS::path regionPath = m_FileHandle.append(levelId).append(L"region");
 			if (!FS::exists(regionPath)) {
 				return regions;
 			}
@@ -43,7 +43,7 @@ namespace MC {
 		}
 
 		CompoundTag * getDataTagFor(const std::wstring& levelId) {
-			FS::path levelPath = m_File.append(levelId);
+			FS::path levelPath = m_FileHandle.append(levelId);
 			if (!FS::exists(levelPath)) {
 				return nullptr;
 			}
@@ -77,12 +77,12 @@ namespace MC {
 		}
 
 		CompoundTag * getRootTagr(const wchar_t* rootName = nullptr) {
-			if (!FS::exists(m_File)) {
+			if (!FS::exists(m_FileHandle)) {
 				return nullptr;
 			}
 
 			try {
-				FS::ifstream ifs(m_File.string(), std::ios_base::binary);
+				FS::ifstream ifs(m_FileHandle.string(), std::ios_base::binary);
 				unsigned __int16 signature = 0;
 				ifs.read((char*)&signature, sizeof(signature));
 				ifs.seekg(0, BOOST_IOS::_Seekbeg);
@@ -91,7 +91,7 @@ namespace MC {
 					root = NbtIo::readCompressed(ifs);
 				}
 				else {
-					root = NbtIo::read(m_File);
+					root = NbtIo::read(m_FileHandle);
 				}
 				if (rootName) {
 					CompoundTag* tag = root->getCompound(rootName);
@@ -109,7 +109,7 @@ namespace MC {
 		}
 
 	public:
-		NbtFile(const FS::path& base) : m_File(base)
+		NbtFile(const FS::path& base) : m_FileHandle(base)
 		{
 		};
 

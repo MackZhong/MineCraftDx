@@ -166,7 +166,6 @@
     <ClInclude Include="LevelStorage.h" />
     <ClInclude Include="NbtFile.h" />
     <ClInclude Include="ChunkDataLayer.h" />
-    <ClInclude Include="Level.h" />
     <ClInclude Include="mc.h" />
     <ClInclude Include="NbtIo.h" />
     <ClInclude Include="NbtReaderWriter.h" />
