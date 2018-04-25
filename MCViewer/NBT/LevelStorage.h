@@ -6,14 +6,27 @@ namespace MC {
 
 	class LevelStorage
 	{
+		wchar_t m_LevelPath[_MAX_PATH];
 		FS::path m_LevelDir;
 
 	public:
 		LevelStorage(const wchar_t* baseDir, const wchar_t* levelId)
 		{
+			PathCombineW(m_LevelPath, baseDir, levelId);
+			if (!PathFileExistsW(m_LevelPath)) {
+				throw "Path not exists";
+			}
+
 			FS::path basePath(baseDir);
 			m_LevelDir = basePath.append(levelId);
 		};
+
+		//int  OpenLevelFile()const {
+		//	int file;
+		//	wchar_t levelFile[_MAX_PATH];
+		//	PathCombineW(levelFile, m_LevelPath, L"level.dat");
+		//	return file;
+		//}
 
 		FS::path getLevelFile() const {
 			FS::path levelFile(m_LevelDir);

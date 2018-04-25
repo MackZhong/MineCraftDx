@@ -23,6 +23,7 @@
 #include <io.h>		// _wopen,_write,_close,_lseek
 #include <fcntl.h>	// _O_RDONLY
 #include <boost/iostreams/copy.hpp>
+#include <Shlwapi.h>
 
 namespace MC {
 
@@ -99,4 +100,16 @@ namespace MC {
 #endif
 		return _Result;
 	}
+
+	// Helper class for safely use HANDLE
+	class SafeHandle {
+	private:
+		HANDLE m_Handle;
+	public:
+		SafeHandle(HANDLE h) :m_Handle(h) {};
+		~SafeHandle() { CloseHandle(m_Handle); m_Handle = NULL; }
+		operator HANDLE() { return m_Handle; }
+		HANDLE& operator=(HANDLE oth) { m_Handle = oth; return m_Handle; }
+	};
+
 }

@@ -31,8 +31,10 @@ namespace MC
 
 		virtual void OnUpdate(DX::StepTimer const& timer) override;
 
+
 	private:
 		std::unique_ptr<CompoundTag> m_Root;
+		std::unique_ptr<DirectX::GeometricPrimitive[]> m_Blocks;
 	};
 }
 

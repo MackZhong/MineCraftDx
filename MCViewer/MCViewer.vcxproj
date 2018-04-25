@@ -159,6 +159,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Block.h" />
     <ClInclude Include="McGame.h" />
     <ClInclude Include="Engine\DeviceResources.h" />
     <ClInclude Include="Engine\EnginePCH.h" />
@@ -175,6 +176,7 @@
     <ClInclude Include="NBT\RegionFile.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Block.cpp" />
     <ClCompile Include="McGame.cpp" />
     <ClCompile Include="Engine\DeviceResources.cpp" />
     <ClCompile Include="Engine\EnginePCH.cpp">

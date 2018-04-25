@@ -84,8 +84,10 @@ namespace MC {
 	using IntArray = std::vector<__int32>;
 	using LongArray = std::vector<__int64>;
 	using StringArray = std::vector<std::wstring>;
-	using SharedPtr64 = std::shared_ptr<__int64>;
-	using SharedPtr32 = std::shared_ptr<__int32>;
+	using SharedPtrC = std::shared_ptr<const __int8>;
+	using SharedPtr2 = std::shared_ptr<__int16>;
+	using SharedPtr4 = std::shared_ptr<__int32>;
+	using SharedPtr8 = std::shared_ptr<__int64>;
 	using UniquePtr = std::unique_ptr<char[]>;
 	using UniquePtrB = std::unique_ptr<bool[]>;
 

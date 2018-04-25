@@ -26,7 +26,9 @@ private:
 	virtual void OnWindowSizeDependentResources(int width, int height) {};
 
 	void ToggleFullscreen();
+
 protected:
+	ID3D11DeviceContext1 * GetContext() const { return m_deviceResources->GetD3DDeviceContext(); }
 
 public:
 

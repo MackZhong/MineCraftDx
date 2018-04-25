@@ -206,6 +206,7 @@ namespace MC {
 		virtual void Load(NbtReader* pdis) override { m_Data = pdis->readFloat(); };
 
 	public:
+		float getData() const { return m_Data; }
 		FloatTag(const std::wstring& name) : super(name), m_Data(0) {};
 		FloatTag(const std::wstring& name, float data) : super(name), m_Data(data) {};
 		virtual TAG_TYPE getId() const override { return TAG_Float; };
@@ -237,7 +238,7 @@ namespace MC {
 		virtual void Load(NbtReader* pdis) override { m_Data = pdis->readDouble(); };
 
 	public:
-		double getData()const { return m_Data; }
+		double getData() const { return m_Data; }
 		DoubleTag(const std::wstring& name) : super(name), m_Data(0) {};
 		DoubleTag(const std::wstring& name, double data) : super(name), m_Data(data) {};
 		virtual TAG_TYPE getId() const override { return TAG_Double; };
@@ -261,7 +262,7 @@ namespace MC {
 
 	class ByteArrayTag :public NbtTag {
 		friend class CompoundTag;
-		std::shared_ptr<const char> m_Data;
+		SharedPtrC m_Data;
 		__int32 m_Size;
 		using super = NbtTag;
 
@@ -278,7 +279,7 @@ namespace MC {
 	public:
 		ByteArrayTag(const std::wstring& name) : super(name) {
 		};
-		ByteArrayTag(const std::wstring& name, const char* data) : super(name), m_Data(data) {
+		ByteArrayTag(const std::wstring& name, const char* data, _int32 size) : super(name), m_Data(data), m_Size(size) {
 		};
 		virtual TAG_TYPE getId() const override { return TAG_Byte_Array; };
 		friend std::wostream& operator<<(std::wostream& wos, const ByteArrayTag& tag) {
@@ -300,7 +301,7 @@ namespace MC {
 
 	class IntArrayTag :public NbtTag {
 		friend class CompoundTag;
-		SharedPtr32 m_Data;
+		SharedPtr4 m_Data;
 		__int32 m_Length;
 		using super = NbtTag;
 
@@ -313,7 +314,7 @@ namespace MC {
 		};
 		virtual void Load(NbtReader* pdis) override {
 			m_Length = pdis->readInt();
-			m_Data = SharedPtr32(new __int32[m_Length]);
+			m_Data = SharedPtr4(new __int32[m_Length]);
 			for (int i = 0; i < m_Length; i++) {
 				m_Data.get()[i] = pdis->readInt();
 			}
@@ -348,7 +349,7 @@ namespace MC {
 
 	class LongArrayTag :public NbtTag {
 		friend class CompoundTag;
-		SharedPtr64  m_Data;
+		SharedPtr8  m_Data;
 		__int32 m_Length;
 		using super = NbtTag;
 
@@ -361,7 +362,7 @@ namespace MC {
 		};
 		virtual void Load(NbtReader* pdis) override {
 			m_Length = pdis->readInt();
-			m_Data = SharedPtr64(new __int64[m_Length]);
+			m_Data = SharedPtr8(new __int64[m_Length]);
 			for (int i = 0; i < m_Length; i++) {
 				m_Data.get()[i] = pdis->readInt();
 			}
@@ -585,8 +586,8 @@ namespace MC {
 		void putString(const std::wstring& name, const std::wstring& value) {
 			m_Tags.emplace(name, new StringTag(name, value));
 		}
-		void putByteArray(const std::wstring& name, char* value) {
-			m_Tags.emplace(name, new ByteArrayTag(name, value));
+		void putByteArray(const std::wstring& name, char* value, __int32 size) {
+			m_Tags.emplace(name, new ByteArrayTag(name, value, size));
 		}
 		void putIntArray(const std::wstring& name, __int32* value, __int32 size) {
 			m_Tags.emplace(name, new IntArrayTag(name, value, size));
@@ -641,18 +642,23 @@ namespace MC {
 			StringTag* tag = reinterpret_cast<StringTag*>(m_Tags.at(name).get());
 			return tag->m_Data;
 		}
-		const std::shared_ptr<const char> getByteArray(const std::wstring& name) const {
+		const SharedPtrC getByteArray(const std::wstring& name, __int32& size) const {
 			if (!contains(name)) return nullptr;
-			ByteArrayTag* tag = reinterpret_cast<ByteArrayTag*>(m_Tags.at(name).get());
+			auto t = m_Tags.at(name);
+			if (t->getId() != TAG_Byte_Array) {
+				throw "Invalid type queryed.";
+			}
+			ByteArrayTag* tag = reinterpret_cast<ByteArrayTag*>(t.get());
+			size = tag->m_Size;
 			return tag->m_Data;
 		}
-		SharedPtr32 getIntArray(const std::wstring& name, __int32& size) const {
+		SharedPtr4 getIntArray(const std::wstring& name, __int32& size) const {
 			if (!contains(name)) return nullptr;
 			IntArrayTag* tag = reinterpret_cast<IntArrayTag*>(m_Tags.at(name).get());
 			size = tag->m_Length;
 			return tag->m_Data;
 		}
-		SharedPtr64 getLongArray(const std::wstring& name, __int32& size) const {
+		SharedPtr8 getLongArray(const std::wstring& name, __int32& size) const {
 			if (!contains(name)) return nullptr;
 			LongArrayTag* tag = reinterpret_cast<LongArrayTag*>(m_Tags.at(name).get());
 			size = tag->m_Length;

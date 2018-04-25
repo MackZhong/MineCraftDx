@@ -7,6 +7,7 @@ namespace MC {
 	class NbtFile
 	{
 		FS::path m_FileHandle;
+		int m_File;
 
 	public:
 		//TagArray getRegions(const std::wstring& levelId) {
@@ -108,20 +109,32 @@ namespace MC {
 			return nullptr;
 		}
 
+	protected:
+		NbtFile(const wchar_t* fileName)
+		{
+			if (!PathFileExistsW(levelFile)) {
+				throw "File not exists.";
+			}
+			errno_t err = _wsopen_s(&m_File, levelFile, _O_RDONLY | _O_BINARY, _SH_DENYNO, _S_IREAD);
+			if (0 != err) {
+				throw "Open file failed.";
+			}
+		};
+
 	public:
 		NbtFile(const FS::path& base) : m_FileHandle(base)
 		{
 		};
 
-		bool isConvertible(const std::wstring& levelId) {
+		//bool isConvertible(const std::wstring& levelId) {
 
-			// check if there is old file format level data
-			CompoundTag* levelData = getDataTagFor(levelId);
-			if (nullptr == levelData || levelData->getInt(L"version") != MCREGION_VERSION_ID) {
-				return false;
-			}
+		//	// check if there is old file format level data
+		//	CompoundTag* levelData = getDataTagFor(levelId);
+		//	if (nullptr == levelData || levelData->getInt(L"version") != MCREGION_VERSION_ID) {
+		//		return false;
+		//	}
 
-			return true;
-		}
+		//	return true;
+		//}
 	};
 }
