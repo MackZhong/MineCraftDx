@@ -1,0 +1,263 @@
+CompoundTag have 39 entries:
+TAG_Byte:raining=0
+TAG_String:generatorName="default"
+TAG_Double:BorderWarningBlocks=5.
+TAG_Long:RandomSeed=-8874207228729342240
+TAG_Long:Time=88
+TAG_Byte:allowCommands=0
+TAG_Double:BorderCenterZ=0.
+TAG_Byte:Difficulty=2
+TAG_Long:BorderSizeLerpTime=0
+TAG_Compound:DimensionData=CompoundTag have 1 entries:
+TAG_Compound:1=CompoundTag have 1 entries:
+TAG_Compound:DragonFight=CompoundTag have 3 entries:
+TAG_List:Gateways=20 entries of type TAG_Int
+TAG_Int:=16
+TAG_Int:=1
+TAG_Int:=12
+TAG_Int:=5
+TAG_Int:=10
+TAG_Int:=18
+TAG_Int:=7
+TAG_Int:=2
+TAG_Int:=9
+TAG_Int:=11
+TAG_Int:=0
+TAG_Int:=14
+TAG_Int:=17
+TAG_Int:=4
+TAG_Int:=3
+TAG_Int:=8
+TAG_Int:=19
+TAG_Int:=13
+TAG_Int:=15
+TAG_Int:=6
+
+TAG_Byte:DragonKilled=1
+TAG_Byte:PreviouslyKilled=1
+
+
+
+TAG_Int:GameType=0
+TAG_Byte:MapFeatures=1
+TAG_Double:BorderCenterX=0.
+TAG_Double:BorderDamagePerBlock=-nan
+TAG_Double:BorderSizeLerpTarget=60000000.
+TAG_Int:DataVersion=1343
+TAG_Compound:Version=CompoundTag have 3 entries:
+TAG_Byte:Snapshot=0
+TAG_Int:Id=1343
+TAG_String:Name="1.12.2"
+
+TAG_String:LevelName="新的世界1"
+TAG_Long:DayTime=88
+TAG_Int:clearWeatherTime=0
+TAG_Byte:initialized=1
+TAG_Long:SizeOnDisk=0
+TAG_Compound:GameRules=CompoundTag have 24 entries:
+TAG_String:doTileDrops="true"
+TAG_String:disableElytraMovementCheck="false"
+TAG_String:doFireTick="true"
+TAG_String:announceAdvancements="true"
+TAG_String:gameLoopFunction="-"
+TAG_String:naturalRegeneration="true"
+TAG_String:maxCommandChainLength="65536"
+TAG_String:doMobLoot="true"
+TAG_String:reducedDebugInfo="false"
+TAG_String:randomTickSpeed="3"
+TAG_String:keepInventory="false"
+TAG_String:doEntityDrops="true"
+TAG_String:doLimitedCrafting="false"
+TAG_String:showDeathMessages="true"
+TAG_String:maxEntityCramming="24"
+TAG_String:mobGriefing="true"
+TAG_String:commandBlockOutput="true"
+TAG_String:doWeatherCycle="true"
+TAG_String:spawnRadius="10"
+TAG_String:doMobSpawning="true"
+TAG_String:logAdminCommands="true"
+TAG_String:spectatorsGenerateChunks="true"
+TAG_String:sendCommandFeedback="true"
+TAG_String:doDaylightCycle="true"
+
+TAG_Double:BorderWarningTime=15.
+TAG_Compound:Player=CompoundTag have 38 entries:
+TAG_List:EnderItems=0 entries of type TAG_End
+
+TAG_Int:HurtByTimestamp=0
+TAG_Float:foodSaturationLevel=5.
+TAG_Short:SleepTimer=0
+TAG_Int:XpSeed=0
+TAG_List:Attributes=8 entries of type TAG_Compound
+TAG_Compound:=CompoundTag have 2 entries:
+TAG_Double:Base=20.
+TAG_String:Name="generic.maxHealth"
+
+TAG_Compound:=CompoundTag have 2 entries:
+TAG_Double:Base=0.
+TAG_String:Name="generic.knockbackResistance"
+
+TAG_Compound:=CompoundTag have 2 entries:
+TAG_Double:Base=-nan
+TAG_String:Name="generic.movementSpeed"
+
+TAG_Compound:=CompoundTag have 2 entries:
+TAG_Double:Base=0.
+TAG_String:Name="generic.armor"
+
+TAG_Compound:=CompoundTag have 2 entries:
+TAG_Double:Base=0.
+TAG_String:Name="generic.armorToughness"
+
+TAG_Compound:=CompoundTag have 2 entries:
+TAG_Double:Base=1.
+TAG_String:Name="generic.attackDamage"
+
+TAG_Compound:=CompoundTag have 2 entries:
+TAG_Double:Base=4.
+TAG_String:Name="generic.attackSpeed"
+
+TAG_Compound:=CompoundTag have 2 entries:
+TAG_Double:Base=0.
+TAG_String:Name="generic.luck"
+
+
+TAG_Byte:Invulnerable=0
+TAG_Byte:OnGround=1
+TAG_Byte:FallFlying=0
+TAG_Float:FallDistance=0.
+TAG_Compound:abilities=CompoundTag have 7 entries:
+TAG_Byte:flying=0
+TAG_Byte:mayBuild=1
+TAG_Byte:invulnerable=0
+TAG_Float:walkSpeed=0.100000001490116119384765625
+TAG_Byte:mayfly=0
+TAG_Byte:instabuild=0
+TAG_Float:flySpeed=5.00000007450580596923828125e-002
+
+TAG_Int:PortalCooldown=0
+TAG_Float:AbsorptionAmount=0.
+TAG_Compound:recipeBook=CompoundTag have 4 entries:
+TAG_List:recipes=0 entries of type TAG_End
+
+TAG_Byte:isFilteringCraftable=0
+TAG_List:toBeDisplayed=0 entries of type TAG_End
+
+TAG_Byte:isGuiOpen=0
+
+TAG_Short:DeathTime=0
+TAG_Float:foodExhaustionLevel=0.
+TAG_Long:UUIDLeast=-8794422475677342852
+TAG_Int:XpTotal=0
+TAG_Int:playerGameType=0
+TAG_Byte:seenCredits=0
+TAG_List:Motion=3 entries of type TAG_Double
+TAG_Double:=0.
+TAG_Double:=-nan
+TAG_Double:=0.
+
+TAG_Float:Health=20.
+TAG_Short:Air=300
+TAG_Int:Dimension=0
+TAG_List:Rotation=2 entries of type TAG_Float
+TAG_Float:=0.
+TAG_Float:=0.
+
+TAG_Short:HurtTime=0
+TAG_Int:XpLevel=0
+TAG_Int:Score=0
+TAG_Short:Fire=-20
+TAG_Long:UUIDMost=-3558955538633030991
+TAG_Byte:Sleeping=0
+TAG_List:Pos=3 entries of type TAG_Double
+TAG_Double:=-7.5
+TAG_Double:=72.
+TAG_Double:=45.5
+
+TAG_Int:foodTickTimer=0
+TAG_Float:XpP=0.
+TAG_Int:DataVersion=1343
+TAG_Int:foodLevel=20
+TAG_Int:SelectedItemSlot=0
+TAG_List:Inventory=0 entries of type TAG_End
+
+
+TAG_Int:SpawnY=64
+TAG_Int:rainTime=145306
+TAG_Double:BorderSize=60000000.
+TAG_Int:generatorVersion=1
+TAG_Byte:DifficultyLocked=0
+TAG_Int:thunderTime=157836
+TAG_Int:SpawnZ=41
+TAG_Byte:hardcore=0
+TAG_String:generatorOptions=""
+TAG_Double:BorderSafeZone=5.
+TAG_Int:SpawnX=-12
+TAG_Byte:thundering=0
+TAG_Int:version=19133
+TAG_Long:LastPlayed=-79817132
+
+Chunk x: 0, z: 2
+Region x: 0, z: 0
+
+Region: 
+CompoundTag have 2 entries:
+TAG_Compound:Level=CompoundTag have 11 entries:
+TAG_Int:xPos=0
+TAG_Byte:LightPopulated=1
+TAG_Int:zPos=2
+TAG_Long:LastUpdate=88
+TAG_Int_Array:HeightMap=[256 integers]
+TAG_List:Sections=6 entries of type TAG_Compound
+TAG_Compound:=CompoundTag have 5 entries:
+TAG_Byte_Array:Blocks=[4,096 bytes]
+TAG_Byte_Array:BlockLight=[2,048 bytes]
+TAG_Byte_Array:SkyLight=[2,048 bytes]
+TAG_Byte:Y=0
+TAG_Byte_Array:Data=[2,048 bytes]
+
+TAG_Compound:=CompoundTag have 5 entries:
+TAG_Byte_Array:Blocks=[4,096 bytes]
+TAG_Byte_Array:BlockLight=[2,048 bytes]
+TAG_Byte_Array:SkyLight=[2,048 bytes]
+TAG_Byte:Y=1
+TAG_Byte_Array:Data=[2,048 bytes]
+
+TAG_Compound:=CompoundTag have 5 entries:
+TAG_Byte_Array:Blocks=[4,096 bytes]
+TAG_Byte_Array:BlockLight=[2,048 bytes]
+TAG_Byte_Array:SkyLight=[2,048 bytes]
+TAG_Byte:Y=2
+TAG_Byte_Array:Data=[2,048 bytes]
+
+TAG_Compound:=CompoundTag have 5 entries:
+TAG_Byte_Array:Blocks=[4,096 bytes]
+TAG_Byte_Array:BlockLight=[2,048 bytes]
+TAG_Byte_Array:SkyLight=[2,048 bytes]
+TAG_Byte:Y=3
+TAG_Byte_Array:Data=[2,048 bytes]
+
+TAG_Compound:=CompoundTag have 5 entries:
+TAG_Byte_Array:Blocks=[4,096 bytes]
+TAG_Byte_Array:BlockLight=[2,048 bytes]
+TAG_Byte_Array:SkyLight=[2,048 bytes]
+TAG_Byte:Y=4
+TAG_Byte_Array:Data=[2,048 bytes]
+
+TAG_Compound:=CompoundTag have 5 entries:
+TAG_Byte_Array:Blocks=[4,096 bytes]
+TAG_Byte_Array:BlockLight=[2,048 bytes]
+TAG_Byte_Array:SkyLight=[2,048 bytes]
+TAG_Byte:Y=5
+TAG_Byte_Array:Data=[2,048 bytes]
+
+
+TAG_Byte_Array:Biomes=[256 bytes]
+TAG_Byte:TerrainPopulated=1
+TAG_Long:InhabitedTime=0
+TAG_List:TileEntities=0 entries of type TAG_End
+
+TAG_List:Entities=0 entries of type TAG_End
+
+
+TAG_Int:DataVersion=1343

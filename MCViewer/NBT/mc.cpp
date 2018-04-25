@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "EnginePCH.h"
 #include "mc.h"
 #include "NbtReaderWriter.h"
 #include "NbtIo.h"
@@ -260,7 +260,7 @@ namespace MC {
 		return nullptr;
 	}
 
-	std::unique_ptr<char[]> NbtIo::compress(CompoundTag* tag) {
+	UniquePtr NbtIo::compress(CompoundTag* tag) {
 		OFilteringStream sbout;
 		//sbout.push(boost::iostreams::gzip_compressor(boost::iostreams::gzip_params(boost::iostreams::gzip::best_compression)));
 		//boost::iostreams::stream_buffer<boost::iostreams::basic_array_source<__int8>> sbuf;

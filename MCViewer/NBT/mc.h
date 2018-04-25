@@ -6,6 +6,7 @@
 #include <vector>
 #include <array>
 #include <map>
+#include <unordered_map>
 #include <sstream>
 #include <fstream>
 #include <iostream>
@@ -85,18 +86,55 @@ namespace MC {
 	using StringArray = std::vector<std::wstring>;
 	using SharedPtr64 = std::shared_ptr<__int64>;
 	using SharedPtr32 = std::shared_ptr<__int32>;
+	using UniquePtr = std::unique_ptr<char[]>;
+	using UniquePtrB = std::unique_ptr<bool[]>;
 
-	inline int DebugMessage(const wchar_t* _Format, ...) {
-		int _Result = 0;
 #ifdef _DEBUG
-		static wchar_t _Buffer[128];
+	inline void DebugMessageW(const wchar_t* _Format, ...) {
+		int _Result = 0;
+		static wchar_t _Buffer[_MAX_PATH];
 		va_list _ArgList;
 		__crt_va_start(_ArgList, _Format);
-		_Result = __vswprintf_l(_Buffer, _Format, NULL, _ArgList);
+		_Result = vswprintf_s(_Buffer, _Format, _ArgList);
 		__crt_va_end(_ArgList);
 		//std::_Debug_message(_Buffer, __FILEW__, __LINE__);
-		std::wcerr << _Buffer;
-#endif
-		return _Result;
+		OutputDebugStringW(_Buffer);
 	}
+#else
+#define DebugMessageW(msg)
+#endif
+
+//
+//	inline int DebugMessageW(const wchar_t* _Format, ...) {
+//		int _Result = 0;
+//#ifdef _DEBUG
+//		static wchar_t _Buffer[128];
+//		va_list _ArgList;
+//		__crt_va_start(_ArgList, _Format);
+//		_Result = __vswprintf_l(_Buffer, _Format, NULL, _ArgList);
+//		__crt_va_end(_ArgList);
+//		//std::_Debug_message(_Buffer, __FILEW__, __LINE__);
+//		std::wcerr << _Buffer;
+//#endif
+//		return _Result;
+//	}
+#define _SWAP_SHORT(l)                \
+            ( ( ((l) >> 8) & 0x000000FFL ) |       \
+              ( (l << 8) & 0x0000FF00L ) )
+
+#define _SWAP_LONG(l)                \
+            ( ( ((l) >> 24) & 0x000000FFL ) |       \
+              ( ((l) >>  8) & 0x0000FF00L ) |       \
+              ( ((l) <<  8) & 0x00FF0000L ) |       \
+              ( ((l) << 24) & 0xFF000000L ) )
+
+#define _SWAP_LONGLONG(l)            \
+            ( ( ((l) >> 56) & 0x00000000000000FFLL ) |       \
+              ( ((l) >> 40) & 0x000000000000FF00LL ) |       \
+              ( ((l) >> 24) & 0x0000000000FF0000LL ) |       \
+              ( ((l) >>  8) & 0x00000000FF000000LL ) |       \
+              ( ((l) <<  8) & 0x000000FF00000000LL ) |       \
+              ( ((l) << 24) & 0x0000FF0000000000LL ) |       \
+              ( ((l) << 40) & 0x00FF000000000000LL ) |       \
+              ( ((l) << 56) & 0xFF00000000000000LL ) )
 }

@@ -23,7 +23,7 @@ namespace MC {
 		__int32 m_ChunkLocation[1024]{ 0 };
 		__int32 m_ChunkTimestamps[1024]{ 0 };
 		int m_TotalSectors;
-		std::unique_ptr<bool[]> m_SectorFree;
+		UniquePtrB m_SectorFree;
 		int m_SizeDelta;
 		time_t m_LastModified = 0;
 
@@ -58,7 +58,7 @@ namespace MC {
 			//m_Offsets.reserve(SECTOR_INTS);
 			//m_ChunkTimestamps.reserve(SECTOR_INTS);
 			if (!FS::exists(m_FileName)) {
-				DebugMessage(L"Region file not founded.\n");
+				DebugMessageW(L"Region file not founded.\n");
 			}
 
 			try {
@@ -142,7 +142,7 @@ namespace MC {
 			}
 			catch (std::exception e) {
 				std::wstring what(e.what(), e.what() + strlen(e.what()));
-				DebugMessage(what.c_str());
+				DebugMessageW(what.c_str());
 			}
 		};
 
@@ -164,20 +164,20 @@ namespace MC {
 			x &= 31;
 			z &= 31;
 			if (this->outofBounds(x, z)) {
-				DebugMessage(L"Read x:%d, z:%d out of bounds.\n", x, z);
+				DebugMessageW(L"Read x:%d, z:%d out of bounds.\n", x, z);
 				return nullptr;
 			}
 
 			int location = this->getChunkLocation(x, z);
 			if (0 == location) {
-				DebugMessage(L"Read x:%d, z:%d miss.\n", x, z);
+				DebugMessageW(L"Read x:%d, z:%d miss.\n", x, z);
 				return nullptr;
 			}
 
 			int offset = location >> 8;
 			int count = location & 0xff;
 			if (offset + count > this->m_TotalSectors) {
-				DebugMessage(L"Read x:%d, z:%d in invalid sector.\n", x, z);
+				DebugMessageW(L"Read x:%d, z:%d in invalid sector.\n", x, z);
 				return nullptr;
 			}
 
@@ -187,7 +187,7 @@ namespace MC {
 			length = BigEndian32(&length);
 
 			if (length > SECTOR_BYTES * count) {
-				DebugMessage(L"Read x:%d, z:%d overflow with invalid length:%d > 4096 * %d.\n", x, z, length, count);
+				DebugMessageW(L"Read x:%d, z:%d overflow with invalid length:%d > 4096 * %d.\n", x, z, length, count);
 				return nullptr;
 			}
 
@@ -214,13 +214,13 @@ namespace MC {
 		//	x &= 31;
 		//	z &= 31;
 		//	if (this->outofBounds(x, z)) {
-		//		DebugMessage(L"Read x:%d, z:%d out of bounds.\n", x, z);
+		//		DebugMessageW(L"Read x:%d, z:%d out of bounds.\n", x, z);
 		//		return nullptr;
 		//	}
 
 		//	int location = this->getChunkLocation(x, z);
 		//	if (0 == location) {
-		//		DebugMessage(L"Read x:%d, z:%d miss.\n", x, z);
+		//		DebugMessageW(L"Read x:%d, z:%d miss.\n", x, z);
 		//		return nullptr;
 		//	}
 
@@ -229,7 +229,7 @@ namespace MC {
 		//	int offset = location >> 8;
 		//	int count = location & 0xff;
 		//	if (offset + count > this->m_TotalSectors) {
-		//		DebugMessage(L"Read x:%d, z:%d in invalid sector.\n", x, z);
+		//		DebugMessageW(L"Read x:%d, z:%d in invalid sector.\n", x, z);
 		//		return nullptr;
 		//	}
 
@@ -241,7 +241,7 @@ namespace MC {
 		//	length = BigEndian32(&length);
 
 		//	if (length > SECTOR_BYTES * count) {
-		//		DebugMessage(L"Read x:%d, z:%d overflow with invalid length:%d > 4096 * %d.\n", x, z, length, count);
+		//		DebugMessageW(L"Read x:%d, z:%d overflow with invalid length:%d > 4096 * %d.\n", x, z, length, count);
 		//		return nullptr;
 		//	}
 
@@ -275,7 +275,7 @@ namespace MC {
 
 		//	return  new NbtReader(sbin);
 
-		//	//DebugMessage(L"Read x:%d, z:%d with unknown file version: %d", x, z, compressionType);
+		//	//DebugMessageW(L"Read x:%d, z:%d with unknown file version: %d", x, z, compressionType);
 		//	//return nullptr;
 		//}
 
@@ -302,12 +302,12 @@ namespace MC {
 
 			// maximum chunk size is 1MB
 			if (sectorsNeeded >= 256) {
-				DebugMessage(L"Sectors needed too large.\n");
+				DebugMessageW(L"Sectors needed too large.\n");
 				return;
 			}
 
 			if (sectorNumber != 0 && sectorAllocated == sectorsNeeded) {
-				DebugMessage(L"Region Save \"%s\" [x:%d, z:%d] %dBytes = rewrite.\n",
+				DebugMessageW(L"Region Save \"%s\" [x:%d, z:%d] %dBytes = rewrite.\n",
 					m_FileName.wstring().c_str(), x, z, length);
 				this->write(sectorNumber, data, length);
 			}
@@ -348,7 +348,7 @@ namespace MC {
 
 				if (runLength >= sectorsNeeded) {
 					// found a free space large enough
-					DebugMessage(L"Region Save \"%s\" [x:%d, z:%d] %dBytes = reuse.\n",
+					DebugMessageW(L"Region Save \"%s\" [x:%d, z:%d] %dBytes = reuse.\n",
 						m_FileName.wstring().c_str(), x, z, length);
 					sectorNumber = runStart;
 					this->setOffset(x, z, (sectorNumber << 8) | sectorsNeeded);
@@ -360,7 +360,7 @@ namespace MC {
 				else {
 					// no free space large enough found
 					// grow the file
-					DebugMessage(L"Region Save \"%s\" [x:%d, z:%d] %dBytes = grow.\n",
+					DebugMessageW(L"Region Save \"%s\" [x:%d, z:%d] %dBytes = grow.\n",
 						m_FileName.wstring().c_str(), x, z, length);
 					//m_FileHandle.seekp(FS::file_size(m_FileName));
 					_lseek(m_FileHandle, 0, SEEK_END);
@@ -384,7 +384,7 @@ namespace MC {
 		}
 
 		void write(int sectorNumber, const char* data, int length) {
-			//DebugMessage(L"\tWrite %d sectors.\n", sectorNumber);
+			//DebugMessageW(L"\tWrite %d sectors.\n", sectorNumber);
 			int writelength = length + 1;
 			//m_FileHandle.seekp(sectorNumber*SECTOR_BYTES, BOOST_IOS::_Seekbeg);
 			//m_FileHandle.write((char*)&writelength, sizeof(writelength));

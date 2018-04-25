@@ -30,10 +30,10 @@ namespace MC {
 			return v;
 		}
 		__int16 readShort() {
-			__int8 v[2];
-			m_Buffer->sgetn(v, sizeof(v));
+			__int16 v;
+			m_Buffer->sgetn(&v, sizeof(v));
 
-			return (short)((v[0] << 8) | (v[1] & 0xff));
+			return (__int16)((v[0] << 8) | (v[1] & 0xff));
 		};
 		__int32 readInt() {
 			__int8 v[4];
