@@ -72,6 +72,9 @@
     <ClInclude Include="Engine\SharedResourcePool.h">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\TextConsole.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -95,8 +98,8 @@
     <ClCompile Include="Engine\Game_DR.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Block.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="Engine\TextConsole.cpp">
+      <Filter>Engine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

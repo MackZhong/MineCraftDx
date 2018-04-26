@@ -6,6 +6,7 @@
 
 #include "DeviceResources.h"
 #include "StepTimer.h"
+#include "TextConsole.h"
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
@@ -73,7 +74,7 @@ private:
 	DX::StepTimer                           m_timer;
 
 protected:
-	DirectX::SimpleMath::Matrix m_world;
+	//std::unique_ptr<TextConsole> m_console;
 	DirectX::SimpleMath::Matrix m_view;
 	DirectX::SimpleMath::Matrix m_proj;
 	DirectX::SimpleMath::Vector3 m_cameraPos;

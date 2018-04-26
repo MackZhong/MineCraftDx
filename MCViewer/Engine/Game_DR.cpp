@@ -319,6 +319,9 @@ void Game_DR::Initialize(HWND window, int width, int height, bool fixedtimer)
 
 	// TODO: Change the timer settings if you want something other than the default variable timestep mode.
 	// e.g. for 60 FPS fixed timestep update logic, call:
+	//m_console = std::make_unique<TextConsole>();
+	//m_console->SetForegroundColor(Colors::Yellow);
+
 	if (fixedtimer) {
 		m_timer.SetFixedTimeStep(true);
 		m_timer.SetTargetElapsedSeconds(1.0 / 60);
@@ -344,6 +347,10 @@ void Game_DR::Tick()
 // Updates the world.
 void Game_DR::Update(DX::StepTimer const& timer)
 {
+	//m_console->WriteLine(L"This is a test");
+	//m_console->WriteLine(L"Line 2");
+	//m_console->Format(L"Time %u, %f ", timer.GetFrameCount(), timer.GetTotalSeconds());
+
 	auto mouse = m_mouse->GetState();
 
 	if (mouse.positionMode == Mouse::MODE_RELATIVE)
@@ -351,7 +358,7 @@ void Game_DR::Update(DX::StepTimer const& timer)
 		Vector3 delta = Vector3(float(mouse.x), float(mouse.y), 0.f)
 			* ROTATION_GAIN;
 
-		m_pitch -= delta.y;
+		m_pitch += delta.y;
 		m_yaw -= delta.x;
 
 		// limit pitch to straight up or straight down
@@ -388,7 +395,7 @@ void Game_DR::Update(DX::StepTimer const& timer)
 
 	if (kb.Home)
 	{
-		m_cameraPos = START_POSITION.v;
+		//m_cameraPos = START_POSITION.v;
 		m_pitch = -1.0f;
 		m_yaw = 1.0f;
 	}
@@ -396,22 +403,22 @@ void Game_DR::Update(DX::StepTimer const& timer)
 	Vector3 move = Vector3::Zero;
 
 	if (kb.Up || kb.W)
-		move.y += 1.f;
+		move.z -= 1.f;
 
 	if (kb.Down || kb.S)
-		move.y -= 1.f;
-
-	if (kb.Left || kb.A)
-		move.x += 1.f;
-
-	if (kb.Right || kb.D)
-		move.x -= 1.f;
-
-	if (kb.PageUp || kb.Space)
 		move.z += 1.f;
 
+	if (kb.Left || kb.A)
+		move.x -= 1.f;
+
+	if (kb.Right || kb.D)
+		move.x += 1.f;
+
+	if (kb.PageUp || kb.Space)
+		move.y += 1.f;
+
 	if (kb.PageDown || kb.X)
-		move.z -= 1.f;
+		move.y -= 1.f;
 
 	Quaternion q = Quaternion::CreateFromYawPitchRoll(m_yaw, m_pitch, 0.f);
 
@@ -459,10 +466,13 @@ void Game_DR::Render()
 
 	XMVECTOR lookAt = m_cameraPos + Vector3(x, y, z);
 
-	m_view = XMMatrixLookAtRH(m_cameraPos, lookAt, Vector3::Up);
+	m_view = XMMatrixLookAtLH(m_cameraPos, lookAt, Vector3::Up);
 
-	context->RSSetState(m_states->CullCounterClockwise());
+	context->RSSetState(m_states->CullNone());
+
 	OnRender(context);
+
+	//m_console->Render(context);
 
 	m_deviceResources->PIXEndEvent();
 
@@ -550,11 +560,12 @@ void Game_DR::GetDefaultSize(int& width, int& height) const
 // These are the resources that depend on the device.
 void Game_DR::CreateDeviceDependentResources(ID3D11Device * device)
 {
+	auto context = ComPtr<ID3D11DeviceContext>( m_deviceResources->GetD3DDeviceContext());
+	//m_console->RestoreDevice(context.Get(), L"consolas.spritefont");
+
 	m_states = std::make_unique<CommonStates>(device);
 
 	m_fxFactory = std::make_unique<EffectFactory>(device);
-
-	m_world = Matrix::Identity;
 
 	// TODO: Initialize device dependent objects here (independent of window size).
 	OnDeviceDependentResources(device);
@@ -563,14 +574,16 @@ void Game_DR::CreateDeviceDependentResources(ID3D11Device * device)
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game_DR::CreateWindowSizeDependentResources(int width, int height)
 {
+	//m_console->SetWindow(SimpleMath::Viewport::ComputeTitleSafeArea((UINT)(width / 3.0f), (UINT)(height / 3.0f)));
+
 	m_view = Matrix::CreateLookAt(Vector3(2.f, 2.f, 2.f),
 		Vector3::Zero, Vector3::UnitY);
 	m_proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f,
-		float(width) / float(height), 0.1f, 10.f);
+		float(width) / float(height), 0.1f, 1000.f);
 
 	// TODO: Initialize windows-size dependent objects here.
-	m_proj = Matrix::CreatePerspectiveFieldOfView(XMConvertToRadians(70.f),
-		float(width) / float(height), 0.01f, 100.f);
+	//m_proj = Matrix::CreatePerspectiveFieldOfView(XMConvertToRadians(70.f),
+	//	float(width) / float(height), 0.01f, 100.f);
 
 	OnWindowSizeDependentResources(width, height);
 }
@@ -578,7 +591,8 @@ void Game_DR::CreateWindowSizeDependentResources(int width, int height)
 void Game_DR::OnDeviceLost()
 {
 	// TODO: Add Direct3D resource cleanup here.
-	//m_deviceResources.reset();
+	//m_console->ReleaseDevice();
+
 	m_states.reset();
 	m_fxFactory.reset();
 	m_mouse.reset();

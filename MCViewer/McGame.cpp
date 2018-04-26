@@ -11,7 +11,7 @@ using namespace DirectX;
 namespace MC {
 	McGame::McGame()
 		:m_WorldPath(L"E:/Games/MineCraft/.minecraft/versions/1.12.2/saves")
-		, m_WorldName(L"新的世界")
+		, m_WorldName(L"新的世界1")
 	{
 
 	}
@@ -19,14 +19,8 @@ namespace MC {
 
 	McGame::~McGame()
 	{
-	}
-
-	void McGame::OnRender(ID3D11DeviceContext1 * context)
-	{
-		//m_model->Draw(context, *m_states, m_world, m_view, m_proj);
 		for (auto b = m_Blocks.begin(); b != m_Blocks.end(); b++) {
-			auto block = *b;
-			block->Draw(context, m_world, m_view, m_proj);
+			delete *b;
 		}
 	}
 
@@ -74,15 +68,17 @@ namespace MC {
 		m_cameraPos.z = posZ;
 		ListTag* playerMotion = playerData->getList(L"Motion");
 		ListTag* playerRotation = playerData->getList(L"Rotation");
-		m_yaw = ((FloatTag*)(playerRotation->get(0)).get())->getData();
-		m_pitch = ((FloatTag*)playerRotation->get(1).get())->getData();
+		m_yaw = ((FloatTag*)(playerRotation->get(0)).get())->getData()  * XM_2PI / 360.0f;
+		m_pitch = ((FloatTag*)playerRotation->get(1).get())->getData() * XM_2PI / 360.0;
 
 #pragma endregion Player files
 
 #pragma region Region
 		{
 			int chunkX = posX / 16;
+			int offsetX = chunkX * 16;
 			int chunkZ = posZ / 16;
+			int offsetZ = chunkZ * 16;
 			ofs << "Player x: " << posX << ", y: " << posY << ", z: " << posZ << std::endl;
 			ofs << "Chunk x: " << chunkX << ", z: " << chunkZ << std::endl;
 			ofs << "Region x: " << (chunkX >> 5) << ", z: " << (chunkZ >> 5) << std::endl << std::endl;
@@ -100,14 +96,14 @@ namespace MC {
 				auto heightMap = regionLevel->getIntArray(L"HeightMap", size);
 				ofs << std::endl << "HeightMap: " << std::endl;
 
-				XMFLOAT3 boxSize{1.0f, 1.0f, 1.0f};
+				XMFLOAT3 boxSize{ 1.0f, 1.0f, 1.0f };
 
 				for (int x = 0; x < 16; x++) {
 					for (int z = 0; z < 16; z++) {
 						int y = heightMap.get()[x * 16 + z];
 						ofs << y << " ";
 						//Block block(device, context, x, y, z);
-						auto block = new Block(device, context, x, y, z);
+						auto block = new Block(device, context, offsetX + x, y, offsetZ + z);
 						m_Blocks.push_back(block);
 					}
 					ofs << std::endl;
@@ -135,10 +131,19 @@ namespace MC {
 		//m_model.reset();
 	}
 
+	void McGame::OnRender(ID3D11DeviceContext1 * context)
+	{
+		//m_model->Draw(context, *m_states, m_world, m_view, m_proj);
+		for (auto b = m_Blocks.begin(); b != m_Blocks.end(); b++) {
+			auto block = *b;
+			block->Draw(context, m_view, m_proj);
+		}
+	}
+
 	void McGame::OnUpdate(DX::StepTimer const& timer)
 	{
 		float time = float(timer.GetTotalSeconds());
 
-		m_world = Matrix::CreateRotationZ(cosf(time) * 2.f);
+		//m_world = Matrix::CreateRotationZ(cosf(time) * 2.f);
 	}
 }

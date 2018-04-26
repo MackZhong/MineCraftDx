@@ -162,6 +162,7 @@
     <ClInclude Include="Block.h" />
     <ClInclude Include="Engine\PlatformHelpers.h" />
     <ClInclude Include="Engine\SharedResourcePool.h" />
+    <ClInclude Include="Engine\TextConsole.h" />
     <ClInclude Include="McGame.h" />
     <ClInclude Include="Engine\DeviceResources.h" />
     <ClInclude Include="Engine\EnginePCH.h" />
@@ -178,7 +179,7 @@
     <ClInclude Include="NBT\RegionFile.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Block.cpp" />
+    <ClCompile Include="Engine\TextConsole.cpp" />
     <ClCompile Include="McGame.cpp" />
     <ClCompile Include="Engine\DeviceResources.cpp" />
     <ClCompile Include="Engine\EnginePCH.cpp">

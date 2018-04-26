@@ -1,9 +1,9 @@
 CompoundTag have 39 entries:
 TAG_Byte:raining=0
-TAG_String:generatorName="flat"
+TAG_String:generatorName="default"
 TAG_Double:BorderWarningBlocks=5.
-TAG_Long:RandomSeed=-362557493
-TAG_Long:Time=3879
+TAG_Long:RandomSeed=-8754757766268622327
+TAG_Long:Time=363
 TAG_Byte:allowCommands=0
 TAG_Double:BorderCenterZ=0.
 TAG_Byte:Difficulty=2
@@ -12,26 +12,26 @@ TAG_Compound:DimensionData=CompoundTag have 1 entries:
 TAG_Compound:1=CompoundTag have 1 entries:
 TAG_Compound:DragonFight=CompoundTag have 3 entries:
 TAG_List:Gateways=20 entries of type TAG_Int
-TAG_Int:=17
-TAG_Int:=14
-TAG_Int:=2
-TAG_Int:=1
-TAG_Int:=0
-TAG_Int:=19
-TAG_Int:=9
-TAG_Int:=8
-TAG_Int:=4
-TAG_Int:=6
-TAG_Int:=13
-TAG_Int:=7
-TAG_Int:=11
-TAG_Int:=5
-TAG_Int:=3
-TAG_Int:=16
-TAG_Int:=18
-TAG_Int:=10
 TAG_Int:=12
+TAG_Int:=17
+TAG_Int:=18
+TAG_Int:=6
+TAG_Int:=7
+TAG_Int:=0
+TAG_Int:=9
+TAG_Int:=19
+TAG_Int:=14
+TAG_Int:=8
 TAG_Int:=15
+TAG_Int:=16
+TAG_Int:=4
+TAG_Int:=13
+TAG_Int:=3
+TAG_Int:=5
+TAG_Int:=1
+TAG_Int:=10
+TAG_Int:=11
+TAG_Int:=2
 
 TAG_Byte:DragonKilled=1
 TAG_Byte:PreviouslyKilled=1
@@ -49,8 +49,8 @@ TAG_Byte:Snapshot=0
 TAG_Int:Id=1343
 TAG_String:Name="1.12.2"
 
-TAG_String:LevelName="新的世界"
-TAG_Long:DayTime=3879
+TAG_String:LevelName="新的世界1"
+TAG_Long:DayTime=363
 TAG_Int:clearWeatherTime=0
 TAG_Byte:initialized=1
 TAG_Long:SizeOnDisk=0
@@ -87,7 +87,7 @@ TAG_List:EnderItems=0 entries of type TAG_End
 TAG_Int:HurtByTimestamp=0
 TAG_Float:foodSaturationLevel=5.
 TAG_Short:SleepTimer=0
-TAG_Int:XpSeed=-1366438423
+TAG_Int:XpSeed=0
 TAG_List:Attributes=8 entries of type TAG_Compound
 TAG_Compound:=CompoundTag have 2 entries:
 TAG_Double:Base=20.
@@ -146,7 +146,7 @@ TAG_List:toBeDisplayed=0 entries of type TAG_End
 TAG_Byte:isGuiOpen=0
 
 TAG_Short:DeathTime=0
-TAG_Float:foodExhaustionLevel=0.
+TAG_Float:foodExhaustionLevel=5.00000007450580596923828125e-002
 TAG_Long:UUIDLeast=-8794422475677342852
 TAG_Int:XpTotal=0
 TAG_Int:playerGameType=0
@@ -160,8 +160,8 @@ TAG_Float:Health=20.
 TAG_Short:Air=300
 TAG_Int:Dimension=0
 TAG_List:Rotation=2 entries of type TAG_Float
-TAG_Float:=-96.3012542724609375
-TAG_Float:=17.5500316619873046875
+TAG_Float:=-167.8499603271484375
+TAG_Float:=4.6499881744384765625
 
 TAG_Short:HurtTime=0
 TAG_Int:XpLevel=0
@@ -170,9 +170,9 @@ TAG_Short:Fire=-20
 TAG_Long:UUIDMost=-3558955538633030991
 TAG_Byte:Sleeping=0
 TAG_List:Pos=3 entries of type TAG_Double
-TAG_Double:=-860.5
-TAG_Double:=4.
-TAG_Double:=1086.5
+TAG_Double:=-212.485476837090715207523317076265811920166015625
+TAG_Double:=63.
+TAG_Double:=147.909086058881285907773417420685291290283203125
 
 TAG_Int:foodTickTimer=0
 TAG_Float:XpP=0.
@@ -182,39 +182,67 @@ TAG_Int:SelectedItemSlot=0
 TAG_List:Inventory=0 entries of type TAG_End
 
 
-TAG_Int:SpawnY=4
-TAG_Int:rainTime=121245
+TAG_Int:SpawnY=64
+TAG_Int:rainTime=30598
 TAG_Double:BorderSize=60000000.
-TAG_Int:generatorVersion=0
+TAG_Int:generatorVersion=1
 TAG_Byte:DifficultyLocked=0
-TAG_Int:thunderTime=130061
-TAG_Int:SpawnZ=1086
+TAG_Int:thunderTime=39860
+TAG_Int:SpawnZ=145
 TAG_Byte:hardcore=0
 TAG_String:generatorOptions=""
 TAG_Double:BorderSafeZone=5.
-TAG_Int:SpawnX=-855
+TAG_Int:SpawnX=-236
 TAG_Byte:thundering=0
 TAG_Int:version=19133
-TAG_Long:LastPlayed=-48529757
+TAG_Long:LastPlayed=1524761607874
 
-Player x: -860.5, y: 4, z: 1086.5
-Chunk x: -53, z: 67
-Region x: -2, z: 2
+Player x: -212.485, y: 63, z: 147.909
+Chunk x: -13, z: 9
+Region x: -1, z: 0
 
 Region: 
 CompoundTag have 2 entries:
 TAG_Compound:Level=CompoundTag have 11 entries:
-TAG_Int:xPos=-53
+TAG_Int:xPos=-13
 TAG_Byte:LightPopulated=1
-TAG_Int:zPos=67
-TAG_Long:LastUpdate=61
+TAG_Int:zPos=9
+TAG_Long:LastUpdate=363
 TAG_Int_Array:HeightMap=[256 integers]
-TAG_List:Sections=1 entries of type TAG_Compound
+TAG_List:Sections=5 entries of type TAG_Compound
 TAG_Compound:=CompoundTag have 5 entries:
 TAG_Byte_Array:Blocks=[4096 bytes]
 TAG_Byte_Array:BlockLight=[2048 bytes]
 TAG_Byte_Array:SkyLight=[2048 bytes]
 TAG_Byte:Y=0
+TAG_Byte_Array:Data=[2048 bytes]
+
+TAG_Compound:=CompoundTag have 5 entries:
+TAG_Byte_Array:Blocks=[4096 bytes]
+TAG_Byte_Array:BlockLight=[2048 bytes]
+TAG_Byte_Array:SkyLight=[2048 bytes]
+TAG_Byte:Y=1
+TAG_Byte_Array:Data=[2048 bytes]
+
+TAG_Compound:=CompoundTag have 5 entries:
+TAG_Byte_Array:Blocks=[4096 bytes]
+TAG_Byte_Array:BlockLight=[2048 bytes]
+TAG_Byte_Array:SkyLight=[2048 bytes]
+TAG_Byte:Y=2
+TAG_Byte_Array:Data=[2048 bytes]
+
+TAG_Compound:=CompoundTag have 5 entries:
+TAG_Byte_Array:Blocks=[4096 bytes]
+TAG_Byte_Array:BlockLight=[2048 bytes]
+TAG_Byte_Array:SkyLight=[2048 bytes]
+TAG_Byte:Y=3
+TAG_Byte_Array:Data=[2048 bytes]
+
+TAG_Compound:=CompoundTag have 5 entries:
+TAG_Byte_Array:Blocks=[4096 bytes]
+TAG_Byte_Array:BlockLight=[2048 bytes]
+TAG_Byte_Array:SkyLight=[2048 bytes]
+TAG_Byte:Y=4
 TAG_Byte_Array:Data=[2048 bytes]
 
 
@@ -223,25 +251,129 @@ TAG_Byte:TerrainPopulated=1
 TAG_Long:InhabitedTime=0
 TAG_List:TileEntities=0 entries of type TAG_End
 
-TAG_List:Entities=0 entries of type TAG_End
+TAG_List:Entities=1 entries of type TAG_Compound
+TAG_Compound:=CompoundTag have 28 entries:
+TAG_Int:HurtByTimestamp=0
+TAG_List:Attributes=7 entries of type TAG_Compound
+TAG_Compound:=CompoundTag have 2 entries:
+TAG_Double:Base=20.
+TAG_String:Name="generic.maxHealth"
+
+TAG_Compound:=CompoundTag have 2 entries:
+TAG_Double:Base=0.
+TAG_String:Name="generic.knockbackResistance"
+
+TAG_Compound:=CompoundTag have 2 entries:
+TAG_Double:Base=0.25
+TAG_String:Name="generic.movementSpeed"
+
+TAG_Compound:=CompoundTag have 2 entries:
+TAG_Double:Base=0.
+TAG_String:Name="generic.armor"
+
+TAG_Compound:=CompoundTag have 2 entries:
+TAG_Double:Base=0.
+TAG_String:Name="generic.armorToughness"
+
+TAG_Compound:=CompoundTag have 3 entries:
+TAG_Double:Base=16.
+TAG_List:Modifiers=1 entries of type TAG_Compound
+TAG_Compound:=CompoundTag have 5 entries:
+TAG_Long:UUIDMost=-7806083718564262189
+TAG_Long:UUIDLeast=-6461800527059169051
+TAG_Double:Amount=-1.1529835268727035846314521450040047056972980499267578125e-002
+TAG_Int:Operation=1
+TAG_String:Name="Random spawn bonus"
+
+
+TAG_String:Name="generic.followRange"
+
+TAG_Compound:=CompoundTag have 2 entries:
+TAG_Double:Base=2.
+TAG_String:Name="generic.attackDamage"
+
+
+TAG_List:HandDropChances=2 entries of type TAG_Float
+TAG_Float:=8.5000000894069671630859375e-002
+TAG_Float:=8.5000000894069671630859375e-002
+
+TAG_Byte:Invulnerable=0
+TAG_Byte:OnGround=1
+TAG_Byte:FallFlying=0
+TAG_Float:FallDistance=0.
+TAG_Short:DeathTime=0
+TAG_Int:PortalCooldown=0
+TAG_Float:AbsorptionAmount=0.
+TAG_Byte:PersistenceRequired=0
+TAG_String:id="minecraft:skeleton"
+TAG_List:Motion=3 entries of type TAG_Double
+TAG_Double:=0.
+TAG_Double:=-nan
+TAG_Double:=0.
+
+TAG_Byte:Leashed=0
+TAG_Long:UUIDLeast=-207467027
+TAG_Float:Health=20.
+TAG_Byte:LeftHanded=0
+TAG_Short:Air=300
+TAG_Int:Dimension=0
+TAG_List:Rotation=2 entries of type TAG_Float
+TAG_Float:=29.527774810791015625
+TAG_Float:=0.
+
+TAG_List:HandItems=2 entries of type TAG_Compound
+TAG_Compound:=CompoundTag have 3 entries:
+TAG_String:id="minecraft:bow"
+TAG_Short:Damage=0
+TAG_Byte:Count=1
+
+TAG_Compound:=CompoundTag have 0 entries:
+
+
+TAG_List:ArmorDropChances=4 entries of type TAG_Float
+TAG_Float:=8.5000000894069671630859375e-002
+TAG_Float:=8.5000000894069671630859375e-002
+TAG_Float:=8.5000000894069671630859375e-002
+TAG_Float:=8.5000000894069671630859375e-002
+
+TAG_Short:Fire=-1
+TAG_Long:UUIDMost=-4375801336689377025
+TAG_List:Pos=3 entries of type TAG_Double
+TAG_Double:=-205.5
+TAG_Double:=15.
+TAG_Double:=145.5
+
+TAG_List:ArmorItems=4 entries of type TAG_Compound
+TAG_Compound:=CompoundTag have 0 entries:
+
+TAG_Compound:=CompoundTag have 0 entries:
+
+TAG_Compound:=CompoundTag have 0 entries:
+
+TAG_Compound:=CompoundTag have 0 entries:
+
+
+TAG_Byte:CanPickUpLoot=0
+TAG_Short:HurtTime=0
+
 
 
 TAG_Int:DataVersion=1343
 
 HeightMap: 
-4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 
-4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 
-4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 
-4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 
-4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 
-4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 
-4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 
-4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 
-4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 
-4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 
-4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 
-4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 
-4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 
-4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 
-4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 
-4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 
+63 63 63 63 63 63 63 63 63 63 63 63 63 63 63 63 
+63 63 63 63 63 63 63 63 63 63 63 63 63 63 63 63 
+63 63 63 63 63 63 63 63 63 63 63 63 63 63 63 63 
+63 63 63 63 63 63 63 63 63 63 63 63 63 63 63 63 
+70 70 63 63 63 63 63 63 63 63 63 63 63 63 63 63 
+70 70 63 67 67 67 67 67 63 63 63 63 63 63 63 63 
+71 70 63 67 68 69 67 67 63 63 63 63 63 63 63 63 
+71 70 63 67 69 69 69 67 63 63 63 63 63 63 63 63 
+70 70 70 70 70 70 67 67 63 63 63 63 71 71 71 71 
+70 70 70 71 71 70 70 70 63 63 63 71 71 71 71 71 
+70 70 71 71 71 71 70 70 64 64 64 71 71 71 71 71 
+71 71 71 71 71 71 71 70 69 69 69 71 71 71 71 71 
+72 72 71 71 71 71 71 70 69 70 69 71 71 71 71 71 
+72 72 71 71 71 71 70 70 70 70 70 71 71 71 71 71 
+73 72 70 71 71 70 69 69 69 70 69 69 71 71 71 71 
+73 72 70 70 70 70 64 63 69 69 69 63 63 64 64 64 
