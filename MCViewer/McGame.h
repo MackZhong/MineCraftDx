@@ -2,6 +2,7 @@
 #include "Game_DR.h"
 #include "mc.h"
 #include "nbttag.h"
+#include "Block.h"
 
 namespace MC
 {
@@ -34,7 +35,7 @@ namespace MC
 
 	private:
 		std::unique_ptr<CompoundTag> m_Root;
-		std::unique_ptr<DirectX::GeometricPrimitive[]> m_Blocks;
+		std::vector<MC::Block*> m_Blocks;
 	};
 }
 

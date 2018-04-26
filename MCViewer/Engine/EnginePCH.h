@@ -59,7 +59,7 @@ using namespace DirectX;
 #include <locale>
 #include <sstream>
 #include <stack>
-
+#include <mutex>
 
 namespace DX
 {
@@ -124,7 +124,7 @@ namespace DX
 //#include "Effects.h"
 #include <Effects.h>
 #include "GamePad.h"
-#include "GeometricPrimitive.h"
+//#include "GeometricPrimitive.h"
 #include "GraphicsMemory.h"
 #include "Keyboard.h"
 #include "Model.h"
@@ -136,5 +136,6 @@ namespace DX
 using namespace DirectX::SimpleMath;
 #include "SpriteBatch.h"
 #include "SpriteFont.h"
+#include "SharedResourcePool.h"
 #include "VertexTypes.h"
 #include "WICTextureLoader.h"

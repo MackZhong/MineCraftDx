@@ -66,6 +66,12 @@
     <ClInclude Include="Block.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\PlatformHelpers.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\SharedResourcePool.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

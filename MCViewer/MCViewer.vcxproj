@@ -160,6 +160,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Block.h" />
+    <ClInclude Include="Engine\PlatformHelpers.h" />
+    <ClInclude Include="Engine\SharedResourcePool.h" />
     <ClInclude Include="McGame.h" />
     <ClInclude Include="Engine\DeviceResources.h" />
     <ClInclude Include="Engine\EnginePCH.h" />

@@ -4,6 +4,7 @@
 #include "NBT/NbtFile.h"
 #include "NBT/RegionFile.h"
 #include <codecvt>
+#include "Block.h"
 
 using namespace DirectX;
 
@@ -23,6 +24,10 @@ namespace MC {
 	void McGame::OnRender(ID3D11DeviceContext1 * context)
 	{
 		//m_model->Draw(context, *m_states, m_world, m_view, m_proj);
+		for (auto b = m_Blocks.begin(); b != m_Blocks.end(); b++) {
+			auto block = *b;
+			block->Draw(context, m_world, m_view, m_proj);
+		}
 	}
 
 	void McGame::OnDeviceDependentResources(ID3D11Device * device)
@@ -99,9 +104,11 @@ namespace MC {
 
 				for (int x = 0; x < 16; x++) {
 					for (int z = 0; z < 16; z++) {
-						ofs << (int)heightMap.get()[x * 16 + z] << " ";
-						auto block = GeometricPrimitive::CreateBox(context, boxSize);
-						m_Blocks
+						int y = heightMap.get()[x * 16 + z];
+						ofs << y << " ";
+						//Block block(device, context, x, y, z);
+						auto block = new Block(device, context, x, y, z);
+						m_Blocks.push_back(block);
 					}
 					ofs << std::endl;
 				}

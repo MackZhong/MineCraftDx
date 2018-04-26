@@ -112,10 +112,10 @@ namespace MC {
 	protected:
 		NbtFile(const wchar_t* fileName)
 		{
-			if (!PathFileExistsW(levelFile)) {
+			if (!PathFileExistsW(fileName)) {
 				throw "File not exists.";
 			}
-			errno_t err = _wsopen_s(&m_File, levelFile, _O_RDONLY | _O_BINARY, _SH_DENYNO, _S_IREAD);
+			errno_t err = _wsopen_s(&m_File, fileName, _O_RDONLY | _O_BINARY, _SH_DENYNO, _S_IREAD);
 			if (0 != err) {
 				throw "Open file failed.";
 			}
