@@ -18,6 +18,10 @@ namespace MC {
 		NbtReader(std::streambuf* buf) :m_Buffer(buf)
 		{}
 
+		int position()  {
+			auto pos = m_Buffer->pubseekoff(0, std::ios_base::cur);
+			return pos;
+		}
 		const std::shared_ptr<char> read(size_t size) {
 			auto ptr = new char[size];
 			m_Buffer->sgetn(ptr, size);

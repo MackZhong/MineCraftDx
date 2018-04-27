@@ -1,0 +1,231 @@
+Player's position: x=-7.5, y=72, z=45.5
+Chunk x=-1, z=2
+
+
+E:/Games/MineCraft/.minecraft/versions/1.12.2\saves\新的世界1\region\r.-1.0.mca
+
+Region x=-1, z=0:
+Chunk in region x=19, z=0
+CompoundTag have 2 entries:
+TAG_Compound:Level=CompoundTag have 11 entries:
+TAG_Int:xPos=-13
+TAG_Byte:LightPopulated=0
+TAG_Int:zPos=0
+TAG_Long:LastUpdate=88
+TAG_Int_Array:HeightMap=[256 integers]
+TAG_List:Sections=5 entries of type TAG_Compound
+TAG_Compound:=CompoundTag have 5 entries:
+TAG_Byte_Array:Blocks=[4096 bytes]
+TAG_Byte_Array:BlockLight=[2048 bytes]
+TAG_Byte_Array:SkyLight=[2048 bytes]
+TAG_Byte:Y=0
+TAG_Byte_Array:Data=[2048 bytes]
+
+TAG_Compound:=CompoundTag have 5 entries:
+TAG_Byte_Array:Blocks=[4096 bytes]
+TAG_Byte_Array:BlockLight=[2048 bytes]
+TAG_Byte_Array:SkyLight=[2048 bytes]
+TAG_Byte:Y=1
+TAG_Byte_Array:Data=[2048 bytes]
+
+TAG_Compound:=CompoundTag have 5 entries:
+TAG_Byte_Array:Blocks=[4096 bytes]
+TAG_Byte_Array:BlockLight=[2048 bytes]
+TAG_Byte_Array:SkyLight=[2048 bytes]
+TAG_Byte:Y=2
+TAG_Byte_Array:Data=[2048 bytes]
+
+TAG_Compound:=CompoundTag have 5 entries:
+TAG_Byte_Array:Blocks=[4096 bytes]
+TAG_Byte_Array:BlockLight=[2048 bytes]
+TAG_Byte_Array:SkyLight=[2048 bytes]
+TAG_Byte:Y=3
+TAG_Byte_Array:Data=[2048 bytes]
+
+TAG_Compound:=CompoundTag have 5 entries:
+TAG_Byte_Array:Blocks=[4096 bytes]
+TAG_Byte_Array:BlockLight=[2048 bytes]
+TAG_Byte_Array:SkyLight=[2048 bytes]
+TAG_Byte:Y=4
+TAG_Byte_Array:Data=[2048 bytes]
+
+
+TAG_Byte_Array:Biomes=[256 bytes]
+TAG_Byte:TerrainPopulated=1
+TAG_Long:InhabitedTime=0
+TAG_List:TileEntities=0 entries of type TAG_End
+
+TAG_List:Entities=0 entries of type TAG_End
+
+
+TAG_Int:DataVersion=1343
+
+HeightMap: 
+78 77 77 76 75 73 72 72 72 72 71 71 71 71 71 70 
+78 76 75 74 72 72 72 72 72 72 71 71 71 71 71 71 
+76 75 72 72 72 72 72 72 72 72 71 71 71 71 71 71 
+74 72 72 72 72 72 72 72 72 72 71 71 71 71 71 71 
+72 72 72 72 71 71 72 72 72 72 71 71 71 71 71 71 
+72 72 72 71 71 71 71 71 72 71 71 71 71 71 71 71 
+72 72 71 71 71 71 71 71 71 71 71 71 71 71 71 71 
+72 71 71 71 71 71 71 71 71 71 71 71 71 71 71 71 
+71 71 71 71 70 71 71 71 71 71 71 71 71 71 71 71 
+71 71 71 71 70 71 71 71 71 71 71 71 71 71 71 71 
+71 71 71 70 70 70 71 71 71 71 71 71 71 71 72 72 
+70 70 70 70 70 70 71 71 71 71 71 71 72 72 72 72 
+70 70 70 70 70 70 70 71 71 71 71 71 72 72 72 72 
+70 70 70 70 70 70 70 71 71 71 71 72 72 72 72 72 
+70 70 70 70 70 70 70 71 71 71 71 72 72 72 72 72 
+70 70 70 70 70 70 70 71 71 71 71 72 72 72 72 73 
+Chunk in region x=19, z=1
+CompoundTag have 2 entries:
+TAG_Compound:Level=CompoundTag have 11 entries:
+TAG_Int:xPos=-13
+TAG_Byte:LightPopulated=0
+TAG_Int:zPos=1
+TAG_Long:LastUpdate=88
+TAG_Int_Array:HeightMap=[256 integers]
+TAG_List:Sections=6 entries of type TAG_Compound
+TAG_Compound:=CompoundTag have 5 entries:
+TAG_Byte_Array:Blocks=[4096 bytes]
+TAG_Byte_Array:BlockLight=[2048 bytes]
+TAG_Byte_Array:SkyLight=[2048 bytes]
+TAG_Byte:Y=0
+TAG_Byte_Array:Data=[2048 bytes]
+
+TAG_Compound:=CompoundTag have 5 entries:
+TAG_Byte_Array:Blocks=[4096 bytes]
+TAG_Byte_Array:BlockLight=[2048 bytes]
+TAG_Byte_Array:SkyLight=[2048 bytes]
+TAG_Byte:Y=1
+TAG_Byte_Array:Data=[2048 bytes]
+
+TAG_Compound:=CompoundTag have 5 entries:
+TAG_Byte_Array:Blocks=[4096 bytes]
+TAG_Byte_Array:BlockLight=[2048 bytes]
+TAG_Byte_Array:SkyLight=[2048 bytes]
+TAG_Byte:Y=2
+TAG_Byte_Array:Data=[2048 bytes]
+
+TAG_Compound:=CompoundTag have 5 entries:
+TAG_Byte_Array:Blocks=[4096 bytes]
+TAG_Byte_Array:BlockLight=[2048 bytes]
+TAG_Byte_Array:SkyLight=[2048 bytes]
+TAG_Byte:Y=3
+TAG_Byte_Array:Data=[2048 bytes]
+
+TAG_Compound:=CompoundTag have 5 entries:
+TAG_Byte_Array:Blocks=[4096 bytes]
+TAG_Byte_Array:BlockLight=[2048 bytes]
+TAG_Byte_Array:SkyLight=[2048 bytes]
+TAG_Byte:Y=4
+TAG_Byte_Array:Data=[2048 bytes]
+
+TAG_Compound:=CompoundTag have 5 entries:
+TAG_Byte_Array:Blocks=[4096 bytes]
+TAG_Byte_Array:BlockLight=[2048 bytes]
+TAG_Byte_Array:SkyLight=[2048 bytes]
+TAG_Byte:Y=5
+TAG_Byte_Array:Data=[2048 bytes]
+
+
+TAG_Byte_Array:Biomes=[256 bytes]
+TAG_Byte:TerrainPopulated=1
+TAG_Long:InhabitedTime=0
+TAG_List:TileEntities=0 entries of type TAG_End
+
+TAG_List:Entities=0 entries of type TAG_End
+
+
+TAG_Int:DataVersion=1343
+
+HeightMap: 
+70 70 70 70 70 70 70 71 71 71 71 72 72 72 73 74 
+70 70 70 70 70 70 70 70 71 71 71 71 72 72 72 72 
+70 70 70 70 70 70 70 70 70 70 71 71 71 71 72 72 
+70 70 70 70 70 70 70 70 70 70 70 70 70 71 71 71 
+70 70 70 70 70 70 70 70 70 70 70 69 69 70 70 70 
+70 70 70 70 70 70 70 70 70 70 70 69 69 70 70 70 
+70 70 70 70 70 70 70 70 70 70 70 69 69 69 70 70 
+70 70 70 70 70 70 70 70 70 70 70 69 69 69 69 69 
+70 70 70 70 70 70 70 70 70 70 70 69 74 74 74 69 
+70 70 70 70 70 70 70 70 70 70 70 74 74 77 74 74 
+70 70 70 70 70 70 70 70 70 70 69 74 77 78 77 74 
+70 70 70 70 70 70 77 77 77 77 77 74 74 77 74 74 
+70 70 70 70 70 77 77 78 78 78 77 77 75 75 77 74 
+70 70 70 70 70 77 78 78 79 78 78 77 76 77 77 77 
+70 70 70 70 70 77 78 79 80 79 78 77 77 76 77 75 
+70 70 70 70 70 77 78 78 79 78 78 77 78 77 76 75 
+Chunk in region x=19, z=2
+CompoundTag have 2 entries:
+TAG_Compound:Level=CompoundTag have 11 entries:
+TAG_Int:xPos=-13
+TAG_Byte:LightPopulated=0
+TAG_Int:zPos=2
+TAG_Long:LastUpdate=88
+TAG_Int_Array:HeightMap=[256 integers]
+TAG_List:Sections=5 entries of type TAG_Compound
+TAG_Compound:=CompoundTag have 5 entries:
+TAG_Byte_Array:Blocks=[4096 bytes]
+TAG_Byte_Array:BlockLight=[2048 bytes]
+TAG_Byte_Array:SkyLight=[2048 bytes]
+TAG_Byte:Y=0
+TAG_Byte_Array:Data=[2048 bytes]
+
+TAG_Compound:=CompoundTag have 5 entries:
+TAG_Byte_Array:Blocks=[4096 bytes]
+TAG_Byte_Array:BlockLight=[2048 bytes]
+TAG_Byte_Array:SkyLight=[2048 bytes]
+TAG_Byte:Y=1
+TAG_Byte_Array:Data=[2048 bytes]
+
+TAG_Compound:=CompoundTag have 5 entries:
+TAG_Byte_Array:Blocks=[4096 bytes]
+TAG_Byte_Array:BlockLight=[2048 bytes]
+TAG_Byte_Array:SkyLight=[2048 bytes]
+TAG_Byte:Y=2
+TAG_Byte_Array:Data=[2048 bytes]
+
+TAG_Compound:=CompoundTag have 5 entries:
+TAG_Byte_Array:Blocks=[4096 bytes]
+TAG_Byte_Array:BlockLight=[2048 bytes]
+TAG_Byte_Array:SkyLight=[2048 bytes]
+TAG_Byte:Y=3
+TAG_Byte_Array:Data=[2048 bytes]
+
+TAG_Compound:=CompoundTag have 5 entries:
+TAG_Byte_Array:Blocks=[4096 bytes]
+TAG_Byte_Array:BlockLight=[2048 bytes]
+TAG_Byte_Array:SkyLight=[2048 bytes]
+TAG_Byte:Y=4
+TAG_Byte_Array:Data=[2048 bytes]
+
+
+TAG_Byte_Array:Biomes=[256 bytes]
+TAG_Byte:TerrainPopulated=1
+TAG_Long:InhabitedTime=0
+TAG_List:TileEntities=0 entries of type TAG_End
+
+TAG_List:Entities=0 entries of type TAG_End
+
+
+TAG_Int:DataVersion=1343
+
+HeightMap: 
+70 70 70 70 70 77 77 78 78 78 77 77 77 76 76 75 
+70 70 70 70 70 69 77 77 77 77 77 76 76 76 75 75 
+70 70 70 69 69 69 69 69 69 69 75 75 75 75 75 75 
+70 69 69 69 69 69 69 69 69 69 69 69 69 69 75 78 
+69 69 69 69 69 69 69 69 69 69 69 66 66 69 75 75 
+69 69 69 69 69 69 69 69 69 69 69 69 66 66 67 75 
+69 69 69 69 69 69 69 69 69 69 69 69 66 66 67 67 
+69 69 69 69 69 69 69 69 69 68 68 68 68 67 72 72 
+69 69 69 69 69 69 69 68 68 68 68 68 68 72 72 75 
+69 69 69 69 69 68 68 68 68 68 68 68 68 72 75 75 
+69 69 69 69 68 68 68 68 68 68 68 68 68 72 72 75 
+69 69 68 68 68 68 68 68 68 68 68 68 68 68 72 72 
+69 68 68 68 68 68 68 68 68 68 68 68 68 68 68 68 
+68 68 68 68 68 68 68 68 68 71 71 71 71 71 68 68 
+68 68 68 68 68 68 68 68 71 71 74 74 74 71 71 68 
+68 68 68 68 68 68 68 68 71 74 74 77 74 74 71 68 
+Chunk in region x=19, z=3

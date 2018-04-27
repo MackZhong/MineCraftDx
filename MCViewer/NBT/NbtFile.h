@@ -11,6 +11,9 @@ namespace MC {
 		NbtFile(const FS::path& base) : m_FileHandle(base)
 		{
 		};
+		NbtFile(const wchar_t* fileName) : m_FileHandle(fileName)
+		{
+		};
 
 	public:
 #pragma region MyRegion
@@ -81,7 +84,6 @@ namespace MC {
 		//}
 
 #pragma endregion
-
 
 		CompoundTag* getRootTagr(const wchar_t* rootName = nullptr) {
 			if (!FS::exists(m_FileHandle)) {

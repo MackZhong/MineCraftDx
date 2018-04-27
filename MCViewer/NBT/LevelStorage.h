@@ -1,25 +1,49 @@
 #pragma once
-#include "mc.h"
+//#include "mc.h"
 
 namespace MC {
-	using FileArray = std::vector<FS::path>;
+	//using FileArray = std::vector<FS::path>;
+
+	inline int PositionToChunk(int p)  {
+		return p >> 4;
+	}
+	inline int PositionToRegion(int p)  {
+		return p >> 9;
+	}
+	inline int ChunkToRegion(int c)  {
+		return c >> 5;
+	}
+	inline int ChunkToPositonBase(int c) {
+		return c << 4;
+	}
+	inline int RegionToPositionBase(int r)  {
+		return r << 9;
+	}
+	inline int RegionToChunkBase(int r)  {
+		return r << 5;
+	}
 
 	class LevelStorage
 	{
-		wchar_t m_LevelPath[_MAX_PATH];
-		FS::path m_LevelDir;
+		wchar_t m_BasePath[_MAX_PATH];
 
 	public:
-		LevelStorage(const wchar_t* baseDir, const wchar_t* levelId)
+		LevelStorage(const wchar_t* baseDir)
 		{
-			PathCombineW(m_LevelPath, baseDir, levelId);
-			if (!PathFileExistsW(m_LevelPath)) {
-				throw "Path not exists";
+			if (!PathFileExistsW(baseDir)) {
+				throw "Minecraft not found.";
 			}
-
-			FS::path basePath(baseDir);
-			m_LevelDir = basePath.append(levelId);
+			StrCpyW(m_BasePath, baseDir);
 		};
+
+		inline const wchar_t* getSavesPath() const {
+			PathCombineW(_Buffer, m_BasePath, L"saves");
+			if (!PathFileExistsW(_Buffer)) {
+				return nullptr;
+			}
+			return _Buffer;
+		}
+
 
 		//int  OpenLevelFile()const {
 		//	int file;
@@ -28,59 +52,125 @@ namespace MC {
 		//	return file;
 		//}
 
-		FS::path getLevelFile() const {
-			FS::path levelFile(m_LevelDir);
-			levelFile.append(L"level.dat");
-			return levelFile;
+		inline const wchar_t* getWorldPath(const wchar_t* worldName) const {
+			const wchar_t* savesPath = getSavesPath();
+			if (nullptr == savesPath) {
+				return nullptr;
+			}
+			PathCombineW(_Buffer, savesPath, worldName);
+			if (!PathFileExistsW(_Buffer)) {
+				return nullptr;
+				// throw "World not found.";
+			}
+			return _Buffer;
 		}
 
-		FileArray getPlayerFiles() const {
-			FileArray files;
-			FS::path playerPath(m_LevelDir);
-			playerPath.append(L"playerdata");
+		inline const wchar_t* getLevelName(const wchar_t* worldName) const {
+			const wchar_t* worldPath = getWorldPath(worldName);
+			if (nullptr == worldPath) {
+				return nullptr;
+			}
+			PathCombineW(_Buffer, worldPath, L"level.dat");
+			if (!PathFileExistsW(_Buffer)) {
+				return nullptr;
+				// throw "Levle file not found.";
+			}
+			return _Buffer;
+		}
 
-			FS::directory_iterator di(playerPath);
-			FS::directory_iterator dend;
+		inline const wchar_t* getRegionPath(const wchar_t* worldName) const {
+			const wchar_t* worldPath = getWorldPath(worldName);
+			if (nullptr == worldPath) {
+				return nullptr;
+			}
+			PathCombineW(_Buffer, worldPath, L"region");
+			if (!PathFileExistsW(_Buffer)) {
+				return nullptr;
+				// throw "Levle file not found.";
+			}
+			return _Buffer;
+		}
 
-			while (di != dend) {
-				files.emplace_back(di->path());
-				di++;
+		const wchar_t* getRegionName(const wchar_t* worldName, int regionX, int regionZ) const {
+			const wchar_t* regionPath = getRegionPath(worldName);
+			if (nullptr == regionPath) {
+				return nullptr;
+			}
+			wchar_t fileName[_MAX_FNAME];
+			wnsprintfW(fileName, _MAX_PATH, L"r.%d.%d.mca", regionX, regionZ);
+			PathCombineW(_Buffer, regionPath, fileName);
+			if (!PathFileExistsW(_Buffer)) {
+				return nullptr;
+				// throw "Levle file not found.";
 			}
 
-			return files;
+			return _Buffer;
 		}
 
-		FS::path getRegionPath() const {
-			FS::path regionPath(m_LevelDir);
-			regionPath.append(L"region");
-			return regionPath;
-		}
+		//std::vector<std::wstring> getRegionNames(const wchar_t* worldName, int regX, int regZ) const {
+		//	std::vector<std::wstring> regions;
+		//	const wchar_t* regionPath = getRegionPath(worldName);
+		//	if (nullptr == regionPath) {
+		//		return regions;
+		//	}
+		//	PathFindFileNameW();
+		//	FS::path basePath(baseDir);
+		//	m_LevelDir = basePath.append(levelId);
+		//	FS::path levelFile(m_LevelDir);
+		//	levelFile.append(L"level.dat");
+		//	return levelFile;
+		//	FS::path levelFile(m_LevelDir);
+		//	levelFile.append(L"");
+		//	return levelFile;
+		//}
 
-		FS::path getRegionFile(int chunkX, int chunkZ) const {
-			int regionX = chunkX >> 5;
-			int regionZ = chunkZ >> 5;
+		//FileArray getPlayerFiles() const {
+		//	FileArray files;
+		//	FS::path playerPath(m_LevelDir);
+		//	playerPath.append(L"playerdata");
 
-			FS::path regionFile = this->getRegionPath();
+		//	FS::directory_iterator di(playerPath);
+		//	FS::directory_iterator dend;
 
-			sprintf_s(DataConversionBuffer, "r.%d.%d.mca", regionX, regionZ);
-			regionFile.append(DataConversionBuffer);
+		//	while (di != dend) {
+		//		files.emplace_back(di->path());
+		//		di++;
+		//	}
 
-			return regionFile;
-		}
+		//	return files;
+		//}
 
-		FileArray getRegionFiles() const {
-			FileArray files;
-			FS::path regionPath = this->getRegionPath();
+		//FS::path getRegionPath() const {
+		//	FS::path regionPath(m_LevelDir);
+		//	regionPath.append(L"region");
+		//	return regionPath;
+		//}
 
-			FS::directory_iterator di(regionPath);
-			FS::directory_iterator dend;
+		//FS::path getRegionFile(int chunkX, int chunkZ) const {
+		//	int regionX = chunkX >> 5;
+		//	int regionZ = chunkZ >> 5;
 
-			while (di != dend) {
-				files.emplace_back(di->path());
-				di++;
-			}
+		//	FS::path regionFile = this->getRegionPath();
 
-			return files;
-		}
+		//	sprintf_s(DataConversionBuffer, "r.%d.%d.mca", regionX, regionZ);
+		//	regionFile.append(DataConversionBuffer);
+
+		//	return regionFile;
+		//}
+
+		//FileArray getRegionFiles() const {
+		//	FileArray files;
+		//	FS::path regionPath = this->getRegionPath();
+
+		//	FS::directory_iterator di(regionPath);
+		//	FS::directory_iterator dend;
+
+		//	while (di != dend) {
+		//		files.emplace_back(di->path());
+		//		di++;
+		//	}
+
+		//	return files;
+		//}
 	};
 }

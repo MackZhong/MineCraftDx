@@ -134,6 +134,7 @@ namespace MC {
 
 	NbtTag* NbtTag::readNamedTag(NbtReader* pdis) {
 		__int8 type = pdis->readByte();
+		int pos = pdis->position();
 		if (type < TAG_End || type >= TAG_Max) {
 			throw "Invalid tag type";
 			return nullptr;

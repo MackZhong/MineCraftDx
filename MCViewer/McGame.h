@@ -9,7 +9,7 @@ namespace MC
 	class McGame :
 		public Game_DR
 	{
-		std::wstring m_WorldPath;
+		std::wstring m_VersionPath;
 		std::wstring m_WorldName;
 
 	public:

@@ -33,9 +33,6 @@ namespace MC {
 		int getChunkLocation(int x, int z) const {
 			return m_ChunkLocation[x + z * 32];
 		}
-		bool hasChunk(int x, int z) const {
-			return getChunkLocation(x, z) != 0;
-		}
 		void setOffset(int x, int z, int offset) {
 			// TODO: little endian convt needed
 			m_ChunkLocation[x + z * 32] = offset;
@@ -54,9 +51,11 @@ namespace MC {
 		}
 
 	public:
+		bool hasChunk(int x, int z) const {
+			return getChunkLocation(x, z) != 0;
+		}
+		RegionFile(const wchar_t* fileName) : RegionFile(FS::path(fileName)){}
 		RegionFile(const FS::path& filePath) : m_FileName(filePath), m_SizeDelta(8192) {
-			//m_Offsets.reserve(SECTOR_INTS);
-			//m_ChunkTimestamps.reserve(SECTOR_INTS);
 			if (!FS::exists(m_FileName)) {
 				DebugMessageW(L"Region file not founded.\n");
 			}
@@ -66,23 +65,13 @@ namespace MC {
 
 				m_FileHandle = _wopen(m_FileName.c_str(), _O_RDONLY | _O_BINARY | _O_RANDOM, _S_IREAD);
 				__int32 fileSize = _lseek(m_FileHandle, 0, SEEK_END);
-				//m_FileHandle.open(m_FileName, BOOST_IOS::binary | BOOST_IOS::in | BOOST_IOS::out);
-				//m_FileHandle.seekp(0, BOOST_IOS::_Seekend);
 
 #pragma region The first 2 sectors
 				if (fileSize < SECTOR_BYTES) {
-					//m_FileHandle.write((char*)&m_ChunkLocation, SECTOR_BYTES - fileSize);
-					//for (int i = fileSize; i < SECTOR_INTS * 2; i++) {
-					//}
-					//m_SizeDelta = SECTOR_BYTES * 2;
-					//fileSize = FS::file_size(m_FileName);
 					fileSize = _lseek(m_FileHandle, 0, SEEK_END);
 				}
 
 				if (fileSize < SECTOR_BYTES * 2) {
-					//m_FileStream.seekp(0, BOOST_IOS::_Seekend);
-					//m_FileHandle.write((char*)&m_ChunkTimestamps, SECTOR_BYTES * 2 - fileSize);
-					//fileSize = FS::file_size(m_FileName);
 					fileSize = _lseek(m_FileHandle, 0, SEEK_END);
 				}
 #pragma endregion The first 2 sectors
@@ -90,11 +79,6 @@ namespace MC {
 #pragma region Align for 4K
 				int align4K = fileSize & 0xfff;
 				if (align4K != 0) {
-					/* the file size is not a multiple of 4KB, grow it */
-					//m_FileHandle.write((char*)&m_ChunkLocation, SECTOR_BYTES - align4K);
-					//for (int i = 0; i < (fileSize & 0xfff); i++) {
-					//	m_FileStream.write((char*)&data, sizeof(data));
-					//}
 					fileSize = _lseek(m_FileHandle, 0, SEEK_END);
 				}
 #pragma endregion Align for 4K
@@ -109,12 +93,6 @@ namespace MC {
 				m_SectorFree[1] = false;
 
 				// Chunk location
-				//m_FileHandle.seekg(0, BOOST_IOS::_Seekbeg);
-				//posg = m_FileHandle.tellg();
-				//posp = m_FileHandle.tellp();
-				//m_FileHandle.read((char*)m_ChunkLocation, SECTOR_BYTES);
-				//posg = m_FileHandle.tellg();
-				//posp = m_FileHandle.tellp();
 				_lseek(m_FileHandle, 0, SEEK_SET);
 				_read(m_FileHandle, m_ChunkLocation, SECTOR_BYTES);
 
@@ -135,7 +113,6 @@ namespace MC {
 				// Chunk timestamps
 				for (int i = 0; i < SECTOR_INTS; i++) {
 					int timestamps;
-					//m_FileHandle.read((char*)&timestamps, sizeof(timestamps));
 					_read(m_FileHandle, &timestamps, sizeof(timestamps));
 					m_ChunkTimestamps[i] = BigEndian32(&timestamps);
 				}

@@ -26,6 +26,7 @@
 #include <boost/iostreams/copy.hpp>
 
 namespace MC {
+	static wchar_t _Buffer[_MAX_PATH * 2];
 
 	enum COMPRESSION_SCHEME : __int32 {
 		COMPRESSION_SCHEME_GZIP = 1,
@@ -94,7 +95,6 @@ namespace MC {
 #ifdef _DEBUG
 	inline void DebugMessageW(const wchar_t* _Format, ...) {
 		int _Result = 0;
-		static wchar_t _Buffer[_MAX_PATH];
 		va_list _ArgList;
 		__crt_va_start(_ArgList, _Format);
 		_Result = vswprintf_s(_Buffer, _Format, _ArgList);
@@ -106,20 +106,20 @@ namespace MC {
 #define DebugMessageW(msg)
 #endif
 
-//
-//	inline int DebugMessageW(const wchar_t* _Format, ...) {
-//		int _Result = 0;
-//#ifdef _DEBUG
-//		static wchar_t _Buffer[128];
-//		va_list _ArgList;
-//		__crt_va_start(_ArgList, _Format);
-//		_Result = __vswprintf_l(_Buffer, _Format, NULL, _ArgList);
-//		__crt_va_end(_ArgList);
-//		//std::_Debug_message(_Buffer, __FILEW__, __LINE__);
-//		std::wcerr << _Buffer;
-//#endif
-//		return _Result;
-//	}
+	//
+	//	inline int DebugMessageW(const wchar_t* _Format, ...) {
+	//		int _Result = 0;
+	//#ifdef _DEBUG
+	//		static wchar_t _Buffer[128];
+	//		va_list _ArgList;
+	//		__crt_va_start(_ArgList, _Format);
+	//		_Result = __vswprintf_l(_Buffer, _Format, NULL, _ArgList);
+	//		__crt_va_end(_ArgList);
+	//		//std::_Debug_message(_Buffer, __FILEW__, __LINE__);
+	//		std::wcerr << _Buffer;
+	//#endif
+	//		return _Result;
+	//	}
 #define _SWAP_SHORT(l)                \
             ( ( ((l) >> 8) & 0x000000FFL ) |       \
               ( (l << 8) & 0x0000FF00L ) )
