@@ -47,9 +47,10 @@ namespace MC {
 
 #pragma region Level
 		const wchar_t* levelFileName = storage.getLevelName(m_WorldName.c_str());
-		MC::NbtFile levelFile(levelFileName);
+		FS::path p(levelFileName);
+		MC::NbtFile levelFile(p);
 
-		m_Root = std::unique_ptr<CompoundTag>(levelFile.getRootTagr(L"Data"));
+		m_Root = std::unique_ptr<CompoundTag>(levelFile.getRootTag(L"Data"));
 		std::wofstream ofs("LevelData.txt");
 
 		ofs.imbue(std::locale(std::wcout.getloc(), new std::codecvt_utf8<wchar_t>));
@@ -99,8 +100,8 @@ namespace MC {
 				int regionZ = regions[i][1];
 				const wchar_t* regionFileName = storage.getRegionName(m_WorldName.c_str(), regionX, regionZ);
 				if (nullptr != regionFileName) {
-					ofs << regionFileName << std::endl << std::endl;
 					ofs << "Region x=" << regionX << ", z=" << regionZ << ":" << std::endl;
+					ofs << regionFileName << std::endl << std::endl;
 					RegionFile regionFile(regionFileName);
 
 					for (int chunkInRegionX = 0; chunkInRegionX < 32; chunkInRegionX++) {
@@ -109,7 +110,9 @@ namespace MC {
 								continue;
 							}
 							ofs << "Chunk in region x=" << chunkInRegionX << ", z=" << chunkInRegionZ << std::endl;
-
+							if (5 == chunkInRegionX && 5 == chunkInRegionZ) {
+								int a = 0;
+							}
 							CompoundTag* regionData = regionFile.readChunk(chunkInRegionX, chunkInRegionZ);
 							ofs << *regionData;
 
@@ -130,10 +133,10 @@ namespace MC {
 								}
 								ofs << std::endl;
 							}
+				ofs << std::endl << std::endl << std::endl;
 						}
 					}
 				}
-				ofs << std::endl << std::endl;
 				ofs.close();
 			}
 

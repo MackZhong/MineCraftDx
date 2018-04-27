@@ -134,7 +134,6 @@ namespace MC {
 
 	NbtTag* NbtTag::readNamedTag(NbtReader* pdis) {
 		__int8 type = pdis->readByte();
-		int pos = pdis->position();
 		if (type < TAG_End || type >= TAG_Max) {
 			throw "Invalid tag type";
 			return nullptr;
@@ -145,6 +144,7 @@ namespace MC {
 		}
 
 		const std::wstring& name = pdis->readUTF();
+		int pos = pdis->position();
 		NbtTag* newTag = createTag((TAG_TYPE)type, name);
 		newTag->Load(pdis);
 
@@ -245,6 +245,7 @@ namespace MC {
 		sbin.push(data);
 		std::ofstream decomped("decomp.bin");
 		boost::iostreams::copy(sbin, decomped);
+		decomped.flush();
 		decomped.close();
 		std::ifstream ins("decomp.bin");
 		NbtReader dis(ins);

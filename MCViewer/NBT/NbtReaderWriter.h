@@ -9,6 +9,7 @@ namespace MC {
 	{
 		//std::shared_ptr<std::streambuf> m_Buffer;
 		std::streambuf* m_Buffer;
+		size_t m_pos = 0;
 
 	public:
 		NbtReader(const IFilteringStream& stream) : m_Buffer(stream.rdbuf())
@@ -18,25 +19,25 @@ namespace MC {
 		NbtReader(std::streambuf* buf) :m_Buffer(buf)
 		{}
 
-		int position()  {
-			auto pos = m_Buffer->pubseekoff(0, std::ios_base::cur);
-			return pos;
+		size_t position() const {
+			return m_pos;
 		}
 		const std::shared_ptr<char> read(size_t size) {
 			auto ptr = new char[size];
 			m_Buffer->sgetn(ptr, size);
+			m_pos += size;
 			return std::shared_ptr<char>(ptr);
 		}
 		__int8 readByte() {
 			__int8 v;
 			m_Buffer->sgetn((char*)&v, sizeof(v));
-
+			m_pos++;
 			return v;
 		}
 		__int16 readShort() {
 			__int8 v[2];
 			m_Buffer->sgetn(v, sizeof(v));
-
+			m_pos += 2;
 			return (__int16)((v[0] << 8) | (v[1] & 0xff));
 		};
 		__int32 readInt() {
@@ -47,13 +48,14 @@ namespace MC {
 			//v[1] = m_Buffer->sgetc();
 			//v[0] = m_Buffer->sgetc();
 			//return *(__int32*)v;
+			m_pos += 4;
 			return (__int32)(((v[0] & 0xff) << 24) | ((v[1] & 0xff) << 16) |
 				((v[2] & 0xff) << 8) | (v[3] & 0xff));
 		};
 		__int64 readLong() {
 			__int8 v[8];
 			m_Buffer->sgetn(v, sizeof(v));
-
+			m_pos += 8;
 			return (__int64)(((__int64)(v[0] & 0xff) << 56) |
 				((__int64)(v[1] & 0xff) << 48) |
 				((__int64)(v[2] & 0xff) << 40) |
@@ -78,9 +80,8 @@ namespace MC {
 				return L"";
 			}
 			auto data = std::make_unique<__int8[]>(length);
-			//auto pos1 = m_Buffer->pubseekpos(0, BOOST_IOS::_Seekcur);
 			auto readed = m_Buffer->sgetn(data.get(), length);
-			//auto pos2 = m_Buffer->pubseekpos(0, BOOST_IOS::_Seekcur);
+			m_pos += length;
 			for (int i = 0; i < length; i++) {
 				unsigned __int8 a = data[i];
 				unsigned __int8 b = data[i + 1];
@@ -101,9 +102,7 @@ namespace MC {
 					break;
 				}
 			}
-			//__super::load(readed);
-			//char buf[10];
-			//__super::load_binary(buf, 10);
+
 			return str;
 		}
 	};
