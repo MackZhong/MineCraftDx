@@ -47,15 +47,27 @@ namespace MC {
 
 #pragma region Level
 		const wchar_t* levelFileName = storage.getLevelName(m_WorldName.c_str());
-		FS::path p(levelFileName);
-		MC::NbtFile levelFile(p);
 
-		m_Root = std::unique_ptr<CompoundTag>(levelFile.getRootTag(L"Data"));
-		std::wofstream ofs("LevelData.txt");
+		int sfloat = sizeof(float);
+		int sint = sizeof(int);
+		int sdouble = sizeof(double);
 
+		MC::NbtFile levelFile(levelFileName);
+		NbtTag* pTag = levelFile.ReadTag();
+		m_Root = std::unique_ptr<CompoundTag>(((CompoundTag*)pTag)->getCompound(L"Data"));
+		std::wofstream ofs("LevelData1.txt");
 		ofs.imbue(std::locale(std::wcout.getloc(), new std::codecvt_utf8<wchar_t>));
 		ofs << *m_Root << std::endl;
 		ofs.close();
+
+		//FS::path p(levelFileName);
+		////MC::NbtFile levelFile(p);
+
+		//m_Root = std::unique_ptr<CompoundTag>(levelFile.getRootTag(L"Data"));
+		//ofs.open("LevelData2.txt");
+		//ofs.imbue(std::locale(std::wcout.getloc(), new std::codecvt_utf8<wchar_t>));
+		//ofs << *m_Root << std::endl;
+		//ofs.close();
 #pragma endregion Level file
 
 #pragma region Player

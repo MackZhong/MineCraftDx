@@ -4,12 +4,15 @@
 #include "NbtIo.h"
 #include "zlib.h"
 #pragma comment(lib, "zlibwapi.lib")
+#include <malloc.h>
 
 namespace MC {
 	class NbtFile
 	{
-		ByteArray m_Datas;
-		size_t m_Pos;
+		const unsigned int _BlockSize = 1024 * 1024;
+		std::unique_ptr<char[]> m_Buffer;
+		unsigned int m_Size;
+		unsigned int m_Pos;
 
 		FS::path m_FileHandle;
 
@@ -17,83 +20,240 @@ namespace MC {
 		NbtFile(const FS::path& base) : m_FileHandle(base)
 		{
 		};
+
+		NbtFile(const char* buf, unsigned int size) : m_Size(size) {
+			assert(_msize((void*)buf) == size);
+			m_Buffer = std::make_unique<char[]>(size);
+			memcpy_s(m_Buffer.get(), m_Size, buf, size);
+		}
 		NbtFile(const wchar_t* fileName)
 		{
 			gzFile zf = gzopen_w(fileName, "rb");
-			int ch = gzgetc(zf);
-			while (ch != -1) {
-				m_Datas.push_back(ch);
-				ch = gzgetc(zf);
+			char* _buffer = (char*)std::malloc(_BlockSize);
+			m_Size = 0;
+			while (true) {
+				int readed = gzread(zf, _buffer, _BlockSize);
+				int errnum = 0;
+				const char* errmsg = gzerror(zf, &errnum);
+				if (readed < 0) {
+					throw "Read file eroor.";
+				}
+				m_Size += readed;
+				if (readed < _BlockSize) {
+					void* temp = _expand(_buffer, m_Size);
+					if (NULL == temp) {
+						throw "Memory alloc failed.";
+					}
+					_buffer = (char*)temp;
+					break;
+				}
+				if (Z_OK == errnum) {
+					gzclearerr(zf);
+					break;
+				}
+				else if (Z_BUF_ERROR == errnum) {
+					gzclearerr(zf);
+					void* temp = _expand(_buffer, m_Size + _BlockSize);
+					if (NULL == temp) {
+						temp = realloc(_buffer, m_Size + _BlockSize);
+					}
+					if (NULL == temp) {
+						throw "Memory alloc failed.";
+					}
+					_buffer = (char*)temp;
+				}
 			}
 			gzclose(zf);
+			size_t memsize = _msize(_buffer);
+			assert(memsize == m_Size);
+			m_Buffer = std::unique_ptr<char[]>(_buffer);
+			int f;
+			errno_t e = _wsopen_s(&f, L"dump.nbt", _O_CREAT | _O_RDWR, _SH_DENYNO, _S_IREAD | _S_IWRITE);
+			_write(f, m_Buffer.get(), m_Size);
+			_close(f);
 		};
+
+		//~NbtFile() { free(m_Buffer); m_Buffer = nullptr; }
 
 		inline void ResetBuffer() { m_Pos = 0; }
 
 		inline char GetByte() {
-			return m_Datas[m_Pos++];
+			if (m_Pos >= m_Size)
+				throw "Memory overflow.";
+			return m_Buffer[m_Pos++];
 		}
 
 		inline short GetShort() {
-			return (short)((m_Datas[m_Pos++] << 8) | m_Datas[m_Pos++]);
+			if (m_Pos + 2 >= m_Size)
+				throw "Memory overflow.";
+			return (short)((m_Buffer[m_Pos++] << 8) | m_Buffer[m_Pos++]);
 		}
 
-		inline void GetBytes(char* buffer, size_t size) {
-			for (size_t i = 0; i < size; i++) {
-				buffer[i] = m_Datas[m_Pos++];
-			}
+		inline int GetInt() {
+			if (m_Pos + 4 >= m_Size)
+				throw "Memory overflow.";
+			return (int)(((m_Buffer[m_Pos++] & 0xff) << 24) | ((m_Buffer[m_Pos++] & 0xff) << 16) |
+				((m_Buffer[m_Pos++] & 0xff) << 8) | (m_Buffer[m_Pos++] & 0xff));
 		}
 
-		std::wstring GetUtf8() {
+		inline float GetFloat() {
+			int v = GetInt();
+			return *(float*)&v;
+		}
+
+		inline __int64 GetLong() {
+			if (m_Pos + 8 >= m_Size)
+				throw "Memory overflow.";
+			return (__int64)(((__int64)(m_Buffer[m_Pos++] & 0xff) << 56) |
+				((__int64)(m_Buffer[m_Pos++] & 0xff) << 48) |
+				((__int64)(m_Buffer[m_Pos++] & 0xff) << 40) |
+				((__int64)(m_Buffer[m_Pos++] & 0xff) << 32) |
+				((long)(m_Buffer[m_Pos++] & 0xff) << 24) |
+				((long)(m_Buffer[m_Pos++] & 0xff) << 16) |
+				((long)(m_Buffer[m_Pos++] & 0xff) << 8) |
+				((long)(m_Buffer[m_Pos++] & 0xff)));
+		}
+
+		inline double GetDouble() {
+			__int64 v = GetLong();
+			return *(double*)&v;
+		}
+
+		inline void GetBytes(char* buffer, unsigned int size) {
+			if (m_Pos + size + 1 >= m_Size)
+				throw "Memory overflow.";
+			memcpy_s(buffer, size, m_Buffer.get() + m_Pos, size);
+			m_Pos += size;
+		}
+
+		std::wstring GetUtf8(short length) {
 			std::wstring str;
-			short length = GetShort();
-			if (1 > length) {
-				return str;
-			}
-
-			auto data = std::make_unique<__int8[]>(length);
-			//auto pos1 = m_Buffer->pubseekpos(0, BOOST_IOS::_Seekcur);
-			GetBytes(data.get(), length);
-			//auto pos2 = m_Buffer->pubseekpos(0, BOOST_IOS::_Seekcur);
-			for (int i = 0; i < length; i++) {
-				unsigned __int8 a = data[i];
-				unsigned __int8 b = data[i + 1];
-				unsigned __int8 c = data[i + 2];
+			int pos = 0;
+			for (pos = 0; pos < length; pos++) {
+				unsigned __int8 a = m_Buffer[m_Pos + pos];
+				unsigned __int8 b = m_Buffer[m_Pos + pos + 1];
+				unsigned __int8 c = m_Buffer[m_Pos + pos + 2];
 				if (a >> 7 == 0) {
 					str += a;
 				}
 				else if (a >> 5 == 0x6 && b >> 6 == 0x2) {
 					str += (wchar_t)(((a & 0x1F) << 6) | (b & 0x3F));
-					i++;
+					pos++;
 				}
 				else if (a >> 4 == 0xe && b >> 6 == 0x2 && c >> 6 == 0x2) {
 					str += (wchar_t)(((a & 0x0F) << 12) | ((b & 0x3F) << 6) | (c & 0x3F));
-					i += 2;
+					pos += 2;
 				}
 				else {
 					throw "Invalid UTF string";
 					break;
 				}
 			}
+			m_Pos += pos;
 
 			return str;
 		}
 
-		CompoundTag* ReadTag() {
-			ResetBuffer();
-			char ttype = GetByte();
-			if (TAG_Compound != ttype) {
-				return nullptr;
-			}
-
-			std::wstring name = GetUtf8();
-			CompoundTag* root = new CompoundTag(name);
-			Load(root);
-			return root;
+		const char* GetCur() const {
+			return m_Buffer.get() + m_Pos;
 		}
 
-		void Load(CompoundTag* tag) {
+		NbtTag* ReadTag() {
+			char ttype = GetByte();
+			if (TAG_End == ttype) {
+				return new EndTag;
+			}
 
+			short length = GetShort();
+			std::wstring name = GetUtf8(length);
+			return LoadTypedTag(ttype, name);
+		}
+
+		NbtTag* LoadTypedTag(char ttype, const std::wstring& name) {
+			NbtTag* tag = nullptr;
+			switch (ttype) {
+			case TAG_Byte:
+				tag = new ByteTag(name, GetByte());
+				break;
+			case TAG_Short:
+				tag = new ShortTag(name, GetShort());
+				break;
+			case TAG_Int:
+				tag = new IntTag(name, GetInt());
+				break;
+			case TAG_Long:
+				tag = new LongTag(name, GetLong());
+				break;
+			case TAG_Float:
+				tag = new FloatTag(name, GetFloat());
+				break;
+			case TAG_Double:
+				tag = new DoubleTag(name, GetDouble());
+				break;
+			case TAG_Byte_Array:
+			{
+				int size = GetInt();
+				tag = new ByteArrayTag(name, GetCur(), size);
+				break;
+			}
+			case TAG_String:
+			{
+			if (L"LevelName" == name) {
+				DebugMessageW(name.c_str());
+			}
+				short length = GetShort();
+				tag = new StringTag(name, GetUtf8(length));
+				break;
+			}
+			case TAG_List:
+			{
+				ttype = GetByte();
+				int size = GetInt();
+				tag = new  ListTag(name, (TAG_TYPE)ttype);
+				for (int i = 0; i < size; i++) {
+					NbtTag* elem = LoadTypedTag(ttype, L"");
+					((ListTag*)tag)->add(elem);
+				}
+				break;
+			}
+			case TAG_Compound:
+			{
+				tag = new CompoundTag(name); 
+				while(true){					
+					NbtTag* next = ReadTag();
+					if (nullptr == next || TAG_End == next->getId()) {
+						break;
+					}
+					((CompoundTag*)tag)->put(next->getName(), next);
+				}
+				break;
+			}
+			case TAG_Int_Array:
+			{
+				int size = GetInt();
+				int* buf = new int[size];
+				for (int i = 0; i < size; i++) {
+					buf[i] = GetInt();
+				}
+				tag = new IntArrayTag(name, buf, size);
+			break;
+			}
+			case TAG_Long_Array:
+			{
+				int size = GetInt();
+				__int64* buf = new __int64[size];
+				for (int i = 0; i < size; i++) {
+					buf[i] = GetLong();
+				}
+				tag = new LongArrayTag(name, buf, size);
+				break;
+			}
+			case TAG_Short_Array:
+				throw "Not implemented.";
+				break;
+			}
+
+			return tag;
 		}
 
 	public:

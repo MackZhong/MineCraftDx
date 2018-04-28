@@ -100,7 +100,7 @@ namespace MC {
 		return ostm;
 	}
 
-	NbtTag* NbtTag::createTag(TAG_TYPE type, const std::wstring& name) {
+	NbtTag* NbtTag::createTag(int type, const std::wstring& name) {
 		switch (type) {
 		case TAG_End:
 			return new EndTag;
@@ -144,7 +144,7 @@ namespace MC {
 		}
 
 		const std::wstring& name = pdis->readUTF();
-		int pos = pdis->position();
+		int pos = (int)pdis->position();
 		NbtTag* newTag = createTag((TAG_TYPE)type, name);
 		newTag->Load(pdis);
 

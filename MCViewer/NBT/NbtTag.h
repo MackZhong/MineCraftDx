@@ -17,6 +17,7 @@ namespace MC {
 		TAG_Compound = 10,
 		TAG_Int_Array = 11,
 		TAG_Long_Array = 12,
+		TAG_Short_Array = 13,
 		TAG_Max
 	};
 
@@ -34,7 +35,7 @@ namespace MC {
 		virtual void Write(NbtWriter* pdos) const = 0;
 		virtual void Load(NbtReader* pdis) = 0;
 
-		static NbtTag* createTag(TAG_TYPE type, const std::wstring& name);
+		static NbtTag* createTag(int type, const std::wstring& name);
 		virtual TAG_TYPE getId() const = 0;
 		NbtTag* setName(const std::wstring& name) { this->m_Name = name;  return this; }
 		const std::wstring& getName() const { return m_Name; }
@@ -279,7 +280,7 @@ namespace MC {
 	public:
 		ByteArrayTag(const std::wstring& name) : super(name) {
 		};
-		ByteArrayTag(const std::wstring& name, const char* data, _int32 size) : super(name), m_Data(data), m_Size(size) {
+		ByteArrayTag(const std::wstring& name, const char* data, unsigned int size) : super(name), m_Data(data), m_Size(size) {
 		};
 		virtual TAG_TYPE getId() const override { return TAG_Byte_Array; };
 		friend std::wostream& operator<<(std::wostream& wos, const ByteArrayTag& tag) {
@@ -472,7 +473,9 @@ namespace MC {
 		};
 
 	public:
-		ListTag(const std::wstring& name) : super(name) {
+		ListTag(const std::wstring& name, TAG_TYPE type) : super(name), m_ElemType(type) {
+		};
+		ListTag(const std::wstring& name) : super(name), m_ElemType(TAG_End) {
 		};
 		virtual TAG_TYPE getId() const override { return TAG_List; };
 		friend std::wostream& operator<<(std::wostream& wos, const ListTag& tag) {
@@ -562,8 +565,8 @@ namespace MC {
 			}
 			return tags;
 		}
-		void put(const std::wstring& name, NbtTag& tag) {
-			m_Tags.emplace(name, tag.setName(name));
+		void put(const std::wstring& name, NbtTag* tag) {
+			m_Tags.emplace(name, tag);
 		}
 		void putByte(const std::wstring& name, __int8 value) {
 			m_Tags.emplace(name, new ByteTag(name, value));
