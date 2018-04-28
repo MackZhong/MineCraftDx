@@ -1,8 +1,7 @@
 #pragma once
-#include "IComparable.h"
 #include <string>
 
-namespace MC{
+namespace MC {
 	enum TagType
 	{
 		TAG_END = 0,
@@ -22,23 +21,23 @@ namespace MC{
 		TAG_MAX
 	};
 
-class TagKey : public IComparable<TagKey>
-{
-protected:
-	std::string m_Name;
-	TagType m_Type;
+	class TagKey
+	{
+	protected:
+		std::string m_Name;
+		TagType m_Type;
 
-public:
-	TagKey(const char* name, TagType type) : m_Name(name), m_Type(type) {};
-	std::string Name() const { return m_Name; }
-	TagType Type() const { return m_Type; }
+	public:
+		TagKey(const char* name, TagType type) : m_Name(name), m_Type(type) {};
+		std::string Name() const { return m_Name; }
+		TagType Type() const { return m_Type; }
 
-	// 通过 IComparable 继承
-	virtual bool CompareTo(const TagKey & other) override {
-		if (this->m_Type != other.m_Type) {
-			return false;
-		}
-		return this->m_Name == other.m_Name;
+		// 通过 IComparable 继承
+		bool operator=(const TagKey & other) {
+			if (this->m_Type != other.m_Type) {
+				return false;
+			}
+			return this->m_Name == other.m_Name;
+		};
 	};
-};
 }

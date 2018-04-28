@@ -30,11 +30,8 @@
     <ClInclude Include="NbtViewer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="IComparable.h">
-      <Filter>Model</Filter>
-    </ClInclude>
     <ClInclude Include="TagKey.h">
-      <Filter>头文件</Filter>
+      <Filter>Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
