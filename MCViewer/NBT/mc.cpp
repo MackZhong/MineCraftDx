@@ -1,7 +1,7 @@
 #include "EnginePCH.h"
 #include "mc.h"
 #include "NbtReaderWriter.h"
-#include "NbtIo.h"
+//#include "NbtIo.h"
 #include "NbtTag.h"
 
 namespace MC {
@@ -198,154 +198,139 @@ namespace MC {
 		return "UNKNOWN";
 	}
 
-	CompoundTag* NbtIo::readCompressed(FS::ifstream& in) {
-		IFilteringStream sbin;
-		sbin.set_auto_close(true);
-		sbin.push(boost::iostreams::gzip_decompressor());
-		sbin.push(in);
-
-		NbtReader dis(sbin);
-		try {
-			CompoundTag* tag = NbtIo::readFrom(&dis);
-			return tag;
-		}
-		catch (std::exception& err) {
-			std::cerr << "Error: " << err.what() << std::endl;
-			throw err;
-		}
-		//dis.Close();
-		return nullptr;
-	}
-
-	void NbtIo::writeCompressed(const CompoundTag* tag, FS::ofstream& out) {
-		//OFilteringStreamBuf sbout;
-		boost::iostreams::filtering_ostream sbout;
-		//sbout.push(boost::iostreams::gzip_compressor());
-		sbout.push(out);
-
-		NbtWriter dos(sbout);
-		try {
-			NbtIo::writeTo(tag, &dos);
-		}
-		catch (std::exception& err) {
-			throw err;
-		}
-		//final {
-		//	dos.Close();
-		//}
-	}
-
-	CompoundTag* NbtIo::decompress(const char* buffer, size_t size, COMPRESSION_SCHEME scheme) {
-		IFilteringStream sbin;
-		if (COMPRESSION_SCHEME_GZIP == scheme)
-			sbin.push(boost::iostreams::gzip_decompressor());
-		else
-			sbin.push(boost::iostreams::zlib_decompressor());
-		boost::iostreams::array_source data(buffer, size);
-		sbin.push(data);
-		std::ofstream decomped("decomp.bin");
-		boost::iostreams::copy(sbin, decomped);
-		decomped.flush();
-		decomped.close();
-		std::ifstream ins("decomp.bin");
-		NbtReader dis(ins);
+	//CompoundTag* NbtIo::readCompressed(FS::ifstream& in) {
+		//IFilteringStream sbin;
+		//sbin.set_auto_close(true);
+		//sbin.push(boost::iostreams::gzip_decompressor());
+		//sbin.push(in);
 
 		//NbtReader dis(sbin);
-		try {
-			CompoundTag* tag = readFrom(&dis);
-			return tag;
-		}
-		catch (std::exception& err) {
-			throw err;
-		}
-
-		return nullptr;
-	}
-
-	UniquePtr NbtIo::compress(CompoundTag* tag) {
-		OFilteringStream sbout;
-		//sbout.push(boost::iostreams::gzip_compressor(boost::iostreams::gzip_params(boost::iostreams::gzip::best_compression)));
-		//boost::iostreams::stream_buffer<boost::iostreams::basic_array_source<__int8>> sbuf;
-		//sbout.push(sbuf);
-
-		NbtWriter dos(sbout);
-		try {
-			NbtIo::writeTo(tag, &dos);
-		}
-		catch (std::exception& err) {
-			throw err;
-		}
-		//finally{
-		//	dos.Close();
+		//try {
+		//	CompoundTag* tag = NbtIo::readFrom(&dis);
+		//	return tag;
 		//}
-		//buffer.open()
-		size_t size = sbout.size();
-		auto buf = std::make_unique<__int8[]>(size);
-		sbout.rdbuf()->sgetn(buf.get(), size);
-		//IO::read(sbout, buf.get(), size);
-
-		return buf;
-	}
-
-	void NbtIo::write(const CompoundTag* tag, FS::path& file) {
-		FS::ofstream ofs(file);
-		NbtWriter dos(ofs);
-		try {
-			NbtIo::writeTo(tag, &dos);
-		}
-		catch (std::exception err) {
-
-		}
-		//finally{
-		//	dos.close();
+		//catch (std::exception& err) {
+		//	std::cerr << "Error: " << err.what() << std::endl;
+		//	throw err;
 		//}
-	}
+	//	return nullptr;
+	//}
 
-	void NbtIo::safeWrite(const CompoundTag* tag, FS::path file) {
-		FS::path file2(file.filename().wstring() + L"_tmp");
-		if (FS::exists(file2)) {
-			FS::remove(file2);
-		}
+	//void NbtIo::writeCompressed(const CompoundTag* tag, FS::ofstream& out) {
+		//boost::iostreams::filtering_ostream sbout;
+		//sbout.push(out);
 
-		NbtIo::write(tag, file2);
+		//NbtWriter dos(sbout);
+		//try {
+		//	NbtIo::writeTo(tag, &dos);
+		//}
+		//catch (std::exception& err) {
+		//	throw err;
+		//}
+	//}
 
+	//CompoundTag* NbtIo::decompress(const char* buffer, size_t size, COMPRESSION_SCHEME scheme) {
+		//IFilteringStream sbin;
+		//if (COMPRESSION_SCHEME_GZIP == scheme)
+		//	sbin.push(boost::iostreams::gzip_decompressor());
+		//else
+		//	sbin.push(boost::iostreams::zlib_decompressor());
+		//boost::iostreams::array_source data(buffer, size);
+		//sbin.push(data);
+		//std::ofstream decomped("decomp.bin");
+		//boost::iostreams::copy(sbin, decomped);
+		//decomped.flush();
+		//decomped.close();
+		//std::ifstream ins("decomp.bin");
+		//NbtReader dis(ins);
 
-		if (FS::exists(file)) {
-			FS::remove(file);
-		}
-		if (FS::exists(file)) {
-			wchar_t buf[128];
-			swprintf_s(buf, L"Failed to delete %s ", file.filename().wstring().c_str());
-			throw buf;
-		}
-
-		FS::rename(file2, file);
-	}
-
-	CompoundTag* NbtIo::readFrom(NbtReader* pdis) {
-		NbtTag* tag1 = NbtTag::readNamedTag(pdis);
-		CompoundTag* tag = reinterpret_cast<CompoundTag*>(tag1);
-
-		if (tag)
-			return tag;
-
-		throw "Root tag must be a named compound tag";
-	}
-
-	CompoundTag* NbtIo::read(FS::path& file) {
-		if (!FS::exists(file)) return nullptr;
-		FS::ifstream ifs(file);
-		NbtReader dis(ifs);
-		try {
-			return NbtIo::readFrom(&dis);
-		}
-		catch (std::exception err) {
-
-		}
-		//finally{
-		//	dis.close();
+		//try {
+		//	CompoundTag* tag = readFrom(&dis);
+		//	return tag;
+		//}
+		//catch (std::exception& err) {
+		//	throw err;
 		//}
 
-		return nullptr;
-	}
+	//	return nullptr;
+	//}
+
+	//UniquePtr NbtIo::compress(CompoundTag* tag) {
+	//	OFilteringStream sbout;
+	//	NbtWriter dos(sbout);
+	//	try {
+	//		NbtIo::writeTo(tag, &dos);
+	//	}
+	//	catch (std::exception& err) {
+	//		throw err;
+	//	}
+
+	//	size_t size = sbout.size();
+	//	auto buf = std::make_unique<__int8[]>(size);
+	//	sbout.rdbuf()->sgetn(buf.get(), size);
+
+	//	return buf;
+	//}
+
+	//void NbtIo::write(const CompoundTag* tag, FS::path& file) {
+	//	FS::ofstream ofs(file);
+	//	NbtWriter dos(ofs);
+	//	try {
+	//		NbtIo::writeTo(tag, &dos);
+	//	}
+	//	catch (std::exception err) {
+
+	//	}
+	//	//finally{
+	//	//	dos.close();
+	//	//}
+	//}
+
+	//void NbtIo::safeWrite(const CompoundTag* tag, FS::path file) {
+	//	FS::path file2(file.filename().wstring() + L"_tmp");
+	//	if (FS::exists(file2)) {
+	//		FS::remove(file2);
+	//	}
+
+	//	NbtIo::write(tag, file2);
+
+
+	//	if (FS::exists(file)) {
+	//		FS::remove(file);
+	//	}
+	//	if (FS::exists(file)) {
+	//		wchar_t buf[128];
+	//		swprintf_s(buf, L"Failed to delete %s ", file.filename().wstring().c_str());
+	//		throw buf;
+	//	}
+
+	//	FS::rename(file2, file);
+	//}
+
+	//CompoundTag* NbtIo::readFrom(NbtReader* pdis) {
+	//	NbtTag* tag1 = NbtTag::readNamedTag(pdis);
+	//	CompoundTag* tag = reinterpret_cast<CompoundTag*>(tag1);
+
+	//	if (tag)
+	//		return tag;
+
+	//	throw "Root tag must be a named compound tag";
+	//}
+
+	//CompoundTag* NbtIo::read(FS::path& file) {
+	//	if (!FS::exists(file)) return nullptr;
+	//	FS::ifstream ifs(file);
+	//	NbtReader dis(ifs);
+	//	try {
+	//		return NbtIo::readFrom(&dis);
+	//	}
+	//	catch (std::exception err) {
+
+	//	}
+	//	//finally{
+	//	//	dis.close();
+	//	//}
+
+	//	return nullptr;
+	//}
 }

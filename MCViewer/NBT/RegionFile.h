@@ -1,6 +1,6 @@
 #pragma once
 #include "mc.h"
-#include "NbtIo.h"
+//#include "NbtIo.h"
 #include "LevelStorage.h"
 
 // https://minecraft.gamepedia.com/Region_file_format
@@ -18,13 +18,13 @@ namespace MC {
 		const int CHUNK_HEADER_SIZE = 5;
 		//static ByteBuffer emptySector[] = new byte[4096];
 
-		FS::path m_FileName;
+		//FS::path m_FileName;
 		int m_FileHandle;
 		__int32 m_ChunkLocation[1024]{ 0 };
 		__int32 m_ChunkTimestamps[1024]{ 0 };
 		int m_TotalSectors;
 		UniquePtrB m_SectorFree;
-		int m_SizeDelta;
+		int m_SizeDelta{ 8192 };
 		time_t m_LastModified = 0;
 
 		bool outofBounds(int x, int z) const {
@@ -54,16 +54,18 @@ namespace MC {
 		bool hasChunk(int x, int z) const {
 			return getChunkLocation(x, z) != 0;
 		}
-		RegionFile(const wchar_t* fileName) : RegionFile(FS::path(fileName)){}
-		RegionFile(const FS::path& filePath) : m_FileName(filePath), m_SizeDelta(8192) {
-			if (!FS::exists(m_FileName)) {
+		RegionFile(const wchar_t* fileName) {
+			errno_t err = _wsopen_s(&m_FileHandle, fileName, _O_RDONLY | _O_BINARY, _SH_DENYNO, _S_IREAD | _S_IWRITE);
+			if (0 != err) {
 				DebugMessageW(L"Region file not founded.\n");
+				throw "Region file not founded.";
 			}
 
-			try {
-				m_LastModified = FS::last_write_time(m_FileName);
+			struct _stat buf;
+			int result = _wstat(fileName, &buf);
+			m_LastModified = buf.st_mtime;
 
-				m_FileHandle = _wopen(m_FileName.c_str(), _O_RDONLY | _O_BINARY | _O_RANDOM, _S_IREAD);
+			try {
 				__int32 fileSize = _lseek(m_FileHandle, 0, SEEK_END);
 
 #pragma region The first 2 sectors
@@ -121,7 +123,75 @@ namespace MC {
 				std::wstring what(e.what(), e.what() + strlen(e.what()));
 				DebugMessageW(what.c_str());
 			}
-		};
+
+		}
+		//		RegionFile(const FS::path& filePath) : m_FileName(filePath), m_SizeDelta(8192) {
+		//			if (!FS::exists(m_FileName)) {
+		//				DebugMessageW(L"Region file not founded.\n");
+		//			}
+		//
+		//			try {
+		//				m_LastModified = FS::last_write_time(m_FileName);
+		//
+		//				m_FileHandle = _wopen(m_FileName.c_str(), _O_RDONLY | _O_BINARY | _O_RANDOM, _S_IREAD);
+		//				__int32 fileSize = _lseek(m_FileHandle, 0, SEEK_END);
+		//
+		//#pragma region The first 2 sectors
+		//				if (fileSize < SECTOR_BYTES) {
+		//					fileSize = _lseek(m_FileHandle, 0, SEEK_END);
+		//				}
+		//
+		//				if (fileSize < SECTOR_BYTES * 2) {
+		//					fileSize = _lseek(m_FileHandle, 0, SEEK_END);
+		//				}
+		//#pragma endregion The first 2 sectors
+		//
+		//#pragma region Align for 4K
+		//				int align4K = fileSize & 0xfff;
+		//				if (align4K != 0) {
+		//					fileSize = _lseek(m_FileHandle, 0, SEEK_END);
+		//				}
+		//#pragma endregion Align for 4K
+		//
+		//				/* set up the available sector map */
+		//				m_TotalSectors = (int)fileSize / SECTOR_BYTES;
+		//				m_SectorFree = std::make_unique<bool[]>(m_TotalSectors);
+		//				memset(m_SectorFree.get(), true, m_TotalSectors);
+		//
+		//				// the first Chunk location and Chunk timestamps?
+		//				m_SectorFree[0] = false;
+		//				m_SectorFree[1] = false;
+		//
+		//				// Chunk location
+		//				_lseek(m_FileHandle, 0, SEEK_SET);
+		//				_read(m_FileHandle, m_ChunkLocation, SECTOR_BYTES);
+		//
+		//				// find used sectors
+		//				for (int i = 0; i < SECTOR_INTS; i++) {
+		//					if (m_ChunkLocation[i] != 0) {
+		//						m_ChunkLocation[i] = BigEndian32(m_ChunkLocation + i);
+		//						int offset = m_ChunkLocation[i] >> 8;
+		//						int count = m_ChunkLocation[i] & 0xff;
+		//						if (offset + count <= m_TotalSectors) {
+		//							for (int sectorIdx = 0; sectorIdx < count; sectorIdx++) {
+		//								m_SectorFree[offset + sectorIdx] = false;
+		//							}
+		//						}
+		//					}
+		//				}
+		//
+		//				// Chunk timestamps
+		//				for (int i = 0; i < SECTOR_INTS; i++) {
+		//					int timestamps;
+		//					_read(m_FileHandle, &timestamps, sizeof(timestamps));
+		//					m_ChunkTimestamps[i] = BigEndian32(&timestamps);
+		//				}
+		//			}
+		//			catch (std::exception e) {
+		//				std::wstring what(e.what(), e.what() + strlen(e.what()));
+		//				DebugMessageW(what.c_str());
+		//			}
+		//		};
 
 		time_t LastModified() const { return m_LastModified; }
 
@@ -131,12 +201,9 @@ namespace MC {
 			return ret;
 		}
 
-		CompoundTag* readChunk(int x, int z) {
+		CompoundTag* ReadChunk(int x, int z) {
 			wchar_t writeName[_MAX_FNAME];
 			swprintf_s(writeName, L"Chunk-%d-%d.nbt", x, z);
-			FS::path writeFile(m_FileName);
-			writeFile.remove_filename();
-			writeFile.append(writeName);
 
 			x &= 31;
 			z &= 31;
@@ -173,19 +240,82 @@ namespace MC {
 			length--;
 			auto data = std::make_unique<char[]>(length);
 			_read(m_FileHandle, data.get(), length);
-			int wfile = _wopen(writeFile.c_str(), _O_WRONLY | _O_BINARY | _O_CREAT, _S_IWRITE);
+			int wfile;
+			errno_t err = _wsopen_s(&wfile, writeName, _O_WRONLY | _O_BINARY | _O_CREAT, _SH_DENYNO, _S_IREAD | _S_IWRITE);
 			_write(wfile, data.get(), length);
 			_close(wfile);
 
-			if (COMPRESSION_SCHEME_GZIP == compressionType) {
-				return NbtIo::decompress(data.get(), length, COMPRESSION_SCHEME_GZIP);
-			}
-			else if (COMPRESSION_SCHEME_ZLIB_DEFLATE == compressionType) {
-				return NbtIo::decompress(data.get(), length, COMPRESSION_SCHEME_ZLIB_DEFLATE);
-			}
+			NbtFile nfile(data.get(), length, COMPRESSION_SCHEME_GZIP);
+			NbtTag* tag = nfile.ReadTag();
+			if (tag->getId() == TAG_Compound)
+				return (CompoundTag*)tag;
 
+			//if (COMPRESSION_SCHEME_GZIP == compressionType) {
+
+			//	return NbtIo::decompress(data.get(), length, COMPRESSION_SCHEME_GZIP);
+			//}
+			//else if (COMPRESSION_SCHEME_ZLIB_DEFLATE == compressionType) {
+			//	return NbtIo::decompress(data.get(), length, COMPRESSION_SCHEME_ZLIB_DEFLATE);
+			//}
+			throw "Invalid tag type";
 			return nullptr;
 		}
+
+		//CompoundTag* readChunk(int x, int z) {
+		//	wchar_t writeName[_MAX_FNAME];
+		//	swprintf_s(writeName, L"Chunk-%d-%d.nbt", x, z);
+		//	FS::path writeFile(m_FileName);
+		//	writeFile.remove_filename();
+		//	writeFile.append(writeName);
+
+		//	x &= 31;
+		//	z &= 31;
+		//	if (this->outofBounds(x, z)) {
+		//		DebugMessageW(L"Read x:%d, z:%d out of bounds.\n", x, z);
+		//		return nullptr;
+		//	}
+
+		//	int location = this->getChunkLocation(x, z);
+		//	if (0 == location) {
+		//		DebugMessageW(L"Read x:%d, z:%d miss.\n", x, z);
+		//		return nullptr;
+		//	}
+
+		//	int offset = location >> 8;
+		//	int count = location & 0xff;
+		//	if (offset + count > this->m_TotalSectors) {
+		//		DebugMessageW(L"Read x:%d, z:%d in invalid sector.\n", x, z);
+		//		return nullptr;
+		//	}
+
+		//	int length;
+		//	_lseek(m_FileHandle, offset * SECTOR_BYTES, SEEK_SET);
+		//	_read(m_FileHandle, &length, sizeof(length));
+		//	length = BigEndian32(&length);
+
+		//	if (length > SECTOR_BYTES * count) {
+		//		DebugMessageW(L"Read x:%d, z:%d overflow with invalid length:%d > 4096 * %d.\n", x, z, length, count);
+		//		return nullptr;
+		//	}
+
+		//	__int8 compressionType;
+		//	_read(m_FileHandle, &compressionType, sizeof(__int8));
+		//	length--;
+		//	auto data = std::make_unique<char[]>(length);
+		//	_read(m_FileHandle, data.get(), length);
+		//	int wfile = _wopen(writeFile.c_str(), _O_WRONLY | _O_BINARY | _O_CREAT, _S_IWRITE);
+		//	_write(wfile, data.get(), length);
+		//	_close(wfile);
+
+		//	if (COMPRESSION_SCHEME_GZIP == compressionType) {
+		//		return NbtIo::decompress(data.get(), length, COMPRESSION_SCHEME_GZIP);
+		//	}
+		//	else if (COMPRESSION_SCHEME_ZLIB_DEFLATE == compressionType) {
+		//		return NbtIo::decompress(data.get(), length, COMPRESSION_SCHEME_ZLIB_DEFLATE);
+		//	}
+
+		//	return nullptr;
+		//}
 
 		//NbtReader* GetChunkDataReader(int x, int z) {
 		//	x &= 31;
@@ -284,8 +414,8 @@ namespace MC {
 			}
 
 			if (sectorNumber != 0 && sectorAllocated == sectorsNeeded) {
-				DebugMessageW(L"Region Save \"%s\" [x:%d, z:%d] %dBytes = rewrite.\n",
-					m_FileName.wstring().c_str(), x, z, length);
+				//DebugMessageW(L"Region Save \"%s\" [x:%d, z:%d] %dBytes = rewrite.\n",
+				//	m_FileName.wstring().c_str(), x, z, length);
 				this->write(sectorNumber, data, length);
 			}
 			else {
@@ -325,8 +455,8 @@ namespace MC {
 
 				if (runLength >= sectorsNeeded) {
 					// found a free space large enough
-					DebugMessageW(L"Region Save \"%s\" [x:%d, z:%d] %dBytes = reuse.\n",
-						m_FileName.wstring().c_str(), x, z, length);
+					//DebugMessageW(L"Region Save \"%s\" [x:%d, z:%d] %dBytes = reuse.\n",
+					//	m_FileName.wstring().c_str(), x, z, length);
 					sectorNumber = runStart;
 					this->setOffset(x, z, (sectorNumber << 8) | sectorsNeeded);
 					for (int i = 0; i < sectorsNeeded; i++) {
@@ -337,8 +467,8 @@ namespace MC {
 				else {
 					// no free space large enough found
 					// grow the file
-					DebugMessageW(L"Region Save \"%s\" [x:%d, z:%d] %dBytes = grow.\n",
-						m_FileName.wstring().c_str(), x, z, length);
+					//DebugMessageW(L"Region Save \"%s\" [x:%d, z:%d] %dBytes = grow.\n",
+					//	m_FileName.wstring().c_str(), x, z, length);
 					//m_FileHandle.seekp(FS::file_size(m_FileName));
 					_lseek(m_FileHandle, 0, SEEK_END);
 					sectorNumber = m_TotalSectors;

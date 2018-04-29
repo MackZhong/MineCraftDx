@@ -1,0 +1,100 @@
+CompoundTag have 38 entries:
+TAG_List:EnderItems=0 entries of type TAG_End
+
+TAG_Int:HurtByTimestamp=0
+TAG_Float:foodSaturationLevel=5.
+TAG_Short:SleepTimer=0
+TAG_Int:XpSeed=0
+TAG_List:Attributes=8 entries of type TAG_Compound
+TAG_Compound:=CompoundTag have 2 entries:
+TAG_Double:Base=20.
+TAG_String:Name="generic.maxHealth"
+
+TAG_Compound:=CompoundTag have 2 entries:
+TAG_Double:Base=0.
+TAG_String:Name="generic.knockbackResistance"
+
+TAG_Compound:=CompoundTag have 2 entries:
+TAG_Double:Base=0.100000001490116119384765625
+TAG_String:Name="generic.movementSpeed"
+
+TAG_Compound:=CompoundTag have 2 entries:
+TAG_Double:Base=0.
+TAG_String:Name="generic.armor"
+
+TAG_Compound:=CompoundTag have 2 entries:
+TAG_Double:Base=0.
+TAG_String:Name="generic.armorToughness"
+
+TAG_Compound:=CompoundTag have 2 entries:
+TAG_Double:Base=1.
+TAG_String:Name="generic.attackDamage"
+
+TAG_Compound:=CompoundTag have 2 entries:
+TAG_Double:Base=4.
+TAG_String:Name="generic.attackSpeed"
+
+TAG_Compound:=CompoundTag have 2 entries:
+TAG_Double:Base=0.
+TAG_String:Name="generic.luck"
+
+
+TAG_Byte:Invulnerable=0
+TAG_Byte:OnGround=1
+TAG_Byte:FallFlying=0
+TAG_Float:FallDistance=0.
+TAG_Compound:abilities=CompoundTag have 7 entries:
+TAG_Byte:flying=0
+TAG_Byte:mayBuild=1
+TAG_Byte:invulnerable=0
+TAG_Float:walkSpeed=0.100000001490116119384765625
+TAG_Byte:mayfly=0
+TAG_Byte:instabuild=0
+TAG_Float:flySpeed=5.00000007450580596923828125e-002
+
+TAG_Int:PortalCooldown=0
+TAG_Float:AbsorptionAmount=0.
+TAG_Compound:recipeBook=CompoundTag have 4 entries:
+TAG_List:recipes=0 entries of type TAG_End
+
+TAG_Byte:isFilteringCraftable=0
+TAG_List:toBeDisplayed=0 entries of type TAG_End
+
+TAG_Byte:isGuiOpen=0
+
+TAG_Short:DeathTime=0
+TAG_Float:foodExhaustionLevel=0.
+TAG_Long:UUIDLeast=-8794422475677342852
+TAG_Int:XpTotal=0
+TAG_Int:playerGameType=0
+TAG_Byte:seenCredits=0
+TAG_List:Motion=3 entries of type TAG_Double
+TAG_Double:=0.
+TAG_Double:=-7.840000152587890680511151231257827021181583404541015625e-002
+TAG_Double:=0.
+
+TAG_Float:Health=20.
+TAG_Short:Air=300
+TAG_Int:Dimension=0
+TAG_List:Rotation=2 entries of type TAG_Float
+TAG_Float:=230.6996917724609375
+TAG_Float:=13.05002593994140625
+
+TAG_Short:HurtTime=0
+TAG_Int:XpLevel=0
+TAG_Int:Score=0
+TAG_Short:Fire=-20
+TAG_Long:UUIDMost=-3558955538633030991
+TAG_Byte:Sleeping=0
+TAG_List:Pos=3 entries of type TAG_Double
+TAG_Double:=-214.6345943047712125917314551770687103271484375
+TAG_Double:=75.
+TAG_Double:=153.245415076700709278156864456832408905029296875
+
+TAG_Int:foodTickTimer=0
+TAG_Float:XpP=0.
+TAG_Int:DataVersion=1343
+TAG_Int:foodLevel=20
+TAG_Int:SelectedItemSlot=0
+TAG_List:Inventory=0 entries of type TAG_End
+

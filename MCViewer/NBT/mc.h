@@ -10,20 +10,20 @@
 #include <sstream>
 #include <fstream>
 #include <iostream>
-#include <boost/iostreams/filter/gzip.hpp>
-#include <boost/iostreams/device/array.hpp>
-#include <boost/iostreams/filtering_streambuf.hpp>
-#include <boost/iostreams/filtering_stream.hpp>
+//#include <boost/iostreams/filter/gzip.hpp>
+//#include <boost/iostreams/device/array.hpp>
+//#include <boost/iostreams/filtering_streambuf.hpp>
+//#include <boost/iostreams/filtering_stream.hpp>
+//#include <boost/iostreams/stream.hpp>
+//#include <boost/filesystem/fstream.hpp>
+//#include <boost/filesystem.hpp>
+//#include <boost/locale/utf8_codecvt.hpp>
+//#include <boost/iostreams/copy.hpp>
+//#include <boost/archive/binary_iarchive.hpp>
 //using ByteDevice = boost::iostreams::basic_array_source<__int8>;
 //using ByteBuffer = boost::iostreams::stream_buffer<ByteDevice>;
-#include <boost/iostreams/stream.hpp>
-//#include <boost/archive/binary_iarchive.hpp>
-#include <boost/filesystem/fstream.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/locale/utf8_codecvt.hpp>
 #include <io.h>		// _wopen,_write,_close,_lseek
 #include <fcntl.h>	// _O_RDONLY
-#include <boost/iostreams/copy.hpp>
 
 namespace MC {
 	static wchar_t _Buffer[_MAX_PATH * 2];
@@ -70,10 +70,10 @@ namespace MC {
 	using TagArray = std::vector<NbtTagPtr>;
 	//using TagList = std::vector<const NbtTag*>;
 
-	namespace FS = boost::filesystem;
-	namespace IO = boost::iostreams;
-	using IFilteringStream = boost::iostreams::filtering_istream;
-	using OFilteringStream = boost::iostreams::filtering_ostream;
+	//namespace FS = boost::filesystem;
+	//namespace IO = boost::iostreams;
+	//using IFilteringStream = boost::iostreams::filtering_istream;
+	//using OFilteringStream = boost::iostreams::filtering_ostream;
 
 	extern const int MCREGION_VERSION_ID;
 	extern const int ANVIL_VERSION_ID;

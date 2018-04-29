@@ -12,8 +12,8 @@ namespace MC {
 		size_t m_pos = 0;
 
 	public:
-		NbtReader(const IFilteringStream& stream) : m_Buffer(stream.rdbuf())
-		{}
+		//NbtReader(const IFilteringStream& stream) : m_Buffer(stream.rdbuf())
+		//{}
 		NbtReader(const std::ifstream& stream) :m_Buffer(stream.rdbuf())
 		{}
 		NbtReader(std::streambuf* buf) :m_Buffer(buf)
@@ -112,8 +112,8 @@ namespace MC {
 		std::shared_ptr<std::streambuf> m_Buffer;
 
 	public:
-		NbtWriter(const OFilteringStream& stream) : m_Buffer(stream.rdbuf())
-		{}
+		//NbtWriter(const OFilteringStream& stream) : m_Buffer(stream.rdbuf())
+		//{}
 		NbtWriter(const std::ofstream& stream) : m_Buffer(stream.rdbuf())
 		{}
 

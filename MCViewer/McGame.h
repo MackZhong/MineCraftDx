@@ -36,6 +36,7 @@ namespace MC
 	private:
 		std::unique_ptr<CompoundTag> m_Root;
 		std::vector<MC::Block*> m_Blocks;
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_texture;
 	};
 }
 

@@ -1,8 +1,8 @@
 #pragma once
 #include "mc.h"
 #include "NbtTag.h"
-#include "NbtIo.h"
-#include "zlib.h"
+//#include "NbtIo.h"
+#include <zlib.h>
 #pragma comment(lib, "zlibwapi.lib")
 #include <malloc.h>
 
@@ -14,17 +14,59 @@ namespace MC {
 		unsigned int m_Size;
 		unsigned int m_Pos;
 
-		FS::path m_FileHandle;
+		//FS::path m_FileHandle;
 
 	public:
-		NbtFile(const FS::path& base) : m_FileHandle(base)
-		{
-		};
+		//NbtFile(const FS::path& base) : m_FileHandle(base)
+		//{
+		//};
 
-		NbtFile(const char* buf, unsigned int size) : m_Size(size) {
+		NbtFile(const char* buf, unsigned int size) {
 			assert(_msize((void*)buf) == size);
 			m_Buffer = std::make_unique<char[]>(size);
 			memcpy_s(m_Buffer.get(), m_Size, buf, size);
+		}
+		NbtFile(const char* buf, unsigned int size, COMPRESSION_SCHEME comp) : m_Size(size) {
+			assert(_msize((void*)buf) == size);
+
+			char* _buffer = (char*)std::malloc(_BlockSize);
+			m_Size = 0;
+			while (true) {
+				uLongf destSize = _BlockSize;
+				int result = uncompress((Bytef*)_buffer, &destSize, (const Bytef*)buf, size);
+				m_Size += destSize;
+				if (destSize < _BlockSize) {
+					void* temp = _expand(_buffer, m_Size);
+					if (NULL == temp) {
+						throw "Memory alloc failed.";
+					}
+					_buffer = (char*)temp;
+					break;
+				}
+				if (Z_OK == result) {
+					break;
+				}
+				else if (Z_BUF_ERROR == result) {
+					void* temp = _expand(_buffer, m_Size + _BlockSize);
+					if (NULL == temp) {
+						temp = realloc(_buffer, m_Size + _BlockSize);
+					}
+					if (NULL == temp) {
+						throw "Memory alloc failed.";
+					}
+					_buffer = (char*)temp;
+				}
+				else {
+					throw "Unknown error.";
+				}
+			}
+			size_t memsize = _msize(_buffer);
+			assert(memsize == m_Size);
+			m_Buffer = std::unique_ptr<char[]>(_buffer);
+			int f;
+			errno_t e = _wsopen_s(&f, L"dump.nbt", _O_CREAT | _O_RDWR, _SH_DENYNO, _S_IREAD | _S_IWRITE);
+			_write(f, m_Buffer.get(), m_Size);
+			_close(f);
 		}
 		NbtFile(const wchar_t* fileName)
 		{
@@ -39,7 +81,7 @@ namespace MC {
 					throw "Read file eroor.";
 				}
 				m_Size += readed;
-				if (readed < _BlockSize) {
+				if (readed < (int)_BlockSize) {
 					void* temp = _expand(_buffer, m_Size);
 					if (NULL == temp) {
 						throw "Memory alloc failed.";
@@ -86,14 +128,21 @@ namespace MC {
 		inline short GetShort() {
 			if (m_Pos + 2 >= m_Size)
 				throw "Memory overflow.";
-			return (short)((m_Buffer[m_Pos++] << 8) | m_Buffer[m_Pos++]);
+			char v[2];
+			v[1] = GetByte();
+			v[0] = GetByte();
+			return *(short*)v;
 		}
 
 		inline int GetInt() {
 			if (m_Pos + 4 >= m_Size)
 				throw "Memory overflow.";
-			return (int)(((m_Buffer[m_Pos++] & 0xff) << 24) | ((m_Buffer[m_Pos++] & 0xff) << 16) |
-				((m_Buffer[m_Pos++] & 0xff) << 8) | (m_Buffer[m_Pos++] & 0xff));
+			char v[4];
+			v[3] = GetByte();
+			v[2] = GetByte();
+			v[1] = GetByte();
+			v[0] = GetByte();
+			return *(int*)v;
 		}
 
 		inline float GetFloat() {
@@ -104,14 +153,16 @@ namespace MC {
 		inline __int64 GetLong() {
 			if (m_Pos + 8 >= m_Size)
 				throw "Memory overflow.";
-			return (__int64)(((__int64)(m_Buffer[m_Pos++] & 0xff) << 56) |
-				((__int64)(m_Buffer[m_Pos++] & 0xff) << 48) |
-				((__int64)(m_Buffer[m_Pos++] & 0xff) << 40) |
-				((__int64)(m_Buffer[m_Pos++] & 0xff) << 32) |
-				((long)(m_Buffer[m_Pos++] & 0xff) << 24) |
-				((long)(m_Buffer[m_Pos++] & 0xff) << 16) |
-				((long)(m_Buffer[m_Pos++] & 0xff) << 8) |
-				((long)(m_Buffer[m_Pos++] & 0xff)));
+			char v[8];
+			v[7] = GetByte();
+			v[6] = GetByte();
+			v[5] = GetByte();
+			v[4] = GetByte();
+			v[3] = GetByte();
+			v[2] = GetByte();
+			v[1] = GetByte();
+			v[0] = GetByte();
+			return *(__int64*)v;
 		}
 
 		inline double GetDouble() {
@@ -154,8 +205,10 @@ namespace MC {
 			return str;
 		}
 
-		const char* GetCur() const {
-			return m_Buffer.get() + m_Pos;
+		const char* GetCur(unsigned int size) {
+			const char* cur = m_Buffer.get() + m_Pos;
+			m_Pos += size;
+			return cur;
 		}
 
 		NbtTag* ReadTag() {
@@ -166,6 +219,9 @@ namespace MC {
 
 			short length = GetShort();
 			std::wstring name = GetUtf8(length);
+			if (name == L"Pos") {
+				int a = 0;
+			}
 			return LoadTypedTag(ttype, name);
 		}
 
@@ -193,14 +249,14 @@ namespace MC {
 			case TAG_Byte_Array:
 			{
 				int size = GetInt();
-				tag = new ByteArrayTag(name, GetCur(), size);
+				tag = new ByteArrayTag(name, GetCur(size), size);
 				break;
 			}
 			case TAG_String:
 			{
-			if (L"LevelName" == name) {
-				DebugMessageW(name.c_str());
-			}
+				if (L"LevelName" == name) {
+					DebugMessageW(name.c_str());
+				}
 				short length = GetShort();
 				tag = new StringTag(name, GetUtf8(length));
 				break;
@@ -218,8 +274,8 @@ namespace MC {
 			}
 			case TAG_Compound:
 			{
-				tag = new CompoundTag(name); 
-				while(true){					
+				tag = new CompoundTag(name);
+				while (true) {
 					NbtTag* next = ReadTag();
 					if (nullptr == next || TAG_End == next->getId()) {
 						break;
@@ -236,7 +292,7 @@ namespace MC {
 					buf[i] = GetInt();
 				}
 				tag = new IntArrayTag(name, buf, size);
-			break;
+				break;
 			}
 			case TAG_Long_Array:
 			{
@@ -326,30 +382,30 @@ namespace MC {
 
 #pragma endregion
 
-		CompoundTag* getRootTag(const wchar_t* rootName = nullptr) {
-			if (!FS::exists(m_FileHandle)) {
-				return nullptr;
-			}
+		//CompoundTag* getRootTag(const wchar_t* rootName = nullptr) {
+		//	if (!FS::exists(m_FileHandle)) {
+		//		return nullptr;
+		//	}
 
-			FS::ifstream ifs(m_FileHandle.string(), std::ios_base::binary);
-			unsigned __int16 signature = 0;
-			ifs.read((char*)&signature, sizeof(signature));
-			ifs.seekg(0, BOOST_IOS::_Seekbeg);
-			CompoundTag* root;
-			if (0x8b1f == signature) {
-				root = NbtIo::readCompressed(ifs);
-			}
-			else {
-				root = NbtIo::read(m_FileHandle);
-			}
+		//	FS::ifstream ifs(m_FileHandle.string(), std::ios_base::binary);
+		//	unsigned __int16 signature = 0;
+		//	ifs.read((char*)&signature, sizeof(signature));
+		//	ifs.seekg(0, BOOST_IOS::_Seekbeg);
+		//	CompoundTag* root;
+		//	if (0x8b1f == signature) {
+		//		root = NbtIo::readCompressed(ifs);
+		//	}
+		//	else {
+		//		root = NbtIo::read(m_FileHandle);
+		//	}
 
-			if (rootName) {
-				CompoundTag* tag = root->getCompound(rootName);
-				root = tag;
-			}
+		//	if (rootName) {
+		//		CompoundTag* tag = root->getCompound(rootName);
+		//		root = tag;
+		//	}
 
-			return root;
-		}
+		//	return root;
+		//}
 
 		//bool isConvertible(const std::wstring& levelId) {
 

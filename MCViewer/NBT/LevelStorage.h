@@ -4,22 +4,22 @@
 namespace MC {
 	//using FileArray = std::vector<FS::path>;
 
-	inline int PositionToChunk(int p)  {
+	inline int PositionToChunk(int p) {
 		return p >> 4;
 	}
-	inline int PositionToRegion(int p)  {
+	inline int PositionToRegion(int p) {
 		return p >> 9;
 	}
-	inline int ChunkToRegion(int c)  {
+	inline int ChunkToRegion(int c) {
 		return c >> 5;
 	}
 	inline int ChunkToPositonBase(int c) {
 		return c << 4;
 	}
-	inline int RegionToPositionBase(int r)  {
+	inline int RegionToPositionBase(int r) {
 		return r << 9;
 	}
-	inline int RegionToChunkBase(int r)  {
+	inline int RegionToChunkBase(int r) {
 		return r << 5;
 	}
 
@@ -71,6 +71,54 @@ namespace MC {
 				return nullptr;
 			}
 			PathCombineW(_Buffer, worldPath, L"level.dat");
+			if (!PathFileExistsW(_Buffer)) {
+				return nullptr;
+				// throw "Levle file not found.";
+			}
+			return _Buffer;
+		}
+
+		inline const wchar_t* getSessionName(const wchar_t* worldName) const {
+			const wchar_t* worldPath = getWorldPath(worldName);
+			if (nullptr == worldPath) {
+				return nullptr;
+			}
+			PathCombineW(_Buffer, worldPath, L"session.lock");
+			if (!PathFileExistsW(_Buffer)) {
+				return nullptr;
+				// throw "Levle file not found.";
+			}
+			return _Buffer;
+		}
+
+		inline const wchar_t* getPlayerDataPath(const wchar_t* worldName) const {
+			const wchar_t* worldPath = getWorldPath(worldName);
+			if (nullptr == worldPath) {
+				return nullptr;
+			}
+			PathCombineW(_Buffer, worldPath, L"playerdata");
+			if (!PathFileExistsW(_Buffer)) {
+				return nullptr;
+				// throw "Levle file not found.";
+			}
+			return _Buffer;
+		}
+
+		inline const wchar_t* getPlayerDataName(const wchar_t* worldName, __int64 UUIDMost, __int64 UUIDLeast) {
+			const wchar_t* playerPath = getPlayerDataPath(worldName);
+			if (nullptr == playerPath) {
+				return nullptr;
+			}
+			wchar_t fileName[_MAX_FNAME];
+			short* most = (short*)&UUIDMost;
+			short* least = (short*)&UUIDLeast;
+			wnsprintfW(fileName, _MAX_FNAME, L"%04hx%04hx-%04hx-%04hx-%04hx-%04hx%04hx%04hx.dat",
+				most[3], most[2],
+				most[1],
+				most[0],
+				least[3],
+				least[2], least[1], least[0]);
+			PathCombineW(_Buffer, playerPath, fileName);
 			if (!PathFileExistsW(_Buffer)) {
 				return nullptr;
 				// throw "Levle file not found.";

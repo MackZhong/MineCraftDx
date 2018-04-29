@@ -468,7 +468,7 @@ void Game_DR::Render()
 
 	m_view = XMMatrixLookAtLH(m_cameraPos, lookAt, Vector3::Up);
 
-	context->RSSetState(m_states->CullNone());
+	context->RSSetState(m_states->CullClockwise());
 
 	OnRender(context);
 
