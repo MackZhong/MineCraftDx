@@ -201,6 +201,70 @@ namespace MC {
 			return ret;
 		}
 
+		std::vector<std::shared_ptr<CompoundTag>> ReadChunks(int chunkX, int chunkZ) {
+			std::vector<std::shared_ptr<CompoundTag>> tags;
+			for (int x = (chunkX & 31) - 2; x < (chunkX & 31) + 2; x++)
+				for (int z = (chunkZ & 31) - 2; z < (chunkZ & 31) + 2; z++) {
+					if (this->outofBounds(x, z)) {
+						DebugMessageW(L"Read x:%d, z:%d out of bounds.\n", x, z);
+						continue;
+					}
+
+					int location = this->getChunkLocation(x, z);
+					if (0 == location) {
+						DebugMessageW(L"Read x:%d, z:%d miss.\n", x, z);
+						continue;
+					}
+
+					int offset = location >> 8;
+					int count = location & 0xff;
+					if (offset + count > this->m_TotalSectors) {
+						DebugMessageW(L"Read x:%d, z:%d in invalid sector.\n", x, z);
+						continue;
+					}
+
+					int length;
+					_lseek(m_FileHandle, offset * SECTOR_BYTES, SEEK_SET);
+					_read(m_FileHandle, &length, sizeof(length));
+					length = BigEndian32(&length);
+
+					if (length > SECTOR_BYTES * count) {
+						DebugMessageW(L"Read x:%d, z:%d overflow with invalid length:%d > 4096 * %d.\n", x, z, length, count);
+						continue;
+					}
+
+					__int8 compressionType;
+					_read(m_FileHandle, &compressionType, sizeof(__int8));
+					length--;
+					auto data = std::make_unique<char[]>(length);
+					_read(m_FileHandle, data.get(), length);
+					wchar_t writeName[_MAX_FNAME];
+					swprintf_s(writeName, L"Chunk-%d-%d.%d", chunkX, chunkZ, compressionType);
+					int wfile;
+					errno_t err = _wsopen_s(&wfile, writeName, _O_WRONLY | _O_BINARY | _O_CREAT, _SH_DENYNO, _S_IREAD | _S_IWRITE);
+					_write(wfile, data.get(), length);
+					_close(wfile);
+
+					NbtFile nfile(data.get(), length, COMPRESSION_SCHEME_GZIP);
+					unsigned int size;
+					const char* buffer = nfile.GetBuffer(size);
+					swprintf_s(writeName, L"Chunk-%d-%d.nbt", chunkX, chunkZ);
+					err = _wsopen_s(&wfile, writeName, _O_WRONLY | _O_BINARY | _O_CREAT, _SH_DENYNO, _S_IREAD | _S_IWRITE);
+					_write(wfile, buffer, size);
+					_close(wfile);
+
+					NbtTag* tag = nfile.ReadTag();
+					if (tag && tag->getId() == TAG_Compound) {
+						//auto p = std::shared_ptr<CompoundTag>(tag);
+						tags.emplace_back((CompoundTag*)tag);
+					}
+					else
+						throw "Invalid tag type";
+				}
+
+			return tags;
+		}
+
 		CompoundTag* ReadChunk(int x, int z) {
 			wchar_t writeName[_MAX_FNAME];
 			swprintf_s(writeName, L"Chunk-%d-%d.nbt", x, z);

@@ -75,6 +75,9 @@
     <ClInclude Include="Engine\TextConsole.h">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="TestRendering.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -100,6 +103,9 @@
     </ClCompile>
     <ClCompile Include="Engine\TextConsole.cpp">
       <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="TestRendering.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

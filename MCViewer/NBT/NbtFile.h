@@ -20,6 +20,10 @@ namespace MC {
 		//NbtFile(const FS::path& base) : m_FileHandle(base)
 		//{
 		//};
+		const char* GetBuffer(unsigned int& size) const {
+			size = m_Size;
+			return m_Buffer.get();
+		}
 
 		NbtFile(const char* buf, unsigned int size) {
 			assert(_msize((void*)buf) == size);

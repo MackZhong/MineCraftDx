@@ -177,6 +177,7 @@
     <ClInclude Include="NBT\NbtReaderWriter.h" />
     <ClInclude Include="NBT\NbtTag.h" />
     <ClInclude Include="NBT\RegionFile.h" />
+    <ClInclude Include="TestRendering.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\TextConsole.cpp" />
@@ -192,6 +193,7 @@
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NBT\mc.cpp" />
+    <ClCompile Include="TestRendering.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Engine\directx.ico" />

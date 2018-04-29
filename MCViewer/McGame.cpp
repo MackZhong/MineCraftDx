@@ -11,17 +11,16 @@ using namespace DirectX;
 namespace MC {
 	McGame::McGame()
 		:m_VersionPath(L"E:/Games/MineCraft/.minecraft/versions/1.12.2")
-		, m_WorldName(L"新的世界")
+		, m_WorldName(L"新的世界1")
 	{
 
 	}
 
-
 	McGame::~McGame()
 	{
-		for (auto b = m_Blocks.begin(); b != m_Blocks.end(); b++) {
-			delete *b;
-		}
+		//for (auto b = m_Blocks.begin(); b != m_Blocks.end(); b++) {
+		//	delete *b;
+		//}
 	}
 
 	void McGame::OnDeviceDependentResources(ID3D11Device * device)
@@ -114,52 +113,15 @@ namespace MC {
 			int offsetZ = ChunkToPositonBase(chunkZ);
 			int regionPosX = PositionToRegion((int)posX);
 			int regionPosZ = PositionToRegion((int)posZ);
-			int chunks[][2] = {
-			{ chunkX - 2, chunkZ - 2 },
-			{ chunkX - 2, chunkZ - 1 },
-			{ chunkX - 2, chunkZ },
-			{ chunkX - 2, chunkZ + 1 },
-			{ chunkX - 2, chunkZ + 2 },
-			{ chunkX - 1, chunkZ - 2 },
-			{ chunkX - 1, chunkZ - 1 },
-			{ chunkX - 1, chunkZ },
-			{ chunkX - 1, chunkZ + 1 },
-			{ chunkX - 1, chunkZ + 2 },
-			{ chunkX, chunkZ - 2 },
-			{ chunkX, chunkZ - 1 },
-			{ chunkX, chunkZ },
-			{ chunkX, chunkZ + 1 },
-			{ chunkX, chunkZ + 2 },
-			{ chunkX + 1, chunkZ - 2 },
-			{ chunkX + 1, chunkZ - 1 },
-			{ chunkX + 1, chunkZ },
-			{ chunkX + 1, chunkZ + 1 },
-			{ chunkX + 1, chunkZ + 2 },
-			{ chunkX + 2, chunkZ - 2 },
-			{ chunkX + 2, chunkZ - 1 },
-			{ chunkX + 2, chunkZ },
-			{ chunkX + 2, chunkZ + 1 },
-			{ chunkX + 2, chunkZ + 2 },
-			};
-
 			const wchar_t* regionFileName = storage.getRegionName(m_WorldName.c_str(), regionPosX, regionPosZ);
 			if (nullptr == regionFileName) {
 				int a = 0;
 			}
 			RegionFile regionFile(regionFileName);
-			for (int i = 0; i < ARRAYSIZE(chunks); i++) {
-				int chunkInRegionX = ChunkToRegion(chunks[i][0]);
-				int chunkInRegionZ = ChunkToRegion(chunks[i][1]);
-				if (!regionFile.hasChunk(chunkInRegionX, chunkInRegionZ)) {
-					continue;
-				}
+			std::vector<std::shared_ptr<CompoundTag>> regions = regionFile.ReadChunks(chunkX, chunkZ);
 
-				if (5 == chunkInRegionX && 5 == chunkInRegionZ) {
-					int a = 0;
-				}
-				CompoundTag* regionData = regionFile.ReadChunk(chunkInRegionX, chunkInRegionZ);
-
-				auto regionLevel = regionData->getCompound(L"Level");
+			for (auto r = regions.begin(); r != regions.end(); r++) {
+				auto regionLevel = (*r)->getCompound(L"Level");
 				int size;
 				auto heightMap = regionLevel->getIntArray(L"HeightMap", size);
 
@@ -169,77 +131,132 @@ namespace MC {
 					for (int z = 0; z < 16; z++) {
 						int y = heightMap.get()[x * 16 + z];
 						auto block = new Block(device, context, offsetX + x, y, offsetZ + z);
-						m_Blocks.push_back(block);
+						m_Blocks.emplace_back(block);
 					}
 				}
 			}
-
-			//ofs.open(L"RegionData.txt");
-			//ofs << "Player's position: x=" << posX << ", y=" << posY << ", z=" << posZ << std::endl;
-			//ofs << "Player's Chunk x=" << chunkX << ", z=" << chunkZ << std::endl << std::endl << std::endl;
-
-			//int regions[][2] = { {regionPosX, regionPosZ},
-			//{regionPosX - 1, regionPosZ - 1},
-			//{regionPosX - 1, regionPosZ},
-			//{regionPosX - 1, regionPosZ + 1},
-			//{regionPosX, regionPosZ - 1},
-			//{regionPosX, regionPosZ + 1},
-			//{regionPosX + 1, regionPosZ - 1},
-			//{regionPosX + 1, regionPosZ},
-			//{regionPosX + 1, regionPosZ + 1} };
-			//for (int i = 0; i < ARRAYSIZE(regions); i++) {
-			//	int regionX = regions[i][0];
-			//	int regionZ = regions[i][1];
-			//	const wchar_t* regionFileName = storage.getRegionName(m_WorldName.c_str(), regionX, regionZ);
-			//	if (nullptr == regionFileName) {
-			//		continue;
-			//	}
-			//	//ofs << "Region x=" << regionX << ", z=" << regionZ << ":" << std::endl;
-			//	//ofs << regionFileName << std::endl << std::endl;
-			//	RegionFile regionFile(regionFileName);
-
-			//	for (int chunkInRegionX = 0; chunkInRegionX < 32; chunkInRegionX++) {
-			//		for (int chunkInRegionZ = 0; chunkInRegionZ < 32; chunkInRegionZ++) {
-			//			if (!regionFile.hasChunk(chunkInRegionX, chunkInRegionZ)) {
-			//				continue;
-			//			}
-			//			//ofs << "Chunk in region x=" << chunkInRegionX << ", z=" << chunkInRegionZ << std::endl;
-			//			if (5 == chunkInRegionX && 5 == chunkInRegionZ) {
-			//				int a = 0;
-			//			}
-			//			CompoundTag* regionData = regionFile.ReadChunk(chunkInRegionX, chunkInRegionZ);
-			//			//ofs << *regionData;
-
-			//			auto regionLevel = regionData->getCompound(L"Level");
-			//			int size;
-			//			auto heightMap = regionLevel->getIntArray(L"HeightMap", size);
-			//			//ofs << std::endl << "HeightMap: " << std::endl;
-
-			//			XMFLOAT3 boxSize{ 1.0f, 1.0f, 1.0f };
-
-			//			for (int x = 0; x < 16; x++) {
-			//				for (int z = 0; z < 16; z++) {
-			//					int y = heightMap.get()[x * 16 + z];
-			//					//ofs << y << " ";
-			//					//Block block(device, context, x, y, z);
-			//					auto block = new Block(device, context, offsetX + x, y, offsetZ + z);
-			//					m_Blocks.push_back(block);
-			//				}
-			//				//ofs << std::endl;
-			//			}
-			//			//ofs << std::endl << std::endl << std::endl;
-			//		}
-			//	}
-			//}
-			//ofs.close();
-
-			//FileArray regionFiles = level.getRegionFiles();
-			//for (int i = 0; i < regionFiles.size(); i++) {
-			//	std::wcout << regionFiles[i].wstring() << std::endl;
-			//	RegionFile region(regionFiles[i]);
-			//	auto reader = region.GetChunkDataReader(0, 0);
-			//}
 		}
+		//int chunks[][2] = {
+		//{ chunkX - 2, chunkZ - 2 },
+		//{ chunkX - 2, chunkZ - 1 },
+		//{ chunkX - 2, chunkZ },
+		//{ chunkX - 2, chunkZ + 1 },
+		//{ chunkX - 2, chunkZ + 2 },
+		//{ chunkX - 1, chunkZ - 2 },
+		//{ chunkX - 1, chunkZ - 1 },
+		//{ chunkX - 1, chunkZ },
+		//{ chunkX - 1, chunkZ + 1 },
+		//{ chunkX - 1, chunkZ + 2 },
+		//{ chunkX, chunkZ - 2 },
+		//{ chunkX, chunkZ - 1 },
+		//{ chunkX, chunkZ },
+		//{ chunkX, chunkZ + 1 },
+		//{ chunkX, chunkZ + 2 },
+		//{ chunkX + 1, chunkZ - 2 },
+		//{ chunkX + 1, chunkZ - 1 },
+		//{ chunkX + 1, chunkZ },
+		//{ chunkX + 1, chunkZ + 1 },
+		//{ chunkX + 1, chunkZ + 2 },
+		//{ chunkX + 2, chunkZ - 2 },
+		//{ chunkX + 2, chunkZ - 1 },
+		//{ chunkX + 2, chunkZ },
+		//{ chunkX + 2, chunkZ + 1 },
+		//{ chunkX + 2, chunkZ + 2 },
+		//};
+
+		//for (int i = 0; i < ARRAYSIZE(chunks); i++) {
+		//	int chunkInRegionX = ChunkToRegion(chunks[i][0]);
+		//	int chunkInRegionZ = ChunkToRegion(chunks[i][1]);
+		//	if (!regionFile.hasChunk(chunkInRegionX, chunkInRegionZ)) {
+		//		continue;
+		//	}
+
+		//	if (5 == chunkInRegionX && 5 == chunkInRegionZ) {
+		//		int a = 0;
+		//	}
+		//	CompoundTag* regionData = regionFile.ReadChunk(chunkInRegionX, chunkInRegionZ);
+
+		//	auto regionLevel = regionData->getCompound(L"Level");
+		//	int size;
+		//	auto heightMap = regionLevel->getIntArray(L"HeightMap", size);
+
+		//	XMFLOAT3 boxSize{ 1.0f, 1.0f, 1.0f };
+
+		//	for (int x = 0; x < 16; x++) {
+		//		for (int z = 0; z < 16; z++) {
+		//			int y = heightMap.get()[x * 16 + z];
+		//			auto block = new Block(device, context, offsetX + x, y, offsetZ + z);
+		//			m_Blocks.push_back(block);
+		//		}
+		//	}
+		//}
+
+		//ofs.open(L"RegionData.txt");
+		//ofs << "Player's position: x=" << posX << ", y=" << posY << ", z=" << posZ << std::endl;
+		//ofs << "Player's Chunk x=" << chunkX << ", z=" << chunkZ << std::endl << std::endl << std::endl;
+
+		//int regions[][2] = { {regionPosX, regionPosZ},
+		//{regionPosX - 1, regionPosZ - 1},
+		//{regionPosX - 1, regionPosZ},
+		//{regionPosX - 1, regionPosZ + 1},
+		//{regionPosX, regionPosZ - 1},
+		//{regionPosX, regionPosZ + 1},
+		//{regionPosX + 1, regionPosZ - 1},
+		//{regionPosX + 1, regionPosZ},
+		//{regionPosX + 1, regionPosZ + 1} };
+		//for (int i = 0; i < ARRAYSIZE(regions); i++) {
+		//	int regionX = regions[i][0];
+		//	int regionZ = regions[i][1];
+		//	const wchar_t* regionFileName = storage.getRegionName(m_WorldName.c_str(), regionX, regionZ);
+		//	if (nullptr == regionFileName) {
+		//		continue;
+		//	}
+		//	//ofs << "Region x=" << regionX << ", z=" << regionZ << ":" << std::endl;
+		//	//ofs << regionFileName << std::endl << std::endl;
+		//	RegionFile regionFile(regionFileName);
+
+		//	for (int chunkInRegionX = 0; chunkInRegionX < 32; chunkInRegionX++) {
+		//		for (int chunkInRegionZ = 0; chunkInRegionZ < 32; chunkInRegionZ++) {
+		//			if (!regionFile.hasChunk(chunkInRegionX, chunkInRegionZ)) {
+		//				continue;
+		//			}
+		//			//ofs << "Chunk in region x=" << chunkInRegionX << ", z=" << chunkInRegionZ << std::endl;
+		//			if (5 == chunkInRegionX && 5 == chunkInRegionZ) {
+		//				int a = 0;
+		//			}
+		//			CompoundTag* regionData = regionFile.ReadChunk(chunkInRegionX, chunkInRegionZ);
+		//			//ofs << *regionData;
+
+		//			auto regionLevel = regionData->getCompound(L"Level");
+		//			int size;
+		//			auto heightMap = regionLevel->getIntArray(L"HeightMap", size);
+		//			//ofs << std::endl << "HeightMap: " << std::endl;
+
+		//			XMFLOAT3 boxSize{ 1.0f, 1.0f, 1.0f };
+
+		//			for (int x = 0; x < 16; x++) {
+		//				for (int z = 0; z < 16; z++) {
+		//					int y = heightMap.get()[x * 16 + z];
+		//					//ofs << y << " ";
+		//					//Block block(device, context, x, y, z);
+		//					auto block = new Block(device, context, offsetX + x, y, offsetZ + z);
+		//					m_Blocks.push_back(block);
+		//				}
+		//				//ofs << std::endl;
+		//			}
+		//			//ofs << std::endl << std::endl << std::endl;
+		//		}
+		//	}
+		//}
+		//ofs.close();
+
+		//FileArray regionFiles = level.getRegionFiles();
+		//for (int i = 0; i < regionFiles.size(); i++) {
+		//	std::wcout << regionFiles[i].wstring() << std::endl;
+		//	RegionFile region(regionFiles[i]);
+		//	auto reader = region.GetChunkDataReader(0, 0);
+		//}
+	//}
 #pragma endregion // Region files
 
 	}
@@ -262,7 +279,7 @@ namespace MC {
 
 		for (auto b = m_Blocks.begin(); b != m_Blocks.end(); b++) {
 			auto block = *b;
-			block->Draw(context, m_view, m_proj);
+			block->Draw(context, nullptr, m_view, m_proj);
 		}
 	}
 

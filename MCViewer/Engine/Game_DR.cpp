@@ -12,8 +12,8 @@ using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 
 static const XMVECTORF32 START_POSITION = { 1.f, 40.0f, 6.f, 0.f };
-static const float ROTATION_GAIN = 0.004f;
-static const float MOVEMENT_GAIN = 0.07f;
+static const float ROTATION_GAIN = 0.4f;
+static const float MOVEMENT_GAIN = 0.7f;
 
 #pragma region Windows procedure
 // Windows procedure
@@ -350,15 +350,16 @@ void Game_DR::Update(DX::StepTimer const& timer)
 	//m_console->WriteLine(L"This is a test");
 	//m_console->WriteLine(L"Line 2");
 	//m_console->Format(L"Time %u, %f ", timer.GetFrameCount(), timer.GetTotalSeconds());
+	double secondes = timer.GetElapsedSeconds();
 
 	auto mouse = m_mouse->GetState();
 
 	if (mouse.positionMode == Mouse::MODE_RELATIVE)
 	{
 		Vector3 delta = Vector3(float(mouse.x), float(mouse.y), 0.f)
-			* ROTATION_GAIN;
+			* ROTATION_GAIN * secondes;
 
-		m_pitch += delta.y;
+		m_pitch -= delta.y;
 		m_yaw -= delta.x;
 
 		// limit pitch to straight up or straight down
@@ -403,16 +404,16 @@ void Game_DR::Update(DX::StepTimer const& timer)
 	Vector3 move = Vector3::Zero;
 
 	if (kb.Up || kb.W)
-		move.z -= 1.f;
-
-	if (kb.Down || kb.S)
 		move.z += 1.f;
 
+	if (kb.Down || kb.S)
+		move.z -= 1.f;
+
 	if (kb.Left || kb.A)
-		move.x -= 1.f;
+		move.x += 1.f;
 
 	if (kb.Right || kb.D)
-		move.x += 1.f;
+		move.x -= 1.f;
 
 	if (kb.PageUp || kb.Space)
 		move.y += 1.f;
@@ -424,7 +425,7 @@ void Game_DR::Update(DX::StepTimer const& timer)
 
 	move = Vector3::Transform(move, q);
 
-	move *= MOVEMENT_GAIN;
+	move *= MOVEMENT_GAIN * secondes;
 
 	m_cameraPos += move;
 
