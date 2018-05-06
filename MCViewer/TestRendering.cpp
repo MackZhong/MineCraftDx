@@ -21,13 +21,13 @@ void TestRendering::OnRender(ID3D11DeviceContext1 * deviceContext)
 	deviceContext->PSSetSamplers(0, 1, &samplerState);
 
 
-	m_Grass->Draw(deviceContext, m_effect.get(), m_view, m_proj);
+	m_Grass->Draw(deviceContext, m_view, m_proj);
 }
 
 void TestRendering::OnDeviceLost()
 {
 	m_Grass.reset();
-	m_effect.reset();
+	//m_effect.reset();
 	m_states.reset();
 }
 
@@ -35,10 +35,10 @@ void TestRendering::OnDeviceDependentResources(ID3D11Device * device)
 {
 
 	m_states = std::make_unique<CommonStates>(device);
-	m_effect = std::make_unique<BasicEffect>(device);
+	//m_effect = std::make_unique<BasicEffect>(device);
 
 	m_Grass = std::make_unique<MC::Block>();
-	m_Grass->Initialize(device, m_effect.get());
+	m_Grass->Initialize(device);
 
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> textureResourceView;
 	DX::ThrowIfFailed(

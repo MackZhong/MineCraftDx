@@ -566,7 +566,7 @@ void Game_DR::CreateDeviceDependentResources(ID3D11Device * device)
 
 	m_states = std::make_unique<CommonStates>(device);
 
-	m_fxFactory = std::make_unique<EffectFactory>(device);
+	//m_fxFactory = std::make_unique<EffectFactory>(device);
 
 	// TODO: Initialize device dependent objects here (independent of window size).
 	OnDeviceDependentResources(device);
@@ -595,7 +595,7 @@ void Game_DR::OnDeviceLost()
 	//m_console->ReleaseDevice();
 
 	m_states.reset();
-	m_fxFactory.reset();
+	//m_fxFactory.reset();
 	m_mouse.reset();
 	m_keyboard.reset();
 }

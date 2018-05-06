@@ -23,7 +23,7 @@ private:
 	virtual void OnDeviceDependentResources(ID3D11Device* device);
 
 	//Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_texture;
-	std::unique_ptr<DirectX::BasicEffect> m_effect;
+	//std::unique_ptr<DirectX::BasicEffect> m_effect;
 	std::unique_ptr<DirectX::CommonStates> m_states;
 	std::unique_ptr<MC::Block> m_Grass;
 };

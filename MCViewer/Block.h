@@ -4,8 +4,8 @@
 #include <wrl.h>
 #include "SimpleMath.h"
 #include "Geometry.h"
-#include <Effects.h>
-#include <DirectXHelpers.h>
+#include "DirectXHelpers.h"
+#include "Dx11Shader.h"
 
 namespace
 {
@@ -35,36 +35,35 @@ namespace
 
 		SetDebugObjectName(*pBuffer, "DirectXTK:GeometricPrimitive");
 	}
+	//
+	//// Helper for creating a D3D input layout.
+	//void CreateInputLayout(_In_ ID3D11Device* device, _Outptr_ ID3D11InputLayout** pInputLayout)
+	//{
+	//	assert(pInputLayout != 0);
 
+	//	void const* shaderByteCode { nullptr };
+	//	size_t byteCodeLength{ 0 };
 
-	// Helper for creating a D3D input layout.
-	void CreateInputLayout(_In_ ID3D11Device* device, DirectX::IEffect* effect, _Outptr_ ID3D11InputLayout** pInputLayout)
-	{
-		assert(pInputLayout != 0);
+	//	//effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
 
-		void const* shaderByteCode;
-		size_t byteCodeLength;
+	//	HRESULT hr = device->CreateInputLayout(
+	//		FaceVertexType::InputElements,
+	//		FaceVertexType::InputElementCount,
+	//		shaderByteCode, byteCodeLength,
+	//		pInputLayout);
+	//	if (FAILED(hr)) {
+	//		throw "Failed to create input layout.";
+	//	};
 
-		effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+	//	_Analysis_assume_(*pInputLayout != 0);
 
-		HRESULT hr = device->CreateInputLayout(
-			FaceVertexType::InputElements,
-			FaceVertexType::InputElementCount,
-			shaderByteCode, byteCodeLength,
-			pInputLayout);
-		if (FAILED(hr)) {
-			throw "Failed to create input layout.";
-		};
-
-		_Analysis_assume_(*pInputLayout != 0);
-
-		DirectX::SetDebugObjectName(*pInputLayout, "DirectXTK:GeometricPrimitive");
-	}
+	//	DirectX::SetDebugObjectName(*pInputLayout, "DirectXTK:GeometricPrimitive");
+	//}
 }
 
 namespace MC {
 
-using namespace DirectX;
+	using namespace DirectX;
 
 	class Block
 	{
@@ -109,23 +108,28 @@ using namespace DirectX;
 		//		DirectX::SimpleMath::Vector3::Up);
 		//};
 		void XM_CALLCONV Draw(ID3D11DeviceContext* deviceContext,
-			DirectX::BasicEffect* effect,
+			//DirectX::BasicEffect* effect,
 			DirectX::CXMMATRIX view,
 			DirectX::CXMMATRIX projection) const
 		{
-			effect->SetMatrices(DirectX::XMMatrixIdentity(), view, projection);
+			//effect->SetMatrices(DirectX::XMMatrixIdentity(), view, projection);
 
-			effect->SetColorAndAlpha(Colors::Yellow);
-			effect->EnableDefaultLighting();
-			effect->SetTextureEnabled(false);
+			//effect->SetColorAndAlpha(Colors::Yellow);
+			//effect->EnableDefaultLighting();
+			//effect->SetTextureEnabled(false);
 			deviceContext->IASetInputLayout(this->m_inputlayout.Get());
-			effect->Apply(deviceContext);
+			//effect->Apply(deviceContext);
 
 			deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			deviceContext->IASetIndexBuffer(this->m_IndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
-			UINT stride = sizeof(FaceVertexType);
-			UINT offset = 0;
-			deviceContext->IASetVertexBuffers(0, 1, m_VertexBuffer.GetAddressOf(), &stride, &offset);
+			UINT stride[1] = { sizeof(FaceVertexType)};
+			UINT offset[1] = { 0 };
+			ID3D11Buffer* vts[1] = { m_VertexBuffer.Get() };
+			deviceContext->IASetVertexBuffers(0, 1, vts, stride, offset);
+
+			deviceContext->VSSetShader(m_VertexShader.Get(), nullptr, 0);
+			deviceContext->PSSetShader(m_PixelShader.Get(), nullptr, 0);
+
 			for (int i = 0; i < 6; i++) {
 				//effect->SetTexture(m_Textures[i].Get());
 				//effect->Apply(deviceContext);
@@ -144,7 +148,7 @@ using namespace DirectX;
 			}
 		}
 
-		HRESULT Initialize(ID3D11Device* device, DirectX::BasicEffect* effect) {
+		HRESULT Initialize(ID3D11Device* device/*, DirectX::BasicEffect* effect*/) {
 
 			//DirectX::VertexPositionColorTexture vertices[] = {
 			//	{ XMFLOAT3{ -0.5f, -0.5f, -0.5f },XMFLOAT4{ 0.0f, 1.0f, 0.0f, 1.0f }, XMFLOAT2{ 0.0f, 1.0f } },
@@ -197,8 +201,48 @@ using namespace DirectX;
 			CreateBuffer(device, vertices, D3D11_BIND_VERTEX_BUFFER, m_VertexBuffer.ReleaseAndGetAddressOf());
 			CreateBuffer(device, indices, D3D11_BIND_INDEX_BUFFER, m_IndexBuffer.ReleaseAndGetAddressOf());
 
-			effect->SetTextureEnabled(true);
-			CreateInputLayout(device, effect, this->m_inputlayout.ReleaseAndGetAddressOf());
+			//effect->SetTextureEnabled(true);
+			Microsoft::WRL::ComPtr<ID3DBlob> blob;
+			HRESULT hr = CompileShader(L"VertexShader.hlsl", "main", "vs_5_0", blob.ReleaseAndGetAddressOf());
+			if (FAILED(hr)) {
+				throw "Failed to compile vetex shader.";
+			};
+
+			hr = device->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, m_VertexShader.ReleaseAndGetAddressOf());
+			if (FAILED(hr)) {
+				throw "Failed to create Vertex shader.";
+			};
+
+			_Analysis_assume_(m_VertexShader.Get() != 0);
+			DirectX::SetDebugObjectName(m_VertexShader.Get(), "m_VertexShader");
+
+			hr = device->CreateInputLayout(
+				FaceVertexType::InputElements,
+				FaceVertexType::InputElementCount,
+				blob->GetBufferPointer(), blob->GetBufferSize(),
+				m_inputlayout.ReleaseAndGetAddressOf());
+			if (FAILED(hr)) {
+				throw "Failed to create input layout.";
+			};
+
+			_Analysis_assume_(m_inputlayout.Get() != 0);
+			DirectX::SetDebugObjectName(m_inputlayout.Get(), "m_inputlayout");
+
+
+			hr = CompileShader(L"PixelShader.hlsl", "main", "ps_5_0", blob.ReleaseAndGetAddressOf());
+			if (FAILED(hr)) {
+				throw "Failed to compile pixel shader.";
+			};
+
+			hr = device->CreatePixelShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, m_PixelShader.ReleaseAndGetAddressOf());
+			if (FAILED(hr)) {
+				throw "Failed to create pixel shader.";
+			};
+
+			_Analysis_assume_(m_PixelShader.Get() != 0);
+			DirectX::SetDebugObjectName(m_PixelShader.Get(), "m_PixelShader");
+
+			//CreateInputLayout(device, /*effect,*/ this->m_inputlayout.ReleaseAndGetAddressOf());
 
 			//D3D11_BUFFER_DESC bfdesc{ 0 };
 			//bfdesc.Usage = D3D11_USAGE_DEFAULT;
@@ -231,10 +275,12 @@ using namespace DirectX;
 		//std::unique_ptr<DirectX::GeometricPrimitive> m_gpBox;
 		DirectX::SimpleMath::Matrix m_world;
 		//DirectX::XMMATRIX
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_VertexShader{ nullptr };
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_PixelShader{ nullptr };
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_Textures[6];
-		Microsoft::WRL::ComPtr<ID3D11Buffer> m_VertexBuffer;
-		Microsoft::WRL::ComPtr<ID3D11Buffer> m_IndexBuffer;
-		Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputlayout;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_VertexBuffer{ nullptr };
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_IndexBuffer{ nullptr };
+		Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputlayout{ nullptr };
 	};
 
 }

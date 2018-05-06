@@ -279,7 +279,7 @@ namespace MC {
 
 		for (auto b = m_Blocks.begin(); b != m_Blocks.end(); b++) {
 			auto block = *b;
-			block->Draw(context, nullptr, m_view, m_proj);
+			block->Draw(context, m_view, m_proj);
 		}
 	}
 

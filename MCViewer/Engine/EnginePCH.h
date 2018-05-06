@@ -36,6 +36,8 @@ using Microsoft::WRL::ComPtr;
 
 #include <d3d11_4.h>
 #pragma comment(lib, "d3d11.lib")
+#include <d3dcompiler.h>
+#pragma comment(lib, "d3dcompiler.lib")
 #if defined(NTDDI_WIN10_RS2)
 #include <dxgi1_6.h>
 #else
@@ -56,6 +58,7 @@ using namespace DirectX;
 #include <stdexcept>
 #include <map>
 #include <list>
+#include <vector>
 #include <locale>
 #include <sstream>
 #include <stack>
@@ -116,26 +119,18 @@ namespace DX
 	};
 }
 
-
 // DirectXTK
 #include "CommonStates.h"
 #include "DDSTextureLoader.h"
 #include "DirectXHelpers.h"
 //#include "Effects.h"
 #include <Effects.h>
-#include "GamePad.h"
-#include "GeometricPrimitive.h"
-#include "GraphicsMemory.h"
-#include "Keyboard.h"
-#include "Model.h"
-#include "Mouse.h"
-#include "PostProcess.h"
-#include "PrimitiveBatch.h"
-#include "ScreenGrab.h"
 #include "SimpleMath.h"
 using namespace DirectX::SimpleMath;
-#include "SpriteBatch.h"
-#include "SpriteFont.h"
 #include "SharedResourcePool.h"
 #include "VertexTypes.h"
 #include "WICTextureLoader.h"
+#include "Keyboard.h"
+#include "Mouse.h"
+
+#include "Dx11Shader.h"

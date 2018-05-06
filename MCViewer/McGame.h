@@ -37,7 +37,7 @@ namespace MC
 	private:
 		std::unique_ptr<CompoundTag> m_Root;
 		std::vector<std::shared_ptr<MC::Block>> m_Blocks;
-		std::unique_ptr<DirectX::BasicEffect> m_effect;
+		//std::unique_ptr<DirectX::BasicEffect> m_effect;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_texture;
 	};
 }

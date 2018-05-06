@@ -129,7 +129,7 @@ void DeviceResources::CreateDeviceResources()
 	}
 
 	ComPtr<IDXGIAdapter1> adapter;
-	GetHardwareAdapter(adapter.GetAddressOf());
+	GetHardwareAdapter(adapter.ReleaseAndGetAddressOf());
 
 	// Create the Direct3D 11 API device object and a corresponding context.
 	ComPtr<ID3D11Device> device;
@@ -146,9 +146,9 @@ void DeviceResources::CreateDeviceResources()
 			s_featureLevels,
 			featLevelCount,
 			D3D11_SDK_VERSION,
-			device.GetAddressOf(),  // Returns the Direct3D device created.
+			device.ReleaseAndGetAddressOf(),  // Returns the Direct3D device created.
 			&m_d3dFeatureLevel,     // Returns feature level of device created.
-			context.GetAddressOf()  // Returns the device immediate context.
+			context.ReleaseAndGetAddressOf()  // Returns the device immediate context.
 		);
 	}
 #if defined(NDEBUG)
@@ -170,9 +170,9 @@ void DeviceResources::CreateDeviceResources()
 			s_featureLevels,
 			featLevelCount,
 			D3D11_SDK_VERSION,
-			device.GetAddressOf(),
+			device.ReleaseAndGetAddressOf(),
 			&m_d3dFeatureLevel,
-			context.GetAddressOf()
+			context.ReleaseAndGetAddressOf()
 		);
 
 		if (SUCCEEDED(hr))
