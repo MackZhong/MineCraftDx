@@ -2,6 +2,7 @@
 #include "Engine/Game_DR.h"
 #include <wrl.h>
 #include "Block.h"
+#include "Commonstates.h"
 
 class TestRendering : public Game_DR
 {

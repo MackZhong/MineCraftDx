@@ -130,8 +130,8 @@ namespace MC {
 				for (int x = 0; x < 16; x++) {
 					for (int z = 0; z < 16; z++) {
 						int y = heightMap.get()[x * 16 + z];
-						auto block = new Block(device, context, offsetX + x, y, offsetZ + z);
-						m_Blocks.emplace_back(block);
+						//auto block = new Block(device, context, offsetX + x, y, offsetZ + z);
+						//m_Blocks.emplace_back(block);
 					}
 				}
 			}

@@ -11,13 +11,17 @@ TestRendering::~TestRendering()
 {
 }
 
-void TestRendering::OnRender(ID3D11DeviceContext1 * context)
+void TestRendering::OnRender(ID3D11DeviceContext1 * deviceContext)
 {
-	context->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
-	context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
-	context->RSSetState(m_states->CullClockwise());
+	deviceContext->OMSetBlendState(this->m_states->Opaque(), nullptr, 0xFFFFFFFF);
+	deviceContext->OMSetDepthStencilState(this->m_states->DepthDefault(), 0);
+	deviceContext->RSSetState(this->m_states->CullClockwise());
 
-	m_Grass->Draw(context, m_effect.get(), m_view, m_proj);
+	ID3D11SamplerState* samplerState = this->m_states->LinearWrap();
+	deviceContext->PSSetSamplers(0, 1, &samplerState);
+
+
+	m_Grass->Draw(deviceContext, m_effect.get(), m_view, m_proj);
 }
 
 void TestRendering::OnDeviceLost()

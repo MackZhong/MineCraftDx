@@ -357,7 +357,7 @@ void Game_DR::Update(DX::StepTimer const& timer)
 	if (mouse.positionMode == Mouse::MODE_RELATIVE)
 	{
 		Vector3 delta = Vector3(float(mouse.x), float(mouse.y), 0.f)
-			* ROTATION_GAIN * secondes;
+			* ROTATION_GAIN * (float)secondes;
 
 		m_pitch -= delta.y;
 		m_yaw -= delta.x;
@@ -425,7 +425,7 @@ void Game_DR::Update(DX::StepTimer const& timer)
 
 	move = Vector3::Transform(move, q);
 
-	move *= MOVEMENT_GAIN * secondes;
+	move *= MOVEMENT_GAIN * (float)secondes;
 
 	m_cameraPos += move;
 
