@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include "ByteReader.h"
+// https://github.com/Howaner/NBTEditor
 
 namespace MineCraft {
 	enum NbtTagType : int8_t {
