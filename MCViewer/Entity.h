@@ -5,8 +5,7 @@ namespace MC
 	class Entity
 	{
 	public:
-		Entity();
-		~Entity();
+		Entity() {};
 	};
 
 }

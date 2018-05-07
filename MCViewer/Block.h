@@ -67,46 +67,14 @@ namespace MC {
 
 	class Block
 	{
-		//FaceVertexType m_Faces[6][4];
 	public:
 		enum Faces {
 			down = 0, up = 1, north = 2, south = 3, west = 4, east = 5
 		};
-		Block() {
-			//m_Faces[down][0] = { XMFLOAT3{-0.5f, -0.5f, -0.5f},XMFLOAT2{0.0f, 0.0f} };
-			//m_Faces[down][1] = { XMFLOAT3{0.5f, -0.5f, -0.5f},XMFLOAT2{1.0f, 0.0f} };
-			//m_Faces[down][2] = { XMFLOAT3{0.5f, -0.5f, 0.5f},XMFLOAT2{1.0f, 1.0f} };
-			//m_Faces[down][3] = { XMFLOAT3{-0.5f, -0.5f, 0.5f},XMFLOAT2{0.0f, 1.0f} };
-			//m_Faces[up][0] = { XMFLOAT3{-0.5f, 0.5f, 0.5f},XMFLOAT2{0.0f, 0.0f} };
-			//m_Faces[up][1] = { XMFLOAT3{0.5f, 0.5f, 0.5f},XMFLOAT2{1.0f, 0.0f} };
-			//m_Faces[up][2] = { XMFLOAT3{0.5f, 0.5f, -0.5f},XMFLOAT2{1.0f, 1.0f} };
-			//m_Faces[up][3] = { XMFLOAT3{-0.5f, 0.5f, -0.5f},XMFLOAT2{0.0f, 1.0f} };
-			//m_Faces[north][0] = { XMFLOAT3{0.5f, 0.5f, 0.5f},XMFLOAT2{0.0f, 0.0f} };
-			//m_Faces[north][1] = { XMFLOAT3{-0.5f, 0.5f, 0.5f},XMFLOAT2{1.0f, 0.0f} };
-			//m_Faces[north][2] = { XMFLOAT3{-0.5f, -0.5f, 0.5f},XMFLOAT2{1.0f, 1.0f} };
-			//m_Faces[north][3] = { XMFLOAT3{0.5f, -0.5f, 0.5f},XMFLOAT2{0.0f, 1.0f} };
-			//m_Faces[south][0] = { XMFLOAT3{-0.5f, 0.5f, -0.5f},XMFLOAT2{0.0f, 0.0f} };
-			//m_Faces[south][1] = { XMFLOAT3{0.5f, 0.5f, -0.5f},XMFLOAT2{1.0f, 0.0f} };
-			//m_Faces[south][2] = { XMFLOAT3{0.5f, -0.5f, -0.5f},XMFLOAT2{1.0f, 1.0f} };
-			//m_Faces[south][3] = { XMFLOAT3{-0.5f, -0.5f, -0.5f},XMFLOAT2{0.0f, 1.0f} };
-			//m_Faces[west][0] = { XMFLOAT3{-0.5f, 0.5f, 0.5f},XMFLOAT2{0.0f, 0.0f} };
-			//m_Faces[west][1] = { XMFLOAT3{-0.5f, 0.5f, -0.5f},XMFLOAT2{1.0f, 0.0f} };
-			//m_Faces[west][2] = { XMFLOAT3{-0.5f, -0.5f, -0.5f},XMFLOAT2{1.0f, 1.0f} };
-			//m_Faces[west][3] = { XMFLOAT3{-0.5f, -0.5f, 0.5f},XMFLOAT2{0.0f, 1.0f} };
-			//m_Faces[east][0] = { XMFLOAT3{0.5f, 0.5f, -0.5f},XMFLOAT2{0.0f, 0.0f} };
-			//m_Faces[east][1] = { XMFLOAT3{0.5f, 0.5f, 0.5f},XMFLOAT2{1.0f, 0.0f} };
-			//m_Faces[east][2] = { XMFLOAT3{0.5f, -0.5f, 0.5f},XMFLOAT2{1.0f, 1.0f} };
-			//m_Faces[east][3] = { XMFLOAT3{0.5f, -0.5f, -0.5f},XMFLOAT2{0.0f, 1.0f} };
-		};
+		Block() { };
 
 		Block(Block const&) = delete;
 		Block& operator=(Block const&) = delete;
-		//Block(ID3D11Device* device, ID3D11DeviceContext* deviceContext, int x, int y, int z) {
-		//	m_gpBox = DirectX::GeometricPrimitive::CreateBox(deviceContext, DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f));
-		//	m_world = DirectX::SimpleMath::Matrix::CreateWorld(DirectX::SimpleMath::Vector3::Vector3((float)x, (float)y, (float)z),
-		//		DirectX::SimpleMath::Vector3::Backward,
-		//		DirectX::SimpleMath::Vector3::Up);
-		//};
 		void XM_CALLCONV Draw(ID3D11DeviceContext* deviceContext,
 			//DirectX::BasicEffect* effect,
 			DirectX::CXMMATRIX view,
