@@ -1,13 +1,8 @@
 #pragma once
+#include "nbt.h"
 #include <string>
 #include <cassert>
 #include <memory>
-
-#ifdef _LIB
-#define LIB_NBT_EXPORT __declspec(dllexport)
-#else
-#define LIB_NBT_EXPORT __declspec(dllimport)
-#endif
 
 namespace MineCraft {
 	const size_t BUFFER_SIZE = 1024 * 1024;

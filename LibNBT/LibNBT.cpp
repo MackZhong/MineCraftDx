@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "nbt.h"
 #include "NbtTag.h"
 #include "ByteBuffer.h"
 #include "GzipByteReader.h"
@@ -11,7 +12,7 @@ namespace MineCraft {
 	}
 
 
-	NbtTag* NbtTag::FromType(NbtTagType type, const wchar_t* name) {
+	TagPtr NbtTag::FromType(NbtTagType type, const wchar_t* name) {
 		switch (type) {
 		case NbtTagType::End:
 			return 0;
@@ -44,7 +45,7 @@ namespace MineCraft {
 		return nullptr;
 	}
 
-	CompoundTag* NbtReader::LoadFromFile(const wchar_t* filePathName, NbtCommpressType* fileType) {
+	CompoundTagPtr NbtReader::LoadFromFile(const wchar_t* filePathName, NbtCommpressType* fileType) {
 		std::ifstream ifs(filePathName, std::ios::binary | std::ios::ate);
 		if (!ifs) {
 			throw "File no found.";
@@ -58,7 +59,7 @@ namespace MineCraft {
 		return LoadFromData(bytes.get(), length, fileType);
 	}
 
-	CompoundTag* NbtReader::LoadFromData(const Byte8* data, UInt length, NbtCommpressType* fileType) {
+	CompoundTagPtr NbtReader::LoadFromData(const Byte8* data, UInt length, NbtCommpressType* fileType) {
 		if (nullptr == data || length < 2) return nullptr;
 
 		if (NbtTagType::Compound == data[0]) {
@@ -66,7 +67,7 @@ namespace MineCraft {
 				MemoryByteReader reader(data, length);
 				ByteBuffer buffer(&reader);
 
-				CompoundTag* tag = LoadFromUncompressedData(&buffer);
+				CompoundTagPtr tag = LoadFromUncompressedData(&buffer);
 				if (nullptr != fileType)
 					*fileType = NbtCommpressType::Uncompressed;
 				return tag;
@@ -88,7 +89,7 @@ namespace MineCraft {
 		return LoadFromUncompressedData(&buffer);
 	}
 
-	CompoundTag* NbtReader::LoadFromUncompressedData(ByteBuffer* buffer) {
+	CompoundTagPtr NbtReader::LoadFromUncompressedData(ByteBuffer* buffer) {
 		Byte8 rootType = buffer->ReadByte();
 		if (NbtTagType::Compound != rootType) {
 			throw "Root type must be a compound.";
@@ -96,12 +97,12 @@ namespace MineCraft {
 		Short16 size = buffer->ReadShort();
 		assert(0 == size);
 
-		CompoundTag* root = new CompoundTag();
+		CompoundTagPtr root = new CompoundTag();
 		int readed = root->Read(buffer);
 		return root;
 	}
 
-	CompoundTag* NbtReader::LoadRegionFile(const wchar_t* filePathName) {
+	CompoundTagPtr NbtReader::LoadRegionFile(const wchar_t* filePathName) {
 		std::ifstream ifs(filePathName, std::ios::binary | std::ios::ate);
 		if (!ifs) {
 			throw "Open file fail.";
@@ -114,12 +115,12 @@ namespace MineCraft {
 		ifs.read(bytes.get(), length);
 		ifs.close();
 
-		CompoundTag* compound = LoadRegionData(bytes.get(), length);
+		CompoundTagPtr compound = LoadRegionData(bytes.get(), length);
 
 		return compound;
 	}
 
-	CompoundTag* NbtReader::LoadRegionData(const Byte8* data, UInt length) {
+	CompoundTagPtr NbtReader::LoadRegionData(const Byte8* data, UInt length) {
 		MemoryByteReader reader(data, length);
 		ByteBuffer buffer(&reader);
 
@@ -135,7 +136,7 @@ namespace MineCraft {
 			chunks[i].lastChange = buffer.ReadInt();
 		}
 
-		CompoundTag * root = new CompoundTag;
+		CompoundTagPtr root = new CompoundTag;
 
 		wchar_t chunkName[64];
 		for (int i = 0; i < 1024; i++) {
@@ -162,14 +163,14 @@ namespace MineCraft {
 			GzipByteReader chunkReader(data + offset + 5, size, false);
 			ByteBuffer chunkBuffer(&chunkReader);
 
-			CompoundTag* tagChunk = LoadFromUncompressedData(&chunkBuffer);
+			CompoundTagPtr tagChunk = LoadFromUncompressedData(&chunkBuffer);
 
 			if (nullptr == tagChunk->FindByName(L"LastChange")) {
 				tagChunk->Add(NbtTagType::Int, L"LastChange", (void*)&chunk->lastChange);
 			}
 
 			wsprintfW(chunkName, L"%d,%d", chunk->relX, chunk->relZ);
-			root->Add(NbtTagType::Compound, chunkName, (void*)tagChunk);
+			root->Add(NbtTagType::Compound, chunkName, (void*)&tagChunk);
 		}
 
 		return root;
@@ -209,5 +210,7 @@ namespace MineCraft {
 	//	this->Clear();
 	//	this->ClearValues();
 	//}
+
+	
 
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include "nbt.h"
 #include <vector>
 #include <string>
 

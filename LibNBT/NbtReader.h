@@ -1,4 +1,5 @@
 #pragma once
+#include "nbt.h"
 #include "NbtTag.h"
 #include "MemoryByteReader.h"
 #include "GzipByteReader.h"

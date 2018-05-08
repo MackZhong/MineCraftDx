@@ -1,4 +1,5 @@
 #pragma once
+#include "nbt.h"
 #include "MemoryByteReader.h"
 #include <zlib.h>
 #pragma comment(lib, "zlibwapi.lib")

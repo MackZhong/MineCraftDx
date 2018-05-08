@@ -171,6 +171,7 @@
     <ClInclude Include="ByteReader.h" />
     <ClInclude Include="GzipByteReader.h" />
     <ClInclude Include="MemoryByteReader.h" />
+    <ClInclude Include="nbt.h" />
     <ClInclude Include="NbtEntry.h" />
     <ClInclude Include="NbtReader.h" />
     <ClInclude Include="NbtTag.h" />
