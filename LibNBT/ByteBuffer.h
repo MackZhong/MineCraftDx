@@ -61,13 +61,27 @@ namespace MineCraft {
 	private:
 		ByteReader m_Reader;
 
+		//void Reverse(Byte8* _first, Byte8* _end) {
+		//	assert(_end > _first);
+		//	int length = _end - _first;
+		//	int count = length / 2;
+		//	Byte8 tmp;
+		//	for (int i = 0; i < count; i++) {
+		//		tmp = _first[i];
+		//		_first[i] = _first[length - i];
+		//		_first[length - i] = tmp;
+		//	}
+		//};
+
 	public:
-		ByteBuffer(ByteReader reader) :m_Reader(reader) {};
+		ByteBuffer(ByteReader reader) : m_Reader(reader) {};
 
 		//using ReadString = Read<std::wstring, NbtTagType::String>;
 		inline Byte8 ReadByte() { return m_Reader->ReadByte(); };
 
-		int ReadBytes(UInt length, Byte8* buffer) { return m_Reader->ReadBytes(length, buffer); };
+		int ReadBytes(UInt length, Byte8* buffer) {
+			return m_Reader->ReadBytes(length, buffer);
+		};
 
 		template<typename T>
 		inline int ReadData(T* data) {
@@ -102,9 +116,10 @@ namespace MineCraft {
 		inline Short16 ReadShort() { return (((Short16)ReadByte()) << 8) | ReadByte(); };
 
 		inline Int32 ReadThreeBytesInt() {
-			Byte8 bytes[3] = { 0 };
+			Byte8 bytes[4] = { 0 };
 			int readed = ReadBytes(3, bytes);
-			std::reverse(bytes, &bytes[3]);  // Big-Endian to Little-Endian
+			std::reverse(bytes, &bytes[3]);
+			//Reverse(bytes, &bytes[3]);  // Big-Endian to Little-Endian
 			return *(Int32*)bytes;
 			//return *(Int32*)((bytes[0] & 0x0F) << 16) | ((bytes[1] & 0xFF) << 8) | ((bytes[2] & 0xFF));
 		}
@@ -179,10 +194,11 @@ namespace MineCraft {
 			if (0 == length)
 				return 0;
 
-			Byte8 chars[4];
-			int readed = ReadBytes(length, chars);
+			std::unique_ptr<Byte8[]> chars = std::make_unique<Byte8[]>(length + 1);
+			ZeroMemory(chars.get(), length + 1);
+			int readed = ReadBytes(length, chars.get());
 
-			return UTF8ToWString(ppStr, chars, readed);
+			return UTF8ToWString(ppStr, chars.get(), readed);
 		}
 	};
 }

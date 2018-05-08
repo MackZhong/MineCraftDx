@@ -11,7 +11,7 @@ namespace MineCraft {
 		ZlibCompressed = 2
 	};
 
-	const char* TypeName(NbtTagType type) {
+	inline const char* TypeName(NbtTagType type) {
 		switch (type) {
 		case NbtTagType::End:
 			return "End";
@@ -67,20 +67,20 @@ namespace MineCraft {
 			}
 			size_t length = wcslen(name);
 			m_Name = new wchar_t[length + 1];
-			wcscpy_s(m_Name, length, name);
+			wcscpy_s(m_Name, length + 1, name);
 		}
 
 	protected:
 		int m_Size{ 0 };
 
 	protected:
-		virtual void ClearValues() = 0;
+		virtual void ClearValues() {};
 
 	public:
-		~NbtTag() {
+		virtual ~NbtTag() {
 			this->Clear();
 			this->ClearValues();
-		}
+		};
 		NbtTag() { }
 		NbtTag(NbtTagType type) : m_Type(type) {}
 		NbtTag(const wchar_t* name, NbtTagType type) : m_Type(type) {
@@ -179,7 +179,7 @@ namespace MineCraft {
 	private:
 		T * m_Values{ nullptr };
 
-	private:
+	protected:
 		virtual void ClearValues() override {
 			if (nullptr != m_Values) {
 				delete[] m_Values;
@@ -251,7 +251,7 @@ namespace MineCraft {
 	private:
 		wchar_t * m_Values{ nullptr };
 
-	private:
+	protected:
 		virtual void ClearValues() override {
 			if (nullptr != m_Values) {
 				delete[] m_Values;
@@ -288,7 +288,7 @@ namespace MineCraft {
 			if (nullptr == m_Values) {
 				return 0;
 			}
-			wcscpy_s((wchar_t*)value, m_Size, m_Values);
+			wcscpy_s((wchar_t*)value, m_Size + 1, m_Values);
 			return m_Size;
 		}
 
@@ -304,7 +304,7 @@ namespace MineCraft {
 				return;
 
 			m_Values = new wchar_t[size + 1];
-			wcscpy_s(m_Values, size, (const wchar_t*)value);
+			wcscpy_s(m_Values, size + 1, (const wchar_t*)value);
 		}
 	};
 
@@ -414,6 +414,13 @@ namespace MineCraft {
 		CompoundTag(const wchar_t* name) : NbtTag(name, NbtTagType::Compound) {};
 		CompoundTag(const std::wstring& name) : NbtTag(name, NbtTagType::Compound) {};
 
+		CompoundTag& operator=(const CompoundTag& rhs) {
+			this->m_Size = rhs.m_Size;
+			this->SetValue((void*)rhs.m_Entries, rhs.m_Size);
+
+			return *this;
+		}
+
 		// 从内存读入数据到标签中。
 		virtual int Read(ByteBuffer* buffer) override {
 			std::vector<TagPtr> entries;
@@ -449,7 +456,7 @@ namespace MineCraft {
 			m_Entries = new TagPtr[size];
 			TagPtr* entries = (TagPtr*)value;
 			for (int i = 0; i < m_Size; i++) {
-				*m_Entries[i] = *entries[i];
+				m_Entries[i] = entries[i]->Clone();
 			}
 		}
 

@@ -40,7 +40,11 @@ namespace MineCraft {
 					throw "zLib uncommpression error.";
 					break;
 				}
-				MemoryByteReader((Byte8*)unCompressed, ds.total_out);
+				m_Length = ds.total_out;
+				m_Offset = 0;
+				m_Data = new Byte8[m_Length];
+				memcpy(m_Data, unCompressed, m_Length);
+
 				free(unCompressed);
 				unCompressed = nullptr;
 			}

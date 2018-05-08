@@ -4,7 +4,7 @@
 
 namespace MineCraft {
 	class LIB_NBT_EXPORT MemoryByteReader : public IByteReader {
-	private:
+	protected:
 		Byte8* m_Data{ nullptr };
 		UInt m_Length{ 0 };
 		UInt m_Offset{ 0 };
