@@ -23,6 +23,16 @@ namespace MineCraft {
 		return std::wstring(pwBuf.get());
 	};
 
+	int UTF8ToWString(wchar_t** ppDstString, const Byte8* srcString, unsigned int srcLength) {
+		if (nullptr != *ppDstString) {
+			delete[] * ppDstString;
+			*ppDstString = nullptr;
+		}
+		int dstLength = MultiByteToWideChar(CP_UTF8, 0, srcString, srcLength, NULL, 0);
+		*ppDstString = new wchar_t[dstLength + 1];
+		return MultiByteToWideChar(CP_UTF8, 0, srcString, srcLength, *ppDstString, dstLength);
+	};
+
 	int WStringToUTF8(const std::wstring& str, char* outStr) {
 		int srcLength = (int)str.length();
 		int dstLength = WideCharToMultiByte(CP_UTF8, 0, str.c_str(), srcLength, NULL, 0, NULL, NULL); ;

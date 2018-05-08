@@ -22,6 +22,15 @@ namespace MineCraft {
 		Null = -1
 	};
 
+	inline bool IsBasicType(NbtTagType type) {
+		return NbtTagType::Byte == type ||
+			NbtTagType::Short == type ||
+			NbtTagType::Int == type ||
+			NbtTagType::Long == type ||
+			NbtTagType::Float == type ||
+			NbtTagType::Double == type;
+	}
+
 	inline	bool IsArrayType(NbtTagType type) {
 		return NbtTagType::ByteArray == type ||
 			NbtTagType::IntArray == type ||
@@ -32,6 +41,20 @@ namespace MineCraft {
 		return NbtTagType::Byte == type ||
 			NbtTagType::Int == type ||
 			NbtTagType::Long == type;
+	}
+
+	inline NbtTagType BaseTypeOf(NbtTagType type) {
+		assert(IsArrayType(type));
+		switch (type) {
+		case NbtTagType::ByteArray:
+			return NbtTagType::Byte;
+		case NbtTagType::IntArray:
+			return NbtTagType::Int;
+		case NbtTagType::LongArray:
+			return NbtTagType::Long;
+		}
+
+		return NbtTagType::Null;
 	}
 
 	class LIB_NBT_EXPORT ByteBuffer {
@@ -45,6 +68,36 @@ namespace MineCraft {
 		inline Byte8 ReadByte() { return m_Reader->ReadByte(); };
 
 		int ReadBytes(UInt length, Byte8* buffer) { return m_Reader->ReadBytes(length, buffer); };
+
+		template<typename T>
+		inline int ReadData(T* data) {
+			int size = sizeof(T);
+			if (1 == size) {
+				*data = ReadByte();
+				return 1;
+			}
+			Byte8* bytes = (Byte8*)data;
+			int readed = ReadBytes(size, bytes);
+			std::reverse(bytes, bytes + size);
+
+			return readed;
+		};
+
+		template<typename T>
+		inline int ReadData(T* data, Int32 count) {
+			int size = sizeof(T);
+			if (1 == size) {
+				return ReadBytes(count, (Byte8*)data);
+			}
+			int readed = 0;
+			for (Int32 c = 0; c < count; c++) {
+				Byte8* bytes = (Byte8*)(data + c);
+				readed += ReadBytes(size, bytes);
+				std::reverse(bytes, bytes + size);
+			}
+
+			return readed;
+		};
 
 		inline Short16 ReadShort() { return (((Short16)ReadByte()) << 8) | ReadByte(); };
 
@@ -119,6 +172,17 @@ namespace MineCraft {
 			int readed = ReadBytes(length, chars);
 
 			return UTF8ToWString(chars, length);
+		}
+
+		inline int ReadString(wchar_t** ppStr, Int32 length) {
+			// Read simple utf-8 bytes and convert it to QString. UTF-8 is the same as described in https://docs.oracle.com/javase/7/docs/api/java/io/DataInput.html#readUTF()
+			if (0 == length)
+				return 0;
+
+			Byte8 chars[4];
+			int readed = ReadBytes(length, chars);
+
+			return UTF8ToWString(ppStr, chars, readed);
 		}
 	};
 }
