@@ -14,6 +14,9 @@ namespace MineCraft {
 		MemoryByteReader() : m_Data(nullptr), m_Length(0), m_Offset(0) {};
 
 	public:
+		Byte8* Get() const { return m_Data; }
+		int Size() const { return m_Length; }
+
 		MemoryByteReader & operator=(const MemoryByteReader&) = delete;
 		~MemoryByteReader() { delete[] m_Data; m_Data = nullptr; }
 
@@ -25,7 +28,7 @@ namespace MineCraft {
 
 		// Í¨¹ý IByteReader ¼Ì³Ð
 		virtual Byte8 ReadByte() override {
-			if (0 == m_Length || m_Offset >= m_Length - 1) {
+			if (0 == m_Length || m_Offset >= m_Length) {
 				throw "Overflow.";
 			}
 			return m_Data[m_Offset++];

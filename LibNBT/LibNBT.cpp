@@ -16,6 +16,7 @@ namespace MineCraft {
 	template<> TypeConvert<TagPtr>* TypeConvert<TagPtr>::instance;
 
 	TagPtr NbtTag::FromType(NbtTagType type, const wchar_t* name) {
+
 		switch (type) {
 		case NbtTagType::End:
 			return 0;
@@ -108,7 +109,8 @@ namespace MineCraft {
 	CompoundTagPtr NbtReader::LoadRegionFile(const wchar_t* filePathName) {
 		std::ifstream ifs(filePathName, std::ios::binary | std::ios::ate);
 		if (!ifs) {
-			throw "Open file fail.";
+			return nullptr;
+			//throw "Open file fail.";
 		}
 
 		UInt length = (UInt)ifs.tellg();
@@ -165,6 +167,9 @@ namespace MineCraft {
 
 			GzipByteReader chunkReader(data + offset + 5, size, false);
 			ByteBuffer chunkBuffer(&chunkReader);
+			//std::ofstream bin("chunk.nbt", std::ios::binary);
+			//bin.write(chunkReader.Get(), chunkReader.Size());
+			//bin.close();
 
 			wsprintfW(chunkName, L"%d,%d", chunk->relX, chunk->relZ);
 			CompoundTagPtr tagChunk = LoadFromUncompressedData(&chunkBuffer, chunkName);

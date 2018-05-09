@@ -261,3 +261,6 @@ paket-files/
 __pycache__/
 *.pyc
 /NbtViewer/data.nbt
+/NbtViewer/player.dat
+/NbtViewer/regions.dat
+*.nbt
