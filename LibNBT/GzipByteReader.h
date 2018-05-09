@@ -23,18 +23,18 @@ namespace MineCraft {
 				throw "zLib init failed.";
 			}
 
-			Bytef* unCompressed = (Bytef*)malloc(BUFFER_SIZE);
+			Bytef* unCompressed = (Bytef*)malloc(UNCOMPRESS_BUFFER_SIZE);
 			while (ds.avail_in != 0) {
 				ds.next_out = unCompressed;
-				ds.avail_out = BUFFER_SIZE;
+				ds.avail_out = UNCOMPRESS_BUFFER_SIZE;
 				result = inflate(&ds, Z_NO_FLUSH);
 				switch (result) {
 				case Z_STREAM_END:
 				case Z_OK:
 					if (ds.avail_in > 0) {
-						unCompressed = (Bytef*)realloc(unCompressed, ds.total_out + BUFFER_SIZE);
+						unCompressed = (Bytef*)realloc(unCompressed, ds.total_out + UNCOMPRESS_BUFFER_SIZE);
 						ds.next_out = unCompressed + ds.total_out;
-						ds.avail_out = BUFFER_SIZE;
+						ds.avail_out = UNCOMPRESS_BUFFER_SIZE;
 					}
 					break;
 				default:

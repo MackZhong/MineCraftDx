@@ -20,7 +20,7 @@ namespace MineCraft {
 
 		CompoundTag* LoadFromData(const Byte8* data, UInt length, NbtCommpressType* fileType = nullptr);
 
-		CompoundTag* LoadFromUncompressedData(ByteBuffer* buffer);
+		CompoundTag* LoadFromUncompressedData(ByteBuffer* buffer, const wchar_t* name);
 
 		CompoundTag* LoadRegionFile(const wchar_t* filePathName);
 

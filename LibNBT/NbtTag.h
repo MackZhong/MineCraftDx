@@ -45,9 +45,7 @@ namespace MineCraft {
 		return "Error";
 	}
 
-	using TagPtr = class NbtTag*;
-
-	class LIB_NBT_EXPORT NbtTag {
+	class LIB_NBT_EXPORT NbtTag/* : public IPayload*/ {
 	private:
 		wchar_t* m_Name{ nullptr };
 
@@ -56,7 +54,7 @@ namespace MineCraft {
 		NbtTagType m_Type{ NbtTagType::Null };
 
 	protected:
-		void Clear() {
+		void ClearName() {
 			if (nullptr != m_Name) {
 				delete[] m_Name;
 				m_Name = nullptr;
@@ -80,7 +78,7 @@ namespace MineCraft {
 
 	public:
 		virtual ~NbtTag() {
-			this->Clear();
+			this->ClearName();
 			this->ClearValues();
 		};
 
@@ -96,7 +94,7 @@ namespace MineCraft {
 			SetName(name.c_str());
 		}
 
-		virtual TagPtr Clone() const = 0;
+		virtual NbtTag* Clone() const = 0;
 		// 读取标签名字
 		const wchar_t* Name() const { return m_Name; };
 		// 读取标签类型
@@ -120,10 +118,16 @@ namespace MineCraft {
 		virtual int Read(ByteBuffer* buffer) = 0;
 
 		// 根据类型创建带名字的NBT标签
-		static TagPtr FromType(NbtTagType type, const wchar_t* name = nullptr);
+		static NbtTag* FromType(NbtTagType type, const wchar_t* name = nullptr);
 		//// 根据类型创建不带名字的NBT标签数组
 		//static TagPtr FromType(NbtTagType type, int count);
+
+		virtual std::wostream& OutString(std::wostream& out) const = 0;
+
+		virtual std::wostream& OutValueString(std::wostream& out) const = 0;
 	};
+
+	using TagPtr = class NbtTag*;
 
 	template<typename T, NbtTagType TYPE> class  LIB_NBT_EXPORT NbtTagBasic :public NbtTag {
 	private:
@@ -190,9 +194,27 @@ namespace MineCraft {
 			memcpy(&m_Value, value, sizeof(T));
 		};
 
-		friend std::ostream& operator<<(std::ostream& out, const NbtTagBasic& tag) {
-			out << tag.Name() << " = " << tag.Value() << std::endl;
+		friend std::wostream& operator<<(std::wostream& out, const NbtTagBasic& tag) {
+			return tag.OutString(out);
+		}
 
+		// operator=的类内实现
+		virtual std::wostream& OutString(std::wostream& out) const override {
+			out << "(" << this->TypeName() << ")";
+			if (nullptr == this->Name()) {
+				out << "NONAME";
+			}
+			else {
+				out << "\"" << this->Name() << "\"";
+			}
+			out << " = ";
+			OutValueString(out);
+			out << std::endl;
+
+			return out;
+		}
+		virtual std::wostream& OutValueString(std::wostream& out) const override {
+			out << MineCraft::TypeConvert<T>::Instance()->toString(this->m_Value);
 			return out;
 		}
 	};
@@ -206,15 +228,52 @@ namespace MineCraft {
 
 	template<typename T, NbtTagType TYPE> class  LIB_NBT_EXPORT NbtTagArray :public NbtTag {
 	private:
+		int m_Capcity{ 0 };
+
+	protected:
 		T * m_Values{ nullptr };
 
 	protected:
+		void AllocCapcity(int size) {
+			this->ClearValues();
+			m_Size = size;
+			m_Capcity = ((m_Size + 15) >> 4) << 4;
+			m_Values = new T[m_Capcity];
+		}
+
+		void Expand(UInt size) {
+			int newCapcity = ((m_Size + 15 + size) >> 4) << 4;
+			if (newCapcity <= m_Capcity) {
+				return;
+			}
+			m_Capcity = newCapcity;
+
+			T * oldEntries = m_Values;
+			m_Values = new T[m_Capcity];
+			memcpy(m_Values, oldEntries, m_Size * sizeof(T));
+			delete[] oldEntries;
+		}
+
+		void Shrink() {
+			int newCapcity = ((m_Size + 15) >> 4) << 4;
+			if (newCapcity >= m_Capcity) {
+				return;
+			}
+			m_Capcity = newCapcity;
+
+			T * oldEntries = m_Values;
+			m_Values = new T[m_Capcity];
+			memcpy(m_Values, oldEntries, m_Size * sizeof(T));
+			delete[] oldEntries;
+		}
+
 		virtual void ClearValues() override {
 			if (nullptr != m_Values) {
 				delete[] m_Values;
 				m_Values = nullptr;
 			}
 			m_Size = 0;
+			m_Capcity = 0;
 		}
 
 	public:
@@ -243,19 +302,18 @@ namespace MineCraft {
 
 		// 从内存读入数据到标签中，返回读取的字节数。
 		virtual int Read(ByteBuffer* buffer) override {
-			ClearValues();
-			m_Size = buffer->ReadInt();
-			if (0 == m_Size) {
-				return m_Size;
+			Int32 size = buffer->ReadInt();
+			if (0 == size) {
+				return size;
 			}
-			m_Values = new T[m_Size];
+			AllocCapcity(size);
 
 			return buffer->ReadData<T>(m_Values, m_Size);
 		}
 
 		// 获取数据指针，根据数据类型转换。
 		// 例：Int32* data = (Int32*)tag->GetValue();
-		virtual void* Value() const {
+		virtual void* Value() const override {
 			return (void*)m_Values;
 		};
 
@@ -276,24 +334,54 @@ namespace MineCraft {
 		// 例：	Int32* data = new Int32[6];
 		//		tag->SetValue((void*)data, 6);
 		virtual void SetValue(void* value, int size = 1) override {
-			this->ClearValues();
-			m_Size = size;
 			if (0 == size) {
 				return;
 			}
-			m_Values = new T[size];
+			AllocCapcity(size);
+
 			memcpy(m_Values, value, size * sizeof(T));
 		};
 
-		friend std::ostream& operator<<(std::ostream& out, const NbtTagArray& tag) {
-			out << tag.Name() << ", " << tag.Size() << " entries = " << std::endl;
-			for (int i = 0; i < tag.Size(); i++) {
-				out << tag.m_Values[i] << " ";
+		friend std::wostream& operator<<(std::wostream& out, const NbtTagArray& tag) {
+			return tag.OutString(out);
+		}
+
+		// operator=的类内实现
+		virtual std::wostream& OutString(std::wostream& out) const override {
+			out << "(" << this->TypeName() << ")";
+			if (nullptr == this->Name()) {
+				out << "NONAME";
 			}
+			else {
+				out << "\"" << this->Name() << "\"";
+			}
+			out << ", " << this->Size() << " entries = " << std::endl;
+			OutValueString(out);
 			out << std::endl;
 
 			return out;
 		}
+
+		virtual std::wostream& OutValueString(std::wostream& out) const override {
+			for (int i = 0; i < this->Size(); i++) {
+				out << MineCraft::TypeConvert<T>::Instance()->toString(this->m_Values[i]) << ",";
+			}
+
+			return out;
+		}
+
+		// 插入一个标签并设置名字、数据
+		// 注意如果是数组、列表或者组合类型，值应为指针的地址
+		virtual T& Add(void* value) {
+			if (m_Size + 1 > m_Capcity) {
+				Expand(1);
+			}
+			T& data = *(T*)value;
+			m_Values[m_Size++] = data;
+
+			return data;
+		}
+
 	};
 	using ByteArrayTag = NbtTagArray<Byte8, NbtTagType::ByteArray>;
 	using IntArrayTag = NbtTagArray<Int32, NbtTagType::IntArray>;
@@ -341,7 +429,7 @@ namespace MineCraft {
 
 		// 获取数据指针，根据数据类型转换。
 		// 例：	wchar_t* str = (wchar_t*)tag->GetValue();
-		virtual void* Value() const {
+		virtual void* Value() const override {
 			return (void*)m_Values;
 		};
 
@@ -372,49 +460,61 @@ namespace MineCraft {
 			wcscpy_s(m_Values, size + 1, (const wchar_t*)value);
 		}
 
-		friend std::ostream& operator<<(std::ostream& out, const StringTag& tag) {
-			out << tag.Name() << " = \"" << tag.Value() << "\"" << std::endl;
+		friend std::wostream& operator<<(std::wostream& out, const StringTag& tag) {
+			return tag.OutString(out);
+		}
 
+		// operator=的类内实现
+		virtual std::wostream& OutString(std::wostream& out) const override {
+			out << "(" << this->TypeName() << ")";
+			if (nullptr == this->Name()) {
+				out << "NONAME";
+			}
+			else {
+				out << "\"" << this->Name() << "\"";
+			}
+			out << " = \"";
+			OutValueString(out);;
+			out << "\"" << std::endl;
+
+			return out;
+		}
+		virtual std::wostream& OutValueString(std::wostream& out) const override {
+			out << this->m_Values;
 			return out;
 		}
 	};
 
 	using StringTagPtr = StringTag * ;
 
-	class  LIB_NBT_EXPORT ListTag :public NbtTag {
+	class  LIB_NBT_EXPORT ListTag :public NbtTagArray<TagPtr, NbtTagType::List> {
 	private:
-		TagPtr * m_Values{ nullptr };
+		using super = NbtTagArray;
 		NbtTagType m_TagId{ NbtTagType::End };
 
 	protected:
 		virtual void ClearValues() override {
-			if (nullptr != m_Values) {
-				for (int i = 0; i < m_Size; i++) {
-					if (nullptr != m_Values[i]) {
-						delete m_Values[i];
-					}
+			for (int i = 0; i < m_Size; i++) {
+				if (nullptr != m_Values[i]) {
+					delete m_Values[i];
 				}
-				delete[] m_Values;
-				m_Values = nullptr;
 			}
-			m_Size = 0;
-			m_TagId = NbtTagType::End;
+
+			super::ClearValues();
 		}
 
 	public:
-		ListTag() : NbtTag(NbtTagType::List) {
-		}
-		ListTag(const wchar_t* name) : NbtTag(name, NbtTagType::List) {
-		}
-		ListTag(const std::wstring& name) : NbtTag(name, NbtTagType::List) {
-		}
+		ListTag() { }
+		ListTag(const wchar_t* name) : super(name) { }
+		ListTag(const std::wstring& name) : super(name) { }
 		ListTag(const ListTag& rhs) { *this = rhs; }
 
 		ListTag& operator=(const ListTag& rhs) {
-			this->SetName(rhs.Name());
 			this->m_TagId = rhs.m_TagId;
-			this->m_Type = NbtTagType::List;
-			this->SetValue(rhs.m_Values, rhs.m_Size);
+			super::operator=(rhs);
+			//this->SetName(rhs.Name());
+			//this->m_Type = NbtTagType::List;
+			//this->SetValue(rhs.m_Values, rhs.m_Size);
 
 			return *this;
 		}
@@ -425,13 +525,16 @@ namespace MineCraft {
 
 		// 从内存读入数据到标签中。
 		virtual int Read(ByteBuffer* buffer) override {
-			ClearValues();
 			m_TagId = static_cast<NbtTagType>(buffer->ReadByte());
 			if (NbtTagType::End == m_TagId) {
 				return m_Size;
 			}
-			m_Size = buffer->ReadInt();
-			m_Values = new TagPtr[m_Size];
+			int size = buffer->ReadInt();
+			if (0 == size) {
+				return m_Size;
+			}
+			AllocCapcity(size);
+
 			for (int i = 0; i < m_Size; i++) {
 				m_Values[i] = NbtTag::FromType(m_TagId);
 				m_Values[i]->Read(buffer);
@@ -443,7 +546,7 @@ namespace MineCraft {
 		// 返回的是TagPtr（也即NbtTag*）类型的指针数组。
 		// 例：	TagPtr* tags = (TagPtr*)tag->GetValue();
 		// 访问其中一个元素：wchar_t* name = tags[1]->Name();
-		virtual void* Value() const {
+		virtual void* Value() const override {
 			return (void*)m_Values;
 		};
 
@@ -452,11 +555,12 @@ namespace MineCraft {
 		//		int count = tag->GetValue((void*)tags);
 		// 注意指针数组中的数据由原标签保存，不进行复制。
 		virtual int GetValue(void* value) const {
-			if (nullptr == m_Values) {
-				return 0;
-			}
-			memcpy(value, m_Values, m_Size * sizeof(TagPtr));
-			return m_Size * sizeof(TagPtr);
+			return NbtTagArray::GetValue(value);
+			//if (nullptr == m_Values) {
+			//	return 0;
+			//}
+			//memcpy(value, m_Values, m_Size * sizeof(TagPtr));
+			//return m_Size * sizeof(TagPtr);
 		}
 
 		// 设置标签的值，要保证指针指向的内存所含数据数量和传入的数量一致。
@@ -465,89 +569,62 @@ namespace MineCraft {
 		// 例：	Int32* data = new Int32[6];
 		//		tag->SetValue((void*)data, 6);
 		virtual void SetValue(void* value, int size = 1) override {
-			this->ClearValues();
-			m_Size = size;
 			if (0 == size) {
 				return;
 			}
-			m_Values = new TagPtr[size];
+			AllocCapcity(size);
+
 			TagPtr* tags = (TagPtr*)value;
 			for (int i = 0; i < size; i++) {
 				m_Values[i] = tags[i]->Clone();
 			}
 		}
 
-		friend std::ostream& operator<<(std::ostream& out, const ListTag& tag) {
-			out << tag.Name() << ", " << tag.Size() << " entries = " << std::endl;
-			for (int i = 0; i < tag.Size(); i++) {
-				//out << *(tag.m_Values[i]);
+		friend std::wostream& operator<<(std::wostream& out, const ListTag& tag) {
+			return tag.OutString(out);
+		}
+
+		// operator=的类内实现
+		virtual std::wostream& OutValueString(std::wostream& out) const override {
+			for (int i = 0; i < this->Size(); i++) {
+				out << "\t";
+				this->m_Values[i]->OutValueString(out);
+				out << " ";
 			}
+
 			return out;
 		}
 	};
 
 	using ListTagPtr = ListTag * ;
 
-	class LIB_NBT_EXPORT CompoundTag : public NbtTag {
+	class LIB_NBT_EXPORT CompoundTag : public NbtTagArray<TagPtr, NbtTagType::Compound> {
 	private:
-		TagPtr * m_Entries{ nullptr };
-		int m_Capcity{ 0 };
-
-	private:
-		void Expand(UInt size) {
-			int newCapcity = ((m_Size + 15 + size) >> 4) << 4;
-			if (newCapcity <= m_Capcity) {
-				return;
-			}
-			m_Capcity = newCapcity;
-
-			TagPtr * oldEntries = m_Entries;
-			m_Entries = new TagPtr[m_Capcity];
-			memcpy(m_Entries, oldEntries, m_Size * sizeof(TagPtr));
-			delete[] oldEntries;
-		}
-
-		void Shrink() {
-			int newCapcity = ((m_Size + 15) >> 4) << 4;
-			if (newCapcity >= m_Capcity) {
-				return;
-			}
-			m_Capcity = newCapcity;
-
-			TagPtr * oldEntries = m_Entries;
-			m_Entries = new TagPtr[m_Capcity];
-			memcpy(m_Entries, oldEntries, m_Size * sizeof(TagPtr));
-			delete[] oldEntries;
-		}
+		using super = NbtTagArray;
 
 	protected:
 		virtual void ClearValues() override {
-			if (nullptr != m_Entries) {
-				for (int i = 0; i < m_Size; i++) {
-					if (nullptr != m_Entries[i]) {
-						delete m_Entries[i];
-					}
+			for (int i = 0; i < m_Size; i++) {
+				if (nullptr != m_Values[i]) {
+					delete m_Values[i];
 				}
-				delete[] m_Entries;
-				m_Entries = nullptr;
 			}
-			m_Size = 0;
-			m_Capcity = 0;
+			super::ClearValues();
 		}
 
 	public:
-		CompoundTag() : NbtTag(NbtTagType::Compound) {};
-		CompoundTag(const wchar_t* name) : NbtTag(name, NbtTagType::Compound) {};
-		CompoundTag(const std::wstring& name) : NbtTag(name, NbtTagType::Compound) {};
+		CompoundTag() {};
+		CompoundTag(const wchar_t* name) : super(name) {};
+		CompoundTag(const std::wstring& name) : super(name) {};
 		CompoundTag(const CompoundTag& rhs) { *this = rhs; }
 
-		CompoundTag& operator=(const CompoundTag& rhs) {
-			this->SetName(rhs.Name());
-			this->m_Type = NbtTagType::Compound;
-			this->SetValue((void*)rhs.m_Entries, rhs.m_Size);
+		//CompoundTag& operator=(const CompoundTag& rhs) {
+		//	this->SetName(rhs.Name());
+		//	this->m_Type = NbtTagType::Compound;
+		//	this->SetValue((void*)rhs.m_Values, rhs.m_Size);
 
-			return *this;
-		}
+		//	return *this;
+		//}
 
 		virtual TagPtr Clone() const override {
 			return new CompoundTag(*this);
@@ -580,16 +657,14 @@ namespace MineCraft {
 		// 例：	Int32* data = new Int32[6];
 		//		tag->SetValue((void*)data, 6);
 		virtual void SetValue(void* value, int size = 1) override {
-			this->ClearValues();
-			m_Size = size;
-			m_Capcity = ((m_Size + 15) >> 4) << 4;
 			if (0 == size) {
 				return;
 			}
-			m_Entries = new TagPtr[m_Capcity];
+			AllocCapcity(size);
+
 			TagPtr* entries = (TagPtr*)value;
 			for (int i = 0; i < m_Size; i++) {
-				m_Entries[i] = entries[i]->Clone();
+				m_Values[i] = entries[i]->Clone();
 			}
 		}
 
@@ -597,8 +672,8 @@ namespace MineCraft {
 		// 返回的是TagPtr（也即NbtTag*）类型的指针数组。
 		// 例：	TagPtr* tags = (TagPtr*)tag->GetValue();
 		// 访问其中一个元素：wchar_t* name = tags[1]->Name();
-		virtual void* Value() const {
-			return (void*)m_Entries;
+		virtual void* Value() const override {
+			return (void*)m_Values;
 		};
 
 		// 读取数据，传入参数需分配好需要的空间，返回读取的字符数。
@@ -606,11 +681,12 @@ namespace MineCraft {
 		//		int count = tag->GetValue((void*)tags);
 		// 注意指针数组中的数据由原标签保存，不进行复制。
 		virtual int GetValue(void* value) const {
-			if (nullptr == m_Entries) {
-				return 0;
-			}
-			memcpy(value, m_Entries, m_Size * sizeof(TagPtr));
-			return m_Size * sizeof(TagPtr);
+			return super::GetValue(value);
+			//if (nullptr == m_Values) {
+			//	return 0;
+			//}
+			//memcpy(value, m_Values, m_Size * sizeof(TagPtr));
+			//return m_Size * sizeof(TagPtr);
 		}
 
 		// 根据名字查找标签
@@ -619,79 +695,86 @@ namespace MineCraft {
 				return nullptr;
 			}
 			for (size_t i = 0; i < m_Size; i++) {
-				if (nullptr == m_Entries[i]->Name()) {
+				if (nullptr == m_Values[i]->Name()) {
 					continue;
 				}
-				if (_wcsnicmp(m_Entries[i]->Name(), name, m_Entries[i]->Size()) == 0) {
-					return m_Entries[i];
+				if (_wcsnicmp(m_Values[i]->Name(), name, m_Values[i]->Size()) == 0) {
+					return m_Values[i];
 				}
 			}
 			return nullptr;
 		}
 
-		// 插入一个标签并设置名字、数据
-		// 注意如果是数组、列表或者组合类型，值应为指针的地址
-		TagPtr Add(NbtTagType type, const wchar_t* name, void* value) {
-			if (m_Size + 1 > m_Capcity) {
-				Expand(1);
-			}
-			TagPtr tag = NbtTag::FromType(type, name);
-			tag->SetValue(value);
-			m_Entries[m_Size++] = tag;
+		//// 插入一个标签并设置名字、数据
+		//// 注意如果是数组、列表或者组合类型，值应为指针的地址
+		//TagPtr Add(NbtTagType type, const wchar_t* name, void* value) {
+		//	if (m_Size + 1 > m_Capcity) {
+		//		Expand(1);
+		//	}
+		//	TagPtr tag = NbtTag::FromType(type, name);
+		//	tag->SetValue(value);
+		//	m_Values[m_Size++] = tag;
 
-			return tag;
+		//	return tag;
+		//}
+
+		friend std::wostream& operator<<(std::wostream& out, const CompoundTag& tag) {
+			//for (int i = 0; i < tag.Size(); i++) {
+			//	switch (tag.m_Values[i]->Type()) {
+			//	case NbtTagType::End:
+			//		out << "-End-";
+			//		break;
+			//	case NbtTagType::Byte:
+			//		out << *(ByteTag*)tag.m_Values[i];
+			//		break;
+			//	case NbtTagType::Short:
+			//		out << *(ShortTag*)tag.m_Values[i];
+			//		break;
+			//	case NbtTagType::Int:
+			//		out << *(IntTag*)tag.m_Values[i];
+			//		break;
+			//	case NbtTagType::Long:
+			//		out << *(LongTag*)tag.m_Values[i];
+			//		break;
+			//	case NbtTagType::Float:
+			//		out << *(FloatTag*)tag.m_Values[i];
+			//		break;
+			//	case NbtTagType::Double:
+			//		out << *(DoubleTag*)tag.m_Values[i];
+			//		break;
+			//	case NbtTagType::ByteArray:
+			//		out << *(ByteArrayTag*)tag.m_Values[i];
+			//		break;
+			//	case NbtTagType::String:
+			//		out << *(StringTag*)tag.m_Values[i];
+			//		break;
+			//	case NbtTagType::List:
+			//		out << *(ListTag*)tag.m_Values[i];
+			//		break;
+			//	case NbtTagType::Compound:
+			//		out << *(CompoundTag*)tag.m_Values[i];
+			//		break;
+			//	case NbtTagType::IntArray:
+			//		out << *(IntArrayTag*)tag.m_Values[i];
+			//		break;
+			//	case NbtTagType::LongArray:
+			//		out << *(LongArrayTag*)tag.m_Values[i];
+			//		break;
+			//	}
+			//}
+			return tag.OutString(out);
 		}
 
-		friend std::ostream& operator<<(std::ostream& out, const CompoundTag& tag) {
-			out << tag.TypeName();
-			out << " " << tag.Name();
-			out << " " << tag.Size();
-			out << " entries." << std::endl;
-			for (int i = 0; i < tag.Size(); i++) {
-				switch (tag.m_Entries[i]->Type()) {
-				case NbtTagType::End:
-					out << "-End-";
-					break;
-				case NbtTagType::Byte:
-					out << *(ByteTag*)tag.m_Entries[i];
-					break;
-				case NbtTagType::Short:
-					out << *(ShortTag*)tag.m_Entries[i];
-					break;
-				case NbtTagType::Int:
-					out << *(IntTag*)tag.m_Entries[i];
-					break;
-				case NbtTagType::Long:
-					out << *(LongTag*)tag.m_Entries[i];
-					break;
-				case NbtTagType::Float:
-					out << *(FloatTag*)tag.m_Entries[i];
-					break;
-				case NbtTagType::Double:
-					out << *(DoubleTag*)tag.m_Entries[i];
-					break;
-				case NbtTagType::ByteArray:
-					out << *(ByteArrayTag*)tag.m_Entries[i];
-					break;
-				case NbtTagType::String:
-					out << *(StringTag*)tag.m_Entries[i];
-					break;
-				case NbtTagType::List:
-					out << *(ListTag*)tag.m_Entries[i];
-					break;
-				case NbtTagType::Compound:
-					out << *(CompoundTag*)tag.m_Entries[i];
-					break;
-				case NbtTagType::IntArray:
-					out << *(IntArrayTag*)tag.m_Entries[i];
-					break;
-				case NbtTagType::LongArray:
-					out << *(LongArrayTag*)tag.m_Entries[i];
-					break;
-				}
+		// operator=的类内实现
+		virtual std::wostream& OutValueString(std::wostream& out) const override {
+			for (int i = 0; i < this->Size(); i++) {
+				out << "\t";
+				this->m_Values[i]->OutString(out);
+				out << " ";
 			}
+
 			return out;
-		};
+		}
 	};
 
 	using CompoundTagPtr = CompoundTag * ;

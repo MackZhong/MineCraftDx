@@ -12,4 +12,9 @@ namespace MineCraft {
 	public:
 		NbtEntry() {};
 	};
+
+	//__interface IPayload {
+	//	const char* toString();
+	//};
+
 }

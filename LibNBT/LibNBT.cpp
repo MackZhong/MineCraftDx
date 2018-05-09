@@ -7,10 +7,13 @@
 #include "NbtReader.h"
 
 namespace MineCraft {
-	void test() {
-		ByteTag tag;
-	}
-
+	template<> TypeConvert<Byte8>* TypeConvert<Byte8>::instance;
+	template<> TypeConvert<Short16>* TypeConvert<Short16>::instance;
+	template<> TypeConvert<Int32>* TypeConvert<Int32>::instance;
+	template<> TypeConvert<Long64>* TypeConvert<Long64>::instance;
+	template<> TypeConvert<Float32>* TypeConvert<Float32>::instance;
+	template<> TypeConvert<Double64>* TypeConvert<Double64>::instance;
+	template<> TypeConvert<TagPtr>* TypeConvert<TagPtr>::instance;
 
 	TagPtr NbtTag::FromType(NbtTagType type, const wchar_t* name) {
 		switch (type) {
@@ -67,7 +70,7 @@ namespace MineCraft {
 				MemoryByteReader reader(data, length);
 				ByteBuffer buffer(&reader);
 
-				CompoundTagPtr tag = LoadFromUncompressedData(&buffer);
+				CompoundTagPtr tag = LoadFromUncompressedData(&buffer, L"root");
 				if (nullptr != fileType)
 					*fileType = NbtCommpressType::Uncompressed;
 				return tag;
@@ -86,10 +89,10 @@ namespace MineCraft {
 		GzipByteReader reader(data, length);
 		ByteBuffer buffer(&reader);
 
-		return LoadFromUncompressedData(&buffer);
+		return LoadFromUncompressedData(&buffer, L"root");
 	}
 
-	CompoundTagPtr NbtReader::LoadFromUncompressedData(ByteBuffer* buffer) {
+	CompoundTagPtr NbtReader::LoadFromUncompressedData(ByteBuffer* buffer, const wchar_t* name) {
 		Byte8 rootType = buffer->ReadByte();
 		if (NbtTagType::Compound != rootType) {
 			throw "Root type must be a compound.";
@@ -97,7 +100,7 @@ namespace MineCraft {
 		Short16 size = buffer->ReadShort();
 		assert(0 == size);
 
-		CompoundTagPtr root = new CompoundTag();
+		CompoundTagPtr root = new CompoundTag(name);
 		int readed = root->Read(buffer);
 		return root;
 	}
@@ -136,7 +139,7 @@ namespace MineCraft {
 			chunks[i].lastChange = buffer.ReadInt();
 		}
 
-		CompoundTagPtr root = new CompoundTag;
+		CompoundTagPtr root = new CompoundTag(L"root");
 
 		wchar_t chunkName[64];
 		for (int i = 0; i < 1024; i++) {
@@ -163,24 +166,28 @@ namespace MineCraft {
 			GzipByteReader chunkReader(data + offset + 5, size, false);
 			ByteBuffer chunkBuffer(&chunkReader);
 
-			CompoundTagPtr tagChunk = LoadFromUncompressedData(&chunkBuffer);
+			wsprintfW(chunkName, L"%d,%d", chunk->relX, chunk->relZ);
+			CompoundTagPtr tagChunk = LoadFromUncompressedData(&chunkBuffer, chunkName);
 
 			if (nullptr == tagChunk->FindByName(L"LastChange")) {
-				tagChunk->Add(NbtTagType::Int, L"LastChange", (void*)&chunk->lastChange);
+				IntTag* tag = dynamic_cast<IntTag*>(NbtTag::FromType(NbtTagType::Int, L"LastChange"));
+				if (nullptr != tag) {
+					tag->SetValue((void*)&chunk->lastChange);
+					tagChunk->Add(&tag);
+				}
 			}
 
-			wsprintfW(chunkName, L"%d,%d", chunk->relX, chunk->relZ);
-			root->Add(NbtTagType::Compound, chunkName, (void*)&tagChunk);
+			root->Add(&tagChunk);
 		}
 
 		return root;
 	}
 
-	std::wstring UTF8ToWString(const Byte8* srcString, unsigned int srcLength) {
+	StringW UTF8ToWString(const Byte8* srcString, unsigned int srcLength) {
 		int dstLength = MultiByteToWideChar(CP_UTF8, 0, srcString, srcLength, NULL, 0);
 		std::unique_ptr<wchar_t[]> pwBuf = std::make_unique<wchar_t[]>(dstLength + 1);
 		int length = MultiByteToWideChar(CP_UTF8, 0, srcString, srcLength, pwBuf.get(), dstLength);
-		return std::wstring(pwBuf.get());
+		return StringW(pwBuf.get());
 	};
 
 	int UTF8ToWString(wchar_t** ppDstString, const Byte8* srcString, unsigned int srcLength) {
@@ -196,7 +203,7 @@ namespace MineCraft {
 		return converted;
 	};
 
-	int WStringToUTF8(const std::wstring& str, char* outStr) {
+	int WStringToUTF8(const StringW& str, char* outStr) {
 		int srcLength = (int)str.length();
 		int dstLength = WideCharToMultiByte(CP_UTF8, 0, str.c_str(), srcLength, NULL, 0, NULL, NULL); ;
 		if (nullptr != outStr) {
@@ -205,12 +212,4 @@ namespace MineCraft {
 		}
 		return dstLength;
 	};
-
-	//NbtTag::~NbtTag() {
-	//	this->Clear();
-	//	this->ClearValues();
-	//}
-
-	
-
 }

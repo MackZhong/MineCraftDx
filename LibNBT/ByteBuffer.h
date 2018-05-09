@@ -2,6 +2,8 @@
 #include "nbt.h"
 #include <string>
 #include <vector>
+#include <typeinfo>
+
 #include "ByteReader.h"
 // https://github.com/Howaner/NBTEditor
 
@@ -35,7 +37,9 @@ namespace MineCraft {
 	inline	bool IsArrayType(NbtTagType type) {
 		return NbtTagType::ByteArray == type ||
 			NbtTagType::IntArray == type ||
-			NbtTagType::LongArray == type;
+			NbtTagType::LongArray == type ||
+			NbtTagType::List == type ||
+			NbtTagType::Compound == type;
 	}
 
 	inline	bool IsArrayBase(NbtTagType type) {
@@ -88,7 +92,7 @@ namespace MineCraft {
 		inline int ReadData(T* data) {
 			int size = sizeof(T);
 			if (1 == size) {
-				*data = ReadByte();
+				*data = (T)ReadByte();
 				return 1;
 			}
 			Byte8* bytes = (Byte8*)data;
@@ -106,9 +110,10 @@ namespace MineCraft {
 			}
 			int readed = 0;
 			for (Int32 c = 0; c < count; c++) {
-				Byte8* bytes = (Byte8*)(data + c);
-				readed += ReadBytes(size, bytes);
-				std::reverse(bytes, bytes + size);
+				readed += ReadData(data + c);
+				//Byte8* bytes = (Byte8*)(data + c);
+				//readed += ReadBytes(size, bytes);
+				//std::reverse(bytes, bytes + size);
 			}
 
 			return readed;
@@ -201,5 +206,9 @@ namespace MineCraft {
 
 			return UTF8ToWString(ppStr, chars.get(), readed);
 		}
+	};
+
+	__interface IReadWrite {
+		int Read(ByteBuffer* buffer);
 	};
 }
