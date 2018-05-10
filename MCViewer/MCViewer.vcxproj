@@ -193,6 +193,7 @@
     <ClInclude Include="TestRendering.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Dx11Shader.cpp" />
     <ClCompile Include="Engine\CommonStates.cpp" />
     <ClCompile Include="Engine\DDSTextureLoader.cpp" />
     <ClCompile Include="Engine\Geometry.cpp" />

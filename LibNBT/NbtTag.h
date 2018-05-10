@@ -118,7 +118,8 @@ namespace MineCraft {
 		virtual int Read(ByteBuffer* buffer) = 0;
 
 		// 根据类型创建带名字的NBT标签
-		static NbtTag* FromType(NbtTagType type, const wchar_t* name = nullptr);
+		template<typename TAG>
+		static TAG* FromType(NbtTagType type, const wchar_t* name = nullptr);
 		//// 根据类型创建不带名字的NBT标签数组
 		//static TagPtr FromType(NbtTagType type, int count);
 
@@ -540,7 +541,7 @@ namespace MineCraft {
 			AllocCapacity(size);
 
 			for (int i = 0; i < m_Size; i++) {
-				m_Values[i] = NbtTag::FromType(m_TagId);
+				m_Values[i] = NbtTag::FromType<NbtTag>(m_TagId);
 				m_Values[i]->Read(buffer);
 			}
 			return m_Size;
@@ -601,14 +602,16 @@ namespace MineCraft {
 			return out;
 		}
 
-		TagPtr Get(int index) const {
+		template<typename TAG>
+		TAG* GetByIndex(int index) const {
 			if (index < 0 || index >= m_Size) {
 				throw "Overflow";
 			}
-			return m_Values[index];
+			return dynamic_cast<TAG*>(m_Values[index]);
 		}
 
-		template<typename T> T GetInternalValue(int index) const {
+		template<typename T>
+		T GetInternalValue(int index) const {
 			if (index < 0 || index >= m_Size) {
 				throw "Overflow";
 			}
@@ -622,15 +625,39 @@ namespace MineCraft {
 	private:
 		using super = ListTag;
 
-	//protected:
-	//	virtual void ClearValues() override {
-	//		for (int i = 0; i < m_Size; i++) {
-	//			if (nullptr != m_Values[i]) {
-	//				delete m_Values[i];
-	//			}
-	//		}
-	//		super::ClearValues();
-	//	}
+		//protected:
+		//	virtual void ClearValues() override {
+		//		for (int i = 0; i < m_Size; i++) {
+		//			if (nullptr != m_Values[i]) {
+		//				delete m_Values[i];
+		//			}
+		//		}
+		//		super::ClearValues();
+		//	}
+
+		// 根据名字查找标签
+		TagPtr GetByName(const wchar_t* name)const {
+			if (nullptr == name) {
+				return nullptr;
+			}
+			size_t findSize = wcslen(name);
+			if (0 == findSize) {
+				return nullptr;
+			}
+			for (size_t i = 0; i < m_Size; i++) {
+				if (nullptr == m_Values[i]->Name()) {
+					continue;
+				}
+				size_t thisSize = wcslen(m_Values[i]->Name());
+				if (thisSize != findSize) {
+					continue;
+				}
+				if (_wcsnicmp(m_Values[i]->Name(), name, m_Values[i]->Size()) == 0) {
+					return m_Values[i];
+				}
+			}
+			return nullptr;
+		}
 
 	public:
 		CompoundTag() { this->m_Type = NbtTagType::Compound; };
@@ -657,7 +684,7 @@ namespace MineCraft {
 			wchar_t* name = nullptr;
 			while (NbtTagType::End != (type = static_cast<NbtTagType>(buffer->ReadByte()))) {
 				buffer->ReadString(&name, buffer->ReadShort());
-				TagPtr tag = NbtTag::FromType(type, name);
+				TagPtr tag = NbtTag::FromType<NbtTag>(type, name);
 				if (nullptr == tag) {
 					throw "Unknown type.";
 				}
@@ -709,28 +736,9 @@ namespace MineCraft {
 		//	//return m_Size * sizeof(TagPtr);
 		//}
 
-		// 根据名字查找标签
-		TagPtr FindByName(const wchar_t* name)const {
-			if (nullptr == name) {
-				return nullptr;
-			}
-			size_t findSize = wcslen(name);
-			if (0 == findSize) {
-				return nullptr;
-			}
-			for (size_t i = 0; i < m_Size; i++) {
-				if (nullptr == m_Values[i]->Name()) {
-					continue;
-				}
-				size_t thisSize = wcslen(m_Values[i]->Name());
-				if (thisSize != findSize) {
-					continue;
-				}
-				if (_wcsnicmp(m_Values[i]->Name(), name, m_Values[i]->Size()) == 0) {
-					return m_Values[i];
-				}
-			}
-			return nullptr;
+		template<typename TAG>
+		TAG* GetByName(const wchar_t* name) const {
+			return dynamic_cast<TAG*>(GetByName(name));
 		}
 
 		//// 插入一个标签并设置名字、数据

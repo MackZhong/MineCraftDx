@@ -167,6 +167,9 @@
     <ClCompile Include="Engine\Mouse.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
+    <ClCompile Include="Dx11Shader.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Engine\directx.ico">

@@ -15,38 +15,51 @@ namespace MineCraft {
 	template<> TypeConvert<Double64>* TypeConvert<Double64>::instance;
 	template<> TypeConvert<TagPtr>* TypeConvert<TagPtr>::instance;
 
-	TagPtr NbtTag::FromType(NbtTagType type, const wchar_t* name) {
-
+	template<typename TAG>
+	TAG* NbtTag::FromType(NbtTagType type, const wchar_t* name) {
+		TagPtr tag = nullptr;
 		switch (type) {
 		case NbtTagType::End:
-			return 0;
+			break;
 		case NbtTagType::Byte:
-			return new ByteTag(name);
+			tag = new ByteTag(name);
+			break;
 		case NbtTagType::Short:
-			return new ShortTag(name);
+			tag = new ShortTag(name);
+			break;
 		case NbtTagType::Int:
-			return new IntTag(name);
+			tag = new IntTag(name);
+			break;
 		case NbtTagType::Long:
-			return new LongTag(name);
+			tag = new LongTag(name);
+			break;
 		case NbtTagType::Float:
-			return new FloatTag(name);
+			tag = new FloatTag(name);
+			break;
 		case NbtTagType::Double:
-			return new DoubleTag(name);
+			tag = new DoubleTag(name);
+			break;
 		case NbtTagType::ByteArray:
-			return new ByteArrayTag(name);
+			tag = new ByteArrayTag(name);
+			break;
 		case NbtTagType::String:
-			return new StringTag(name);
+			tag = new StringTag(name);
+			break;
 		case NbtTagType::List:
-			return new ListTag(name);
+			tag = new ListTag(name);
+			break;
 		case NbtTagType::Compound:
-			return new CompoundTag(name);
+			tag = new CompoundTag(name);
+			break;
 		case NbtTagType::IntArray:
-			return new IntArrayTag(name);
+			tag = new IntArrayTag(name);
+			break;
 		case NbtTagType::LongArray:
-			return new LongArrayTag(name);
+			tag = new LongArrayTag(name);
+			break;
 		}
 
-		return nullptr;
+		return dynamic_cast<TAG*>(tag);
 	}
 
 	CompoundTagPtr NbtReader::LoadFromFile(const wchar_t* filePathName, NbtCommpressType* fileType) {
@@ -174,8 +187,8 @@ namespace MineCraft {
 			wsprintfW(chunkName, L"%d,%d", chunk->relX, chunk->relZ);
 			CompoundTagPtr tagChunk = LoadFromUncompressedData(&chunkBuffer, chunkName);
 
-			if (nullptr == tagChunk->FindByName(L"LastChange")) {
-				IntTag* tag = dynamic_cast<IntTag*>(NbtTag::FromType(NbtTagType::Int, L"LastChange"));
+			if (nullptr == tagChunk->GetByName<IntTag>(L"LastChange")) {
+				IntTag* tag = NbtTag::FromType<IntTag>(NbtTagType::Int, L"LastChange");
 				if (nullptr != tag) {
 					tag->SetValue((void*)&chunk->lastChange);
 					tagChunk->Add(&tag);
