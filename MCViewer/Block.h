@@ -73,6 +73,10 @@ namespace MC {
 		};
 		Block() { };
 
+		void Update() {
+			m_world = XMMatrixIdentity();
+		}
+
 		Block(Block const&) = delete;
 		Block& operator=(Block const&) = delete;
 		void XM_CALLCONV Draw(ID3D11DeviceContext* deviceContext,
@@ -239,6 +243,7 @@ namespace MC {
 		void AddTexture(enum Faces face, ID3D11ShaderResourceView* texture) {
 			m_Textures[face] = texture;
 		};
+
 	private:
 		//std::unique_ptr<DirectX::GeometricPrimitive> m_gpBox;
 		DirectX::SimpleMath::Matrix m_world;

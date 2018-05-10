@@ -577,7 +577,7 @@ void Game_DR::CreateWindowSizeDependentResources(int width, int height)
 {
 	//m_console->SetWindow(SimpleMath::Viewport::ComputeTitleSafeArea((UINT)(width / 3.0f), (UINT)(height / 3.0f)));
 
-	m_view = Matrix::CreateLookAt(Vector3(2.f, 2.f, 2.f),
+	m_view = Matrix::CreateLookAt(Vector3(2.f, 2.f, -2.f),
 		Vector3::Zero, Vector3::UnitY);
 	m_proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f,
 		float(width) / float(height), 0.1f, 1000.f);

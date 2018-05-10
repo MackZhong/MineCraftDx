@@ -2,22 +2,22 @@
 cbuffer Parameters : register(b0)
 {
 	float4 DiffuseColor             : packoffset(c0);
-	float3 EmissiveColor            : packoffset(c1);
-	float3 SpecularColor            : packoffset(c2);
-	float  SpecularPower : packoffset(c2.w);
+	//float3 EmissiveColor            : packoffset(c1);
+	//float3 SpecularColor            : packoffset(c2);
+	//float  SpecularPower : packoffset(c2.w);
 
-	float3 LightDirection[3]        : packoffset(c3);
-	float3 LightDiffuseColor[3]     : packoffset(c6);
-	float3 LightSpecularColor[3]    : packoffset(c9);
+	//float3 LightDirection[3]        : packoffset(c3);
+	//float3 LightDiffuseColor[3]     : packoffset(c6);
+	//float3 LightSpecularColor[3]    : packoffset(c9);
 
-	float3 EyePosition              : packoffset(c12);
+	//float3 EyePosition              : packoffset(c12);
 
-	float3 FogColor                 : packoffset(c13);
-	float4 FogVector                : packoffset(c14);
+	//float3 FogColor                 : packoffset(c13);
+	//float4 FogVector                : packoffset(c14);
 
-	float4x4 World                  : packoffset(c15);
-	float3x3 WorldInverseTranspose  : packoffset(c19);
-	float4x4 WorldViewProj          : packoffset(c22);
+	//float4x4 World                  : packoffset(c15);
+	//float3x3 WorldInverseTranspose  : packoffset(c19);
+	float4x4 WorldViewProj          : packoffset(c1);// (c22);
 };
 
 struct VSInputNmTx
@@ -45,7 +45,7 @@ struct CommonVSOutput
 
 float ComputeFogFactor(float4 position)
 {
-	return saturate(dot(position, FogVector));
+	return 1;// saturate(dot(position, FogVector));
 }
 
 CommonVSOutput ComputeCommonVSOutput(float4 position)
@@ -70,7 +70,7 @@ VSOutputTx main(VSInputNmTx vin)
 	vout.Specular = float4(cout.Specular, cout.FogFactor);
 ;
 
-vout.TexCoord = vin.TexCoord;
+	vout.TexCoord = vin.TexCoord;
 
-return vout;
+	return vout;
 }

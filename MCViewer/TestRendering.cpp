@@ -11,6 +11,11 @@ TestRendering::~TestRendering()
 {
 }
 
+void TestRendering::OnUpdate(DX::StepTimer const & timer)
+{
+	m_Grass->Update();
+}
+
 void TestRendering::OnRender(ID3D11DeviceContext1 * deviceContext)
 {
 	deviceContext->OMSetBlendState(this->m_states->Opaque(), nullptr, 0xFFFFFFFF);
@@ -20,6 +25,12 @@ void TestRendering::OnRender(ID3D11DeviceContext1 * deviceContext)
 	ID3D11SamplerState* samplerState = this->m_states->LinearWrap();
 	deviceContext->PSSetSamplers(0, 1, &samplerState);
 
+	XMMATRIX world = XMMatrixIdentity();
+	m_Parameters.WorldViewProj = XMMatrixMultiply(XMMatrixMultiply(world, m_view), m_proj);
+
+	deviceContext->UpdateSubresource(m_CbParametersBuffer.Get(), 0, nullptr, &m_Parameters, 0, 0);
+
+	deviceContext->VSSetConstantBuffers(0, 1, m_CbParametersBuffer.GetAddressOf());
 
 	m_Grass->Draw(deviceContext, m_view, m_proj);
 }
@@ -33,7 +44,6 @@ void TestRendering::OnDeviceLost()
 
 void TestRendering::OnDeviceDependentResources(ID3D11Device * device)
 {
-
 	m_states = std::make_unique<CommonStates>(device);
 	//m_effect = std::make_unique<BasicEffect>(device);
 
@@ -64,4 +74,16 @@ void TestRendering::OnDeviceDependentResources(ID3D11Device * device)
 	m_cameraPos.x = 0.0f;
 	m_cameraPos.y = 2.0f;
 	m_cameraPos.z = 10.f;
+
+	D3D11_BUFFER_DESC cbds{ 0 };
+	cbds.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cbds.ByteWidth = sizeof(cbParameters);
+	cbds.Usage = D3D11_USAGE_DEFAULT;
+	//cbds.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+	m_Parameters.Diffuse = { 0.0f, 1.0f, 0.0f, 1.0f };
+	m_Parameters.WorldViewProj = XMMatrixIdentity();
+	D3D11_SUBRESOURCE_DATA dsd{ 0 };
+	dsd.pSysMem = &m_Parameters;
+	HRESULT hr = device->CreateBuffer(&cbds, &dsd, m_CbParametersBuffer.ReleaseAndGetAddressOf());
 }

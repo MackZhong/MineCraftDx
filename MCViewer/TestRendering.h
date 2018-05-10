@@ -6,6 +6,14 @@
 
 class TestRendering : public Game_DR
 {
+	struct cbParameters {
+		XMFLOAT4 Diffuse;
+		//XMFLOAT3 Emissive;
+		//XMFLOAT3 SpecularColor;
+
+		XMMATRIX WorldViewProj;
+	};
+
 public:
 	TestRendering();
 	~TestRendering();
@@ -16,6 +24,7 @@ public:
 		return L"TestRendering";
 	};
 
+	virtual void OnUpdate(DX::StepTimer const& timer) override;
 	virtual void OnRender(ID3D11DeviceContext1 * context) override;
 	virtual void OnDeviceLost() override;
 
@@ -26,5 +35,7 @@ private:
 	//std::unique_ptr<DirectX::BasicEffect> m_effect;
 	std::unique_ptr<DirectX::CommonStates> m_states;
 	std::unique_ptr<MC::Block> m_Grass;
+	cbParameters m_Parameters;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> m_CbParametersBuffer{ nullptr };
 };
 
