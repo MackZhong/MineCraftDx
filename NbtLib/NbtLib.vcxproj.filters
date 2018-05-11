@@ -15,42 +15,39 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
+    <ClInclude Include="inc\ByteBuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="targetver.h">
+    <ClInclude Include="inc\ByteReader.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="NbtTag.h">
+    <ClInclude Include="inc\GzipByteReader.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ByteReader.h">
+    <ClInclude Include="inc\MemoryByteReader.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ByteBuffer.h">
+    <ClInclude Include="inc\nbt.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="GzipByteReader.h">
+    <ClInclude Include="inc\NbtEntry.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="MemoryByteReader.h">
+    <ClInclude Include="inc\NbtLibPCH.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="NbtEntry.h">
+    <ClInclude Include="inc\NbtReader.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="NbtReader.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="nbt.h">
+    <ClInclude Include="inc\NbtTag.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="stdafx.cpp">
+    <ClCompile Include="src\NBTLib.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="LibNBT.cpp">
+    <ClCompile Include="src\NBTLibPCH.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

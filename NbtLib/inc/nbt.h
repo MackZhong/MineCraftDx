@@ -7,3 +7,5 @@
 #endif
 #undef LIB_NBT_EXPORT
 #define LIB_NBT_EXPORT 
+
+#include "NbtTag.h"

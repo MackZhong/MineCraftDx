@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "NBTLibPCH.h"
 #include "nbt.h"
 #include "NbtTag.h"
 #include "ByteBuffer.h"

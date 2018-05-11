@@ -61,9 +61,9 @@ namespace
 	//}
 }
 
-namespace MC {
+using namespace DirectX;
 
-	using namespace DirectX;
+namespace MC {
 
 	class Block
 	{
@@ -94,7 +94,7 @@ namespace MC {
 
 			deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			deviceContext->IASetIndexBuffer(this->m_IndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
-			UINT stride[1] = { sizeof(FaceVertexType)};
+			UINT stride[1] = { sizeof(FaceVertexType) };
 			UINT offset[1] = { 0 };
 			ID3D11Buffer* vts[1] = { m_VertexBuffer.Get() };
 			deviceContext->IASetVertexBuffers(0, 1, vts, stride, offset);
