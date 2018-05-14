@@ -5,18 +5,29 @@
 #endif
 
 #include <windows.h>
+#include <shellapi.h>
+
+#if defined(min)
+#undef min
+#undef max
+#endif
+
+#include <wrl.h>
+
 #include <stdlib.h>
+#include <algorithm>
+#include <cassert>
+#include <chrono>
+#include <type_traits>
 
 #include <d3d12.h>
-#include <dxgi1_4.h>
+#include <dxgi1_6.h>
 #include <D3Dcompiler.h>
 #include <DirectXMath.h>
 #include "d3dx12.h"
 
 #include <string>
 #include <vector>
-#include <wrl.h>
-#include <shellapi.h>
 
 
 #pragma comment(lib, "d3d12.lib")

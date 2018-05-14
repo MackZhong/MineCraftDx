@@ -2,7 +2,7 @@
 #include "D3D12TexturedCub.h"
 
 D3D12TexturedCub::D3D12TexturedCub(UINT width, UINT height, std::wstring name)
-	: DXSample(width, height, name)
+	: DxFrame(width, height, name)
 	, m_viewport(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height))
 	, m_scissorRect(0, 0, static_cast<LONG>(width), static_cast<LONG>(height))
 	, m_rtvDescriptorSize(0)
@@ -41,63 +41,108 @@ void D3D12TexturedCub::LoadPipeline()
 	ComPtr<IDXGIFactory4> factory;
 	ThrowIfFailed(CreateDXGIFactory2(dxgiFactoryFlags, IID_PPV_ARGS(&factory)));
 
+	ComPtr<IDXGIAdapter1> dxgiAdapter1;
+	ComPtr<IDXGIAdapter4> dxgiAdapter4;
 	if (m_useWarpDevice)
 	{
-		ComPtr<IDXGIAdapter> warpAdapter;
-		ThrowIfFailed(factory->EnumWarpAdapter(IID_PPV_ARGS(&warpAdapter)));
-
-		ThrowIfFailed(D3D12CreateDevice(
-			warpAdapter.Get(),
-			D3D_FEATURE_LEVEL_11_0,
-			IID_PPV_ARGS(&m_device)
-		));
+		ThrowIfFailed(factory->EnumWarpAdapter(IID_PPV_ARGS(&dxgiAdapter1)));
 	}
 	else
 	{
-		ComPtr<IDXGIAdapter1> hardwareAdapter;
-		GetHardwareAdapter(factory.Get(), &hardwareAdapter);
+		GetHardwareAdapter(factory.Get(), &dxgiAdapter1);
 
-		ThrowIfFailed(D3D12CreateDevice(
-			hardwareAdapter.Get(),
-			D3D_FEATURE_LEVEL_11_0,
-			IID_PPV_ARGS(&m_device)
-		));
+		//ThrowIfFailed(D3D12CreateDevice(
+		//	dxgiAdapter1.Get(),
+		//	D3D_FEATURE_LEVEL_11_0,
+		//	IID_PPV_ARGS(&m_device)
+		//));
 	}
+	ThrowIfFailed(dxgiAdapter1.As(&dxgiAdapter4));
 
-	// Describe and create the command queue.
-	D3D12_COMMAND_QUEUE_DESC queueDesc = {};
-	queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-	queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-
-	ThrowIfFailed(m_device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_commandQueue)));
-
-	// Describe and create the swap chain.
-	DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
-	swapChainDesc.BufferCount = FrameCount;
-	swapChainDesc.Width = m_width;
-	swapChainDesc.Height = m_height;
-	swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-	swapChainDesc.SampleDesc.Count = 1;
-
-	ComPtr<IDXGISwapChain1> swapChain;
-	ThrowIfFailed(factory->CreateSwapChainForHwnd(
-		m_commandQueue.Get(),		// Swap chain needs the queue so that it can force a flush on it.
-		Win32Application::GetHwnd(),
-		&swapChainDesc,
-		nullptr,
-		nullptr,
-		&swapChain
+	ThrowIfFailed(D3D12CreateDevice(
+		dxgiAdapter4.Get(),
+		D3D_FEATURE_LEVEL_11_0,
+		IID_PPV_ARGS(&m_device)
 	));
 
-	// This sample does not support fullscreen transitions.
-	ThrowIfFailed(factory->MakeWindowAssociation(Win32Application::GetHwnd(), DXGI_MWA_NO_ALT_ENTER));
+#if defined(_DEBUG)
+	// Enable DEBUG message in debug mode.
+	ComPtr<ID3D12InfoQueue> pInfoQueue;
+	if (SUCCEEDED(m_device.As(&pInfoQueue))) {
+		pInfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, TRUE);
+		pInfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, TRUE);
+		pInfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, TRUE);
 
-	ThrowIfFailed(swapChain.As(&m_swapChain));
-	m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
+		// Supperess whole categories of messages
+		// D3D12_MESSAGE_CATEGORY messageCategories[] = {}
+
+		// Supperess messages based on their severity level
+		D3D12_MESSAGE_SEVERITY messageSeverities[] = {
+			D3D12_MESSAGE_SEVERITY_INFO
+		};
+
+		// Superess individual messages by their ID
+		D3D12_MESSAGE_ID messageIds[] = {
+			D3D12_MESSAGE_ID_CLEARRENDERTARGETVIEW_MISMATCHINGCLEARVALUE,
+			D3D12_MESSAGE_ID_MAP_INVALID_NULLRANGE,
+			D3D12_MESSAGE_ID_UNMAP_INVALID_NULLRANGE
+		};
+
+		D3D12_INFO_QUEUE_FILTER messageFilter = { 0 };
+		messageFilter.DenyList.NumSeverities = arraysize(messageSeverities);
+		messageFilter.DenyList.pSeverityList = messageSeverities;
+		messageFilter.DenyList.NumIDs = arraysize(messageIds);
+		messageFilter.DenyList.pIDList = messageIds;
+		ThrowIfFailed(pInfoQueue->PushStorageFilter(&messageFilter));
+	}
+#endif
+
+	// Describe and create the command queue.
+	{
+		D3D12_COMMAND_QUEUE_DESC queueDesc = {};
+		queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+		queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+		queueDesc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
+		queueDesc.NodeMask = 0;
+
+		ThrowIfFailed(m_device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_commandQueue)));
+	}
+
+	// Describe and create the swap chain.
+	{
+		DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
+		swapChainDesc.Width = m_width;
+		swapChainDesc.Height = m_height;
+		swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		swapChainDesc.Stereo = FALSE;
+		swapChainDesc.SampleDesc = { 1, 0 };
+		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		swapChainDesc.BufferCount = FrameCount;
+		swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
+		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+		swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
+		swapChainDesc.Flags = CheckTearingSupport() ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
+
+		ComPtr<IDXGISwapChain1> swapChain;
+		ThrowIfFailed(factory->CreateSwapChainForHwnd(
+			m_commandQueue.Get(),		// Swap chain needs the queue so that it can force a flush on it.
+			DxApplication::GetHwnd(),
+			&swapChainDesc,
+			nullptr,
+			nullptr,
+			&swapChain
+		));
+
+		// This sample does not support fullscreen transitions.
+		ThrowIfFailed(factory->MakeWindowAssociation(DxApplication::GetHwnd(), DXGI_MWA_NO_ALT_ENTER));
+
+		ThrowIfFailed(swapChain.As(&m_swapChain));
+		m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
+	}
 
 	// Create descriptor heaps.
+	//https://www.3dgep.com/learning-directx12-1/
+	//For each back buffer of the swap chain, a single RTV is used to describe the resource.
 	{
 		// Describe and create a render target view (RTV) descriptor heap.
 		D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
@@ -143,8 +188,7 @@ void D3D12TexturedCub::LoadPipeline()
 
 	ThrowIfFailed(m_device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_commandAllocator)));
 
-	float aspectRatio = (float)m_width / (float)m_height;
-	m_matProjection = XMMatrixPerspectiveFovLH(75.0f * XM_PI / 180.f, aspectRatio, 0.1f, 1000.0f);
+	m_matProjection = XMMatrixPerspectiveFovLH(75.0f * XM_PI / 180.f, m_aspectRatio, 0.1f, 1000.0f);
 }
 
 void D3D12TexturedCub::LoadAssets()
@@ -187,7 +231,7 @@ void D3D12TexturedCub::LoadAssets()
 		sampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
 		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc;
-		rootSignatureDesc.Init_1_1(_countof(rootParameters), rootParameters, 1, &sampler,
+		rootSignatureDesc.Init_1_1(arraysize(rootParameters), rootParameters, 1, &sampler,
 			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 		ComPtr<ID3DBlob> signature;
@@ -225,7 +269,7 @@ void D3D12TexturedCub::LoadAssets()
 
 		// Describe and create the graphics pipeline state object (PSO).
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
-		psoDesc.InputLayout = { inputElementDescs, _countof(inputElementDescs) };
+		psoDesc.InputLayout = { inputElementDescs, arraysize(inputElementDescs) };
 		psoDesc.pRootSignature = m_rootSignature.Get();
 		psoDesc.VS = CD3DX12_SHADER_BYTECODE(vertexShader.Get());
 		psoDesc.PS = CD3DX12_SHADER_BYTECODE(pixelShader.Get());
@@ -394,7 +438,7 @@ void D3D12TexturedCub::LoadAssets()
 	// Close the command list and execute it to begin the initial GPU setup.
 	ThrowIfFailed(m_commandList->Close());
 	ID3D12CommandList* ppCommandLists[] = { m_commandList.Get() };
-	m_commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
+	m_commandQueue->ExecuteCommandLists(arraysize(ppCommandLists), ppCommandLists);
 
 	// Create synchronization objects and wait until assets have been uploaded to the GPU.
 	{
@@ -484,10 +528,10 @@ void D3D12TexturedCub::PopulateCommandList()
 	m_commandList->IASetIndexBuffer(&m_indexBufferView);
 
 	ID3D12DescriptorHeap* ppHeaps[] = { m_cbvHeap.Get() };
-	m_commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
+	m_commandList->SetDescriptorHeaps(arraysize(ppHeaps), ppHeaps);
 	m_commandList->SetGraphicsRootDescriptorTable(0, m_cbvHeap->GetGPUDescriptorHandleForHeapStart());
 	ppHeaps[0] = { m_srvHeap.Get() };
-	m_commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
+	m_commandList->SetDescriptorHeaps(arraysize(ppHeaps), ppHeaps);
 	m_commandList->SetGraphicsRootDescriptorTable(1, m_srvHeap->GetGPUDescriptorHandleForHeapStart());
 	m_commandList->DrawIndexedInstanced(m_IndexCount, 1, 0, 0, 0);
 
@@ -535,7 +579,7 @@ void D3D12TexturedCub::OnRender()
 
 	// Execute the command list.
 	ID3D12CommandList* ppCommandLists[] = { m_commandList.Get() };
-	m_commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
+	m_commandQueue->ExecuteCommandLists(arraysize(ppCommandLists), ppCommandLists);
 
 	// Present the frame.
 	ThrowIfFailed(m_swapChain->Present(1, 0));

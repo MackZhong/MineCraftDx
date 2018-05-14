@@ -11,14 +11,16 @@
 
 #pragma once
 
-#include "DXSampleHelper.h"
-#include "Win32Application.h"
+#include "DirectXHelper.h"
+#include "DxApplication.h"
 
-class DXSample
+class DxFrame
 {
 public:
-	DXSample(UINT width, UINT height, std::wstring name);
-	virtual ~DXSample();
+	DxFrame(UINT width, UINT height, std::wstring name);
+	virtual ~DxFrame();
+
+	bool CheckTearingSupport();
 
 	virtual void OnInit() = 0;
 	virtual void OnUpdate() = 0;
@@ -42,12 +44,20 @@ protected:
 	void SetCustomWindowText(LPCWSTR text);
 
 	// Viewport dimensions.
-	UINT m_width;
-	UINT m_height;
-	float m_aspectRatio;
+	UINT m_width{ 800 };
+	UINT m_height{ 600 };
+	float m_aspectRatio{ 1.0f };
 
 	// Adapter info.
-	bool m_useWarpDevice;
+	bool m_useWarpDevice{ false };
+
+	// Set to true once the DX12 objects have been initialized.
+	bool m_initialized{ false };
+
+	// V-Sync
+	bool m_vSync{ false };
+	bool m_tearingSupported{ false };
+	bool m_fullscreen{ false };
 
 private:
 	// Root assets path.

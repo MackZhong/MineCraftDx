@@ -11,14 +11,14 @@
 
 #pragma once
 
-#include "DXSample.h"
+#include "DxFrame.h"
 
-class DXSample;
+class DxFrame;
 
-class Win32Application
+class DxApplication
 {
 public:
-	static int Run(DXSample* pSample, HINSTANCE hInstance, int nCmdShow);
+	static int Run(DxFrame* pSample, HINSTANCE hInstance, int nCmdShow);
 	static HWND GetHwnd() { return m_hwnd; }
 
 protected:

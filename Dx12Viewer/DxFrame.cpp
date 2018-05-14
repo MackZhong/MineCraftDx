@@ -10,29 +10,54 @@
 //*********************************************************
 
 #include "pch.h"
-#include "DXSample.h"
+#include "DxFrame.h"
 
 using namespace Microsoft::WRL;
 
-DXSample::DXSample(UINT width, UINT height, std::wstring name) :
+DxFrame::DxFrame(UINT width, UINT height, std::wstring name) :
 	m_width(width),
 	m_height(height),
 	m_title(name),
 	m_useWarpDevice(false)
 {
 	WCHAR assetsPath[512];
-	GetAssetsPath(assetsPath, _countof(assetsPath));
+	GetAssetsPath(assetsPath, arraysize(assetsPath));
 	m_assetsPath = assetsPath;
 
 	m_aspectRatio = static_cast<float>(width) / static_cast<float>(height);
 }
 
-DXSample::~DXSample()
+DxFrame::~DxFrame()
 {
 }
 
+bool DxFrame::CheckTearingSupport()
+{
+    BOOL allowTearing = FALSE;
+ 
+    // Rather than create the DXGI 1.5 factory interface directly, we create the
+    // DXGI 1.4 interface and query for the 1.5 interface. This is to enable the 
+    // graphics debugging tools which will not support the 1.5 factory interface 
+    // until a future update.
+    ComPtr<IDXGIFactory4> factory4;
+    if (SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&factory4))))
+    {
+        ComPtr<IDXGIFactory5> factory5;
+        if (SUCCEEDED(factory4.As(&factory5)))
+        {
+            if (FAILED(factory5->CheckFeatureSupport(
+                DXGI_FEATURE_PRESENT_ALLOW_TEARING, 
+                &allowTearing, sizeof(allowTearing))))
+            {
+                allowTearing = FALSE;
+            }
+        }
+    }
+ 
+    return allowTearing == TRUE;
+}
 // Helper function for resolving the full path of assets.
-std::wstring DXSample::GetAssetFullPath(LPCWSTR assetName)
+std::wstring DxFrame::GetAssetFullPath(LPCWSTR assetName)
 {
 	return m_assetsPath + assetName;
 }
@@ -40,10 +65,11 @@ std::wstring DXSample::GetAssetFullPath(LPCWSTR assetName)
 // Helper function for acquiring the first available hardware adapter that supports Direct3D 12.
 // If no such adapter can be found, *ppAdapter will be set to nullptr.
 _Use_decl_annotations_
-void DXSample::GetHardwareAdapter(IDXGIFactory2* pFactory, IDXGIAdapter1** ppAdapter)
+void DxFrame::GetHardwareAdapter(IDXGIFactory2* pFactory, IDXGIAdapter1** ppAdapter)
 {
 	ComPtr<IDXGIAdapter1> adapter;
 	*ppAdapter = nullptr;
+	SIZE_T maxDedicatedVideoMemory = 0;
 
 	for (UINT adapterIndex = 0; DXGI_ERROR_NOT_FOUND != pFactory->EnumAdapters1(adapterIndex, &adapter); ++adapterIndex)
 	{
@@ -61,7 +87,9 @@ void DXSample::GetHardwareAdapter(IDXGIFactory2* pFactory, IDXGIAdapter1** ppAda
 		// actual device yet.
 		if (SUCCEEDED(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
 		{
-			break;
+			if (desc.DedicatedVideoMemory > maxDedicatedVideoMemory)
+				break;
+			maxDedicatedVideoMemory = desc.DedicatedVideoMemory;
 		}
 	}
 
@@ -69,19 +97,19 @@ void DXSample::GetHardwareAdapter(IDXGIFactory2* pFactory, IDXGIAdapter1** ppAda
 }
 
 // Helper function for setting the window's title text.
-void DXSample::SetCustomWindowText(LPCWSTR text)
+void DxFrame::SetCustomWindowText(LPCWSTR text)
 {
 	std::wstring windowText = m_title + L": " + text;
-	SetWindowText(Win32Application::GetHwnd(), windowText.c_str());
+	SetWindowText(DxApplication::GetHwnd(), windowText.c_str());
 }
 
 // Helper function for parsing any supplied command line args.
 _Use_decl_annotations_
-void DXSample::ParseCommandLineArgs(WCHAR* argv[], int argc)
+void DxFrame::ParseCommandLineArgs(WCHAR* argv[], int argc)
 {
 	for (int i = 1; i < argc; ++i)
 	{
-		if (_wcsnicmp(argv[i], L"-warp", wcslen(argv[i])) == 0 || 
+		if (_wcsnicmp(argv[i], L"-warp", wcslen(argv[i])) == 0 ||
 			_wcsnicmp(argv[i], L"/warp", wcslen(argv[i])) == 0)
 		{
 			m_useWarpDevice = true;

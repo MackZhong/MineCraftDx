@@ -10,16 +10,16 @@
 //*********************************************************
 
 #include "pch.h"
-#include "Win32Application.h"
+#include "DxApplication.h"
 
-HWND Win32Application::m_hwnd = nullptr;
+HWND DxApplication::m_hwnd = nullptr;
 
-int Win32Application::Run(DXSample* pSample, HINSTANCE hInstance, int nCmdShow)
+int DxApplication::Run(DxFrame* pAppFrame, HINSTANCE hInstance, int nCmdShow)
 {
 	// Parse the command line parameters
 	int argc;
 	LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
-	pSample->ParseCommandLineArgs(argv, argc);
+	pAppFrame->ParseCommandLineArgs(argv, argc);
 	LocalFree(argv);
 
 	// Initialize the window class.
@@ -29,28 +29,34 @@ int Win32Application::Run(DXSample* pSample, HINSTANCE hInstance, int nCmdShow)
 	windowClass.lpfnWndProc = WindowProc;
 	windowClass.hInstance = hInstance;
 	windowClass.hCursor = LoadCursor(NULL, IDC_ARROW);
-	windowClass.lpszClassName = L"DXSampleClass";
+	windowClass.lpszClassName = L"DX12FrameWindowClass";
 	RegisterClassEx(&windowClass);
 
-	RECT windowRect = { 0, 0, static_cast<LONG>(pSample->GetWidth()), static_cast<LONG>(pSample->GetHeight()) };
+	int screenWidth = ::GetSystemMetrics(SM_CXSCREEN);
+	int screenHeight = ::GetSystemMetrics(SM_CYSCREEN);
+	RECT windowRect = { 0, 0,
+		static_cast<LONG>(std::max<int>(0, (screenWidth - pAppFrame->GetWidth()) / 2)),
+			static_cast<LONG>(std::max<int>(0, (screenHeight - pAppFrame->GetHeight()) / 2)) };
 	AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
 
+
 	// Create the window and store a handle to it.
-	m_hwnd = CreateWindow(
+	m_hwnd = CreateWindowExW(
+		0,
 		windowClass.lpszClassName,
-		pSample->GetTitle(),
+		pAppFrame->GetTitle(),
 		WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
+		windowRect.left,
+		windowRect.top,
 		windowRect.right - windowRect.left,
 		windowRect.bottom - windowRect.top,
 		nullptr,		// We have no parent window.
 		nullptr,		// We aren't using menus.
 		hInstance,
-		pSample);
+		pAppFrame);
 
 	// Initialize the sample. OnInit is defined in each child-implementation of DXSample.
-	pSample->OnInit();
+	pAppFrame->OnInit();
 
 	ShowWindow(m_hwnd, nCmdShow);
 
@@ -66,26 +72,26 @@ int Win32Application::Run(DXSample* pSample, HINSTANCE hInstance, int nCmdShow)
 		}
 	}
 
-	pSample->OnDestroy();
+	pAppFrame->OnDestroy();
 
 	// Return this part of the WM_QUIT message to Windows.
 	return static_cast<char>(msg.wParam);
 }
 
 // Main message handler for the sample.
-LRESULT CALLBACK Win32Application::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK DxApplication::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	DXSample* pSample = reinterpret_cast<DXSample*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+	DxFrame* pSample = reinterpret_cast<DxFrame*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
 	switch (message)
 	{
 	case WM_CREATE:
-		{
-			// Save the DXSample* passed in to CreateWindow.
-			LPCREATESTRUCT pCreateStruct = reinterpret_cast<LPCREATESTRUCT>(lParam);
-			SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pCreateStruct->lpCreateParams));
-		}
-		return 0;
+	{
+		// Save the DXSample* passed in to CreateWindow.
+		LPCREATESTRUCT pCreateStruct = reinterpret_cast<LPCREATESTRUCT>(lParam);
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pCreateStruct->lpCreateParams));
+	}
+	return 0;
 
 	case WM_KEYDOWN:
 		if (pSample)
