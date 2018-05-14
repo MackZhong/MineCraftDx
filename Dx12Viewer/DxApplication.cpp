@@ -16,6 +16,8 @@ HWND DxApplication::m_hwnd = nullptr;
 
 int DxApplication::Run(DxFrame* pAppFrame, HINSTANCE hInstance, int nCmdShow)
 {
+	SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+
 	// Parse the command line parameters
 	int argc;
 	LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
@@ -34,11 +36,12 @@ int DxApplication::Run(DxFrame* pAppFrame, HINSTANCE hInstance, int nCmdShow)
 
 	int screenWidth = ::GetSystemMetrics(SM_CXSCREEN);
 	int screenHeight = ::GetSystemMetrics(SM_CYSCREEN);
-	RECT windowRect = { 0, 0,
-		static_cast<LONG>(std::max<int>(0, (screenWidth - pAppFrame->GetWidth()) / 2)),
-			static_cast<LONG>(std::max<int>(0, (screenHeight - pAppFrame->GetHeight()) / 2)) };
+	RECT windowRect = {};
+	windowRect.left = static_cast<LONG>(std::max<int>(0, (screenWidth - pAppFrame->GetWidth()) / 2));
+	windowRect.top = static_cast<LONG>(std::max<int>(0, (screenHeight - pAppFrame->GetHeight()) / 2));
+	windowRect.bottom = windowRect.top + pAppFrame->GetHeight();
+	windowRect.right = windowRect.left + pAppFrame->GetWidth();
 	AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
-
 
 	// Create the window and store a handle to it.
 	m_hwnd = CreateWindowExW(
@@ -56,7 +59,7 @@ int DxApplication::Run(DxFrame* pAppFrame, HINSTANCE hInstance, int nCmdShow)
 		pAppFrame);
 
 	// Initialize the sample. OnInit is defined in each child-implementation of DXSample.
-	pAppFrame->OnInit();
+	pAppFrame->Init(m_hwnd);
 
 	ShowWindow(m_hwnd, nCmdShow);
 
@@ -72,7 +75,7 @@ int DxApplication::Run(DxFrame* pAppFrame, HINSTANCE hInstance, int nCmdShow)
 		}
 	}
 
-	pAppFrame->OnDestroy();
+	pAppFrame->Destroy();
 
 	// Return this part of the WM_QUIT message to Windows.
 	return static_cast<char>(msg.wParam);
@@ -81,7 +84,10 @@ int DxApplication::Run(DxFrame* pAppFrame, HINSTANCE hInstance, int nCmdShow)
 // Main message handler for the sample.
 LRESULT CALLBACK DxApplication::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	DxFrame* pSample = reinterpret_cast<DxFrame*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+	DxFrame* pAppFrame = reinterpret_cast<DxFrame*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+	if (!pAppFrame || !pAppFrame->IsInitialized()) {
+		return ::DefWindowProc(hWnd, message, wParam, lParam);
+	}
 
 	switch (message)
 	{
@@ -93,27 +99,49 @@ LRESULT CALLBACK DxApplication::WindowProc(HWND hWnd, UINT message, WPARAM wPara
 	}
 	return 0;
 
+	case WM_SYSKEYDOWN:
 	case WM_KEYDOWN:
-		if (pSample)
+		if (VK_ESCAPE == wParam)
+			::PostQuitMessage(0);
+
+		if (pAppFrame)
 		{
-			pSample->OnKeyDown(static_cast<UINT8>(wParam));
+			pAppFrame->OnKeyDown(static_cast<UINT8>(wParam));
 		}
 		return 0;
 
+	case WM_SYSKEYUP:
 	case WM_KEYUP:
-		if (pSample)
+		if (pAppFrame)
 		{
-			pSample->OnKeyUp(static_cast<UINT8>(wParam));
+			pAppFrame->OnKeyUp(static_cast<UINT8>(wParam));
 		}
+		return 0;
+
+	case WM_SYSCHAR:
 		return 0;
 
 	case WM_PAINT:
-		if (pSample)
+		if (pAppFrame)
 		{
-			pSample->OnUpdate();
-			pSample->OnRender();
+			pAppFrame->Update();
+			pAppFrame->Render();
 		}
 		return 0;
+
+	case WM_SIZE:
+	{
+		RECT rcClient = {};
+		::GetClientRect(hWnd, &rcClient);
+		int width = rcClient.right - rcClient.left;
+		int height = rcClient.bottom - rcClient.top;
+
+		if (pAppFrame) {
+			pAppFrame->Resize(width, height);
+		}
+
+		return 0;
+	}
 
 	case WM_DESTROY:
 		PostQuitMessage(0);

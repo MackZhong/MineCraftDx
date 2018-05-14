@@ -23,7 +23,7 @@
     <ProjectGuid>{FE9AE08E-5109-4AFD-92E5-453D627CBA51}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Dx12Viewer</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
