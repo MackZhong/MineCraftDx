@@ -22,6 +22,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXTemplateLib", "Direc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NbtLib", "NbtLib\NbtLib.vcxproj", "{07429D47-E8BD-4948-8DDE-1CC6675C6389}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Dx12Viewer", "Dx12Viewer\Dx12Viewer.vcxproj", "{FE9AE08E-5109-4AFD-92E5-453D627CBA51}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -86,6 +88,14 @@ Global
 		{07429D47-E8BD-4948-8DDE-1CC6675C6389}.Release|x64.Build.0 = Release|x64
 		{07429D47-E8BD-4948-8DDE-1CC6675C6389}.Release|x86.ActiveCfg = Release|Win32
 		{07429D47-E8BD-4948-8DDE-1CC6675C6389}.Release|x86.Build.0 = Release|Win32
+		{FE9AE08E-5109-4AFD-92E5-453D627CBA51}.Debug|x64.ActiveCfg = Debug|x64
+		{FE9AE08E-5109-4AFD-92E5-453D627CBA51}.Debug|x64.Build.0 = Debug|x64
+		{FE9AE08E-5109-4AFD-92E5-453D627CBA51}.Debug|x86.ActiveCfg = Debug|Win32
+		{FE9AE08E-5109-4AFD-92E5-453D627CBA51}.Debug|x86.Build.0 = Debug|Win32
+		{FE9AE08E-5109-4AFD-92E5-453D627CBA51}.Release|x64.ActiveCfg = Release|x64
+		{FE9AE08E-5109-4AFD-92E5-453D627CBA51}.Release|x64.Build.0 = Release|x64
+		{FE9AE08E-5109-4AFD-92E5-453D627CBA51}.Release|x86.ActiveCfg = Release|Win32
+		{FE9AE08E-5109-4AFD-92E5-453D627CBA51}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
