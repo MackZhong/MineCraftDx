@@ -25,9 +25,11 @@ private:
 	ComPtr<ID3D12Resource> m_vertexBuffer;
 	D3D12_VERTEX_BUFFER_VIEW m_vertexBufferView;
 	ComPtr<ID3D12Resource> m_indexBuffer;
-	UINT m_IndexCount{ 0 };
 	D3D12_INDEX_BUFFER_VIEW m_indexBufferView;
+	UINT m_IndexCount{ 0 };
+	ComPtr<ID3D12DescriptorHeap> m_srvHeap;
 	ComPtr<ID3D12Resource> m_texture;
+	ComPtr<ID3D12DescriptorHeap> m_cbvHeap;
 	ComPtr<ID3D12Resource> m_constantBuffer;
 	SceneConstantBuffer m_constantData{};
 	UINT8* m_pCbvDataBegin{ nullptr };
@@ -39,8 +41,6 @@ private:
 	//void WaitForPreviousFrame();
 
 protected:
-	ComPtr<ID3D12DescriptorHeap> m_cbvHeap;
-	ComPtr<ID3D12DescriptorHeap> m_srvHeap;
 
 public:
 	D3D12TexturedCub(UINT width, UINT height, std::wstring name);

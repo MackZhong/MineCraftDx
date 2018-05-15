@@ -14,7 +14,7 @@
 
 HWND DxApplication::m_hwnd = nullptr;
 
-int DxApplication::Run(DxFrame* pAppFrame, HINSTANCE hInstance, int nCmdShow)
+int DxApplication::Run(DxFrame* pAppFrame, HINSTANCE hInstance)
 {
 	SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 
@@ -61,7 +61,7 @@ int DxApplication::Run(DxFrame* pAppFrame, HINSTANCE hInstance, int nCmdShow)
 	// Initialize the sample. OnInit is defined in each child-implementation of DXSample.
 	pAppFrame->Init(m_hwnd);
 
-	ShowWindow(m_hwnd, nCmdShow);
+	ShowWindow(m_hwnd, SW_SHOW);
 
 	// Main sample loop.
 	MSG msg = {};

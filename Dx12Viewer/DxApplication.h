@@ -18,7 +18,7 @@ class DxFrame;
 class DxApplication
 {
 public:
-	static int Run(DxFrame* pSample, HINSTANCE hInstance, int nCmdShow);
+	static int Run(DxFrame* pSample, HINSTANCE hInstance);
 	static HWND GetHwnd() { return m_hwnd; }
 
 protected:

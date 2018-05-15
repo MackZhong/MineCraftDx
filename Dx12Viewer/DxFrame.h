@@ -57,7 +57,7 @@ protected:
 	ComPtr<ID3D12Fence> CreateFence(ID3D12Device2* device);
 	HANDLE CreateEventHandle();
 
-	void UpdateRenderTargetViews(ID3D12Device2* device, IDXGISwapChain4* swapChain, ID3D12DescriptorHeap* descriptorHeap);
+	void UpdateRenderTargetViews(ID3D12Device2* device, IDXGISwapChain4* swapChain, ID3D12DescriptorHeap* descriptorHeap, ComPtr<ID3D12Resource>* ppTargets, UINT count);
 	UINT64 Signal(ID3D12CommandQueue* commandQueue, ID3D12Fence* fence, UINT64 value);
 	void WaitforFence(ID3D12Fence* fence, UINT64 value, HANDLE event, std::chrono::milliseconds duration = std::chrono::milliseconds::max());
 	void Flush(ID3D12CommandQueue* commandQueue, ID3D12Fence* fence, UINT64 value, HANDLE event);
@@ -93,8 +93,8 @@ private:
 
 	CD3DX12_VIEWPORT m_viewport;
 	CD3DX12_RECT m_scissorRect;
-	ComPtr<ID3D12RootSignature> m_rootSignature;
-	ComPtr<ID3D12PipelineState> m_pipelineState;
+	//ComPtr<ID3D12RootSignature> m_rootSignature;
+	//ComPtr<ID3D12PipelineState> m_pipelineState;
 
 	DirectX::XMMATRIX m_matProjection;
 	DirectX::XMMATRIX m_matView;

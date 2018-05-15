@@ -25,6 +25,8 @@
 #include <D3Dcompiler.h>
 #include <DirectXMath.h>
 #include "d3dx12.h"
+#include <dxgidebug.h>
+#include <DirectXColors.h>
 
 #include <string>
 #include <vector>
@@ -33,3 +35,14 @@
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3dcompiler.lib")
+#pragma comment(lib, "dxguid.lib")
+
+#include "Game.h"
+#include "IndexBuffer.h"
+#include "Window.h"
+#include "Mesh.h"
+#include "RootSignature.h"
+#include "Texture.h"
+#include "VertexBuffer.h"
+#include "Camera.h"
+#include "Light.h"

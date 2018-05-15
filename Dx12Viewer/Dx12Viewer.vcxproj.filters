@@ -33,6 +33,9 @@
     <ClCompile Include="DxApplication.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="TexturedCube.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -53,9 +56,18 @@
     <ClInclude Include="DxApplication.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="TexturedCube.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\TexturedCube_PS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\TexturedCube_VS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

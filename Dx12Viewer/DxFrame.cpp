@@ -15,11 +15,11 @@
 using namespace Microsoft::WRL;
 using namespace DirectX;
 
-DxFrame::DxFrame(UINT width, UINT height, std::wstring name) :
-	m_width(width),
-	m_height(height),
-	m_title(name),
-	m_useWarpDevice(false)
+DxFrame::DxFrame(UINT width, UINT height, std::wstring name)
+	: m_width(width)
+	, m_height(height)
+	, m_title(name)
+	, m_useWarpDevice(false)
 	, m_viewport(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height))
 	, m_scissorRect(0, 0, static_cast<LONG>(width), static_cast<LONG>(height))
 	, m_rtvDescriptorSize(0)
@@ -28,8 +28,8 @@ DxFrame::DxFrame(UINT width, UINT height, std::wstring name) :
 	GetAssetsPath(assetsPath, arraysize(assetsPath));
 	m_assetsPath = assetsPath;
 
-	m_aspectRatio = static_cast<float>(width) / static_cast<float>(height);
 	m_tearingSupported = CheckTearingSupport();
+	m_aspectRatio = static_cast<float>(width) / static_cast<float>(height);
 }
 
 DxFrame::~DxFrame()
@@ -246,21 +246,18 @@ HANDLE DxFrame::CreateEventHandle()
 	return fenceEvent;
 }
 
-void DxFrame::UpdateRenderTargetViews(ID3D12Device2* device,
-	IDXGISwapChain4* swapChain, ID3D12DescriptorHeap* descriptorHeap)
+void DxFrame::UpdateRenderTargetViews(ID3D12Device2* device, IDXGISwapChain4* swapChain, ID3D12DescriptorHeap* descriptorHeap,
+	ComPtr<ID3D12Resource>* ppTargets, UINT count)
 {
 	auto rtvDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
 	CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(descriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
-	for (int i = 0; i < FrameCount; ++i)
+	for (UINT i = 0; i < count; ++i)
 	{
-		ComPtr<ID3D12Resource> backBuffer;
-		ThrowIfFailed(swapChain->GetBuffer(i, IID_PPV_ARGS(&backBuffer)));
+		ThrowIfFailed(swapChain->GetBuffer(i, IID_PPV_ARGS(ppTargets[i].ReleaseAndGetAddressOf())));
 
-		device->CreateRenderTargetView(backBuffer.Get(), nullptr, rtvHandle);
-
-		m_renderTargets[i] = backBuffer;
+		device->CreateRenderTargetView(ppTargets[i].Get(), nullptr, rtvHandle);
 
 		rtvHandle.Offset(rtvDescriptorSize);
 	}
@@ -317,10 +314,11 @@ void DxFrame::SetFullscreen(bool fullscreen) {
 	}
 	m_fullscreen = fullscreen;
 }
+
 void DxFrame::Init(HWND hwnd) {
 	::GetWindowRect(hwnd, &m_rcWindow);
 
-	ComPtr<IDXGIAdapter4> dxgiAdapter4 = this->GetAdapter(false);
+	ComPtr<IDXGIAdapter4> dxgiAdapter4 = this->GetAdapter(m_useWarpDevice);
 	m_device = this->CreateDevice(dxgiAdapter4.Get());
 	m_commandQueue = this->CreateCommandQueue(m_device.Get(), D3D12_COMMAND_LIST_TYPE_DIRECT);
 	m_swapChain = this->CreateSwapChain(hwnd, m_commandQueue.Get(), m_width, m_height, FrameCount);
@@ -328,7 +326,7 @@ void DxFrame::Init(HWND hwnd) {
 	m_rtvHeap = this->CreateDescriptorHeap(m_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, FrameCount);
 	m_rtvDescriptorSize = m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
-	this->UpdateRenderTargetViews(m_device.Get(), m_swapChain.Get(), m_rtvHeap.Get());
+	this->UpdateRenderTargetViews(m_device.Get(), m_swapChain.Get(), m_rtvHeap.Get(), m_renderTargets, FrameCount);
 
 	for (UINT i = 0; i < FrameCount; i++) {
 		m_commandAllocators[i] = this->CreateCommandAllocator(m_device.Get(), D3D12_COMMAND_LIST_TYPE_DIRECT);
@@ -434,9 +432,9 @@ void DxFrame::Init(HWND hwnd) {
 	//this->OnInit(m_device.Get(), m_commandList.Get());
 
 	// Close the command list and execute it to begin the initial GPU setup.
-	ThrowIfFailed(this->m_commandList->Close());
-	ID3D12CommandList* ppCommandLists[] = { this->m_commandList.Get() };
-	this->m_commandQueue->ExecuteCommandLists(arraysize(ppCommandLists), ppCommandLists);
+	//ThrowIfFailed(this->m_commandList->Close());
+	//ID3D12CommandList* ppCommandLists[] = { this->m_commandList.Get() };
+	//this->m_commandQueue->ExecuteCommandLists(arraysize(ppCommandLists), ppCommandLists);
 
 	m_matProjection = XMMatrixPerspectiveFovLH(75.0f * XM_PI / 180.f, m_aspectRatio, 0.1f, 1000.0f);
 
@@ -489,13 +487,13 @@ void DxFrame::Render() {
 	// However, when ExecuteCommandList() is called on a particular command 
 	// list, that command list can then be reset at any time and must be before 
 	// re-recording.
-	ThrowIfFailed(m_commandList->Reset(commandAllocator.Get(), m_pipelineState.Get()));
+	ThrowIfFailed(m_commandList->Reset(commandAllocator.Get(), nullptr/* m_pipelineState.Get()*/));
 
 	// Set necessary state.
-	m_commandList->SetGraphicsRootSignature(m_rootSignature.Get());
+	//m_commandList->SetGraphicsRootSignature(m_rootSignature.Get());
 
-	m_commandList->RSSetViewports(1, &m_viewport);
-	m_commandList->RSSetScissorRects(1, &m_scissorRect);
+	//m_commandList->RSSetViewports(1, &m_viewport);
+	//m_commandList->RSSetScissorRects(1, &m_scissorRect);
 
 	// Indicate that the back buffer will be used as a render target.
 	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(renderTarget.Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
@@ -508,10 +506,10 @@ void DxFrame::Render() {
 	// clear back buffer
 	const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
 	m_commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
-	m_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
+	//m_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
 
 	// 
-	this->OnRender(m_commandList.Get());
+	//this->OnRender(m_commandList.Get());
 
 	// Indicate that the back buffer will now be used to present.
 	barrier = CD3DX12_RESOURCE_BARRIER::Transition(renderTarget.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
@@ -564,7 +562,7 @@ void DxFrame::Resize(UINT32 width, UINT32 height) {
 	hr = m_swapChain->ResizeBuffers(FrameCount, width, height, swapChainDesc.BufferDesc.Format, swapChainDesc.Flags);
 	m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
 
-	UpdateRenderTargetViews(m_device.Get(), m_swapChain.Get(), m_rtvHeap.Get());
+	this->UpdateRenderTargetViews(m_device.Get(), m_swapChain.Get(), m_rtvHeap.Get(), m_renderTargets, FrameCount);
 
 	this->OnResize(width, height);
 }
