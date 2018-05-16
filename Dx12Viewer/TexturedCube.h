@@ -58,7 +58,7 @@ protected:
 	std::vector<SpotLight> m_SpotLights;
 
 public:
-	TexturedCube(const std::wstring& name, int width, int height, bool vSync = false);
+	TexturedCube(const std::wstring& name, int width, int height, bool vSync = true);
 	~TexturedCube();
 
 	/**

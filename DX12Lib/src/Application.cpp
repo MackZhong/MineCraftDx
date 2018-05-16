@@ -229,6 +229,7 @@ Microsoft::WRL::ComPtr<ID3D12Device2> Application::CreateDevice(Microsoft::WRL::
 
 bool Application::CheckTearingSupport()
 {
+	return false;
     BOOL allowTearing = FALSE;
 
     // Rather than create the DXGI 1.5 factory interface directly, we create the

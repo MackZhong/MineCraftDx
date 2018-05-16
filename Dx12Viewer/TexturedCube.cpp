@@ -178,7 +178,7 @@ bool TexturedCube::LoadContent()
 	rtvFormats.NumRenderTargets = 1;
 	rtvFormats.RTFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-	pipelineStateStream.pRootSignature = m_RootSignature.GetRootSignature().Get();
+	pipelineStateStream.pRootSignature = m_RootSignature.Get();
 	pipelineStateStream.InputLayout = { CubeVertexPositionNormalTexture::InputElements, CubeVertexPositionNormalTexture::InputElementCount };
 	pipelineStateStream.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	pipelineStateStream.VS = CD3DX12_SHADER_BYTECODE(vertexShaderBlob.Get());
@@ -190,7 +190,18 @@ bool TexturedCube::LoadContent()
 		sizeof(PipelineStateStream), &pipelineStateStream
 	};
 
-	ThrowIfFailed(device->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_PipelineState)));
+	try {
+		//HRESULT hr = device->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_PipelineState));
+		HRESULT hr = device->CreatePipelineState(&pipelineStateStreamDesc, IID_ID3D12PipelineState, &m_PipelineState);
+		ThrowIfFailed(hr);
+	}
+	catch (const std::exception& ex) {
+		OutputDebugStringA(ex.what());
+		OutputDebugStringA("\n");
+	}
+	catch (...) {
+		OutputDebugStringA("Unknown");
+	}
 
 	auto fenceValue = commandQueue->ExecuteCommandList(commandList);
 	commandQueue->WaitForFenceValue(fenceValue);
@@ -290,7 +301,7 @@ void TexturedCube::OnUpdate(UpdateEventArgs& e)
 	static float cubeRotationTime = 0.0f;
 	if (m_AnimateLights)
 	{
-		cubeRotationTime += static_cast<float>(e.ElapsedTime) * 0.5f * XM_PI;
+		cubeRotationTime += static_cast<float>(e.ElapsedTime) * 0.2f * XM_PI;
 	}
 	XMMATRIX rotationMatrix = XMMatrixRotationY(cubeRotationTime)/* * XMMatrixRotationZ(cubeRotationTime)*/;
 	XMMATRIX translationMatrix = XMMatrixTranslation(4.0f, 4.0f, 4.0f);

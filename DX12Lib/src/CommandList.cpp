@@ -654,7 +654,7 @@ void CommandList::SetPipelineState(Microsoft::WRL::ComPtr<ID3D12PipelineState> p
 
 void CommandList::SetGraphicsRootSignature(const RootSignature& rootSignature)
 {
-	auto d3d12RootSignature = rootSignature.GetRootSignature().Get();
+	auto d3d12RootSignature = rootSignature.Get();
 	if (m_CurrentRootSignature != d3d12RootSignature)
 	{
 		m_CurrentRootSignature = d3d12RootSignature;
@@ -672,7 +672,7 @@ void CommandList::SetGraphicsRootSignature(const RootSignature& rootSignature)
 
 void CommandList::SetComputeRootSignature(const RootSignature& rootSignature)
 {
-	auto d3d12RootSignature = rootSignature.GetRootSignature().Get();
+	auto d3d12RootSignature = rootSignature.Get();
 	if (m_CurrentRootSignature != d3d12RootSignature)
 	{
 		m_CurrentRootSignature = d3d12RootSignature;

@@ -25,10 +25,15 @@ public:
 
     void Destroy();
 
-    Microsoft::WRL::ComPtr<ID3D12RootSignature> GetRootSignature() const
+    ID3D12RootSignature* Get() const
     {
-        return m_RootSignature;
+        return m_RootSignature.Get();
     }
+
+    //Microsoft::WRL::ComPtr<ID3D12RootSignature> GetRootSignature() const
+    //{
+    //    return m_RootSignature;
+    //}
 
     void SetRootSignatureDesc(
         const D3D12_ROOT_SIGNATURE_DESC1& rootSignatureDesc,

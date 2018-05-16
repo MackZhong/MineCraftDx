@@ -47,7 +47,7 @@ GenerateMipsPSO::GenerateMipsPSO()
         CD3DX12_PIPELINE_STATE_STREAM_CS CS;
     } pipelineStateStream;
 
-    pipelineStateStream.pRootSignature = m_RootSignature.GetRootSignature().Get();
+    pipelineStateStream.pRootSignature = m_RootSignature.Get();
     pipelineStateStream.CS = { g_GenerateMips_CS, sizeof( g_GenerateMips_CS ) };
 
     D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = {
