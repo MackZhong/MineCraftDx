@@ -245,61 +245,87 @@ void CommandList::LoadTextureFromFile(Texture& texture, const std::wstring& file
 	}
 }
 
-bool CommandList::CreateCubeTexture(Texture& texture) {
-	CD3DX12_RESOURCE_DESC td = CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R8G8B8A8_UNORM, 16, 16, 6);
-	//D3D12_RESOURCE_DESC textureDesc = {};
-	//textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	//textureDesc.Width = textureDesc.Height = 16;
-	//textureDesc.DepthOrArraySize = 6;
-	//textureDesc.MipLevels = 1;
-	//textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-	//textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-	//textureDesc.SampleDesc = { 1, 0 };
+bool CommandList::CreateCubeTexture(const wchar_t* name, Texture& texture) {
+	auto iter = ms_TextureCache.find(name);
+	if (iter != ms_TextureCache.end())
+	{
+		texture.SetD3D12Resource(iter->second);
+		return true;
+	}
 
 	auto device = Application::Get().GetDevice();
-	ID3D12Resource* mResource;
-	HRESULT hr = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+	ComPtr<ID3D12Resource> texTemp;
+	std::unique_ptr<uint8_t[]> textureData;
+
+	const wchar_t* fileName = L"E:/Games/MineCraft/assets/minecraft/textures/blocks/furnace_front_off.png";
+	D3D12_SUBRESOURCE_DATA resourceData;
+	// Use WIC texture loader.
+	ThrowIfFailed(LoadWICTextureFromFileEx(device.Get(),
+		fileName, 0, D3D12_RESOURCE_FLAG_NONE,
+		WIC_LOADER_MIP_AUTOGEN, &texTemp, textureData,
+		resourceData
+	));
+
+	CD3DX12_RESOURCE_DESC td = CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R8G8B8A8_UNORM, 16, 16, 6);
+	ComPtr<ID3D12Resource> texResource;
+	HRESULT hr = device->CreateCommittedResource(
+		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
 		D3D12_HEAP_FLAG_NONE,
 		&td,
-		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+		D3D12_RESOURCE_STATE_COPY_DEST,
 		nullptr,
-		IID_PPV_ARGS(&mResource));
+		IID_PPV_ARGS(&texResource));
 	if (FAILED(hr)) {
 		return false;
 	}
-	texture.SetD3D12Resource(mResource);
-	texture.SetName(L"CubeTexture");
 
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc.Format = td.Format;
-	if (srvDesc.Format == DXGI_FORMAT_R32_TYPELESS)
-		srvDesc.Format = DXGI_FORMAT_R32_FLOAT;
-	if (srvDesc.Format == DXGI_FORMAT_R16_TYPELESS)
-		srvDesc.Format = DXGI_FORMAT_R16_UNORM;
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
-	srvDesc.TextureCube.MostDetailedMip = 0;
-	srvDesc.TextureCube.MipLevels = td.MipLevels;
+	// Update the global state tracker.
+	ResourceStateTracker::AddGlobalResourceState(texResource.Get(), D3D12_RESOURCE_STATE_COPY_DEST);
+	texture.SetD3D12Resource(texResource);
 
-	std::unique_ptr<uint8_t[]> decodedData;
-	D3D12_SUBRESOURCE_DATA subresource;
-	ComPtr<ID3D12Resource> loadedTexture;
-	HRESULT hr = DirectX::LoadWICTextureFromFile(Application::Get().GetDevice().Get(),
-		L"", loadedTexture.ReleaseAndGetAddressOf(), decodedData, subresource);
-	UINT64 uploadBufferSize = GetRequiredIntermediateSize(loadedTexture.Get(), 0, 1);
-	ComPtr<ID3D12Resource> uploadHeap;
-	hr = device->CreateCommittedResource(
-		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
-		D3D12_HEAP_FLAG_NONE,
-		&CD3DX12_RESOURCE_DESC::Buffer(uploadBufferSize),
-		D3D12_RESOURCE_STATE_GENERIC_READ,
-		nullptr,
-		IID_PPV_ARGS(uploadHeap.ReleaseAndGetAddressOf()));
+	// 0: front
+	UINT subIndex = 0;
+	CopyTextureSubresource(texture, subIndex, 1, &resourceData);
 
-	UpdateSubresources(this->m_d3d12CommandList.Get(), loadedTexture.Get(), uploadHeap.Get(), 0, 0, 1, &subresource);
-	
+	// 1: back
+	fileName = L"E:/Games/MineCraft/assets/minecraft/textures/blocks/furnace_side.png";
+	ThrowIfFailed(LoadWICTextureFromFileEx(device.Get(),
+		fileName, 0, D3D12_RESOURCE_FLAG_NONE,
+		WIC_LOADER_MIP_AUTOGEN, &texTemp, textureData,
+		resourceData
+	));
+	subIndex = 1;
+	CopyTextureSubresource(texture, subIndex, 1, &resourceData);
+	// 2: left
+	subIndex = 2;
+	CopyTextureSubresource(texture, subIndex, 1, &resourceData);
+	// 3: right
+	subIndex = 3;
+	CopyTextureSubresource(texture, subIndex, 1, &resourceData);
+	// 5: bottom
+	subIndex = 5;
+	CopyTextureSubresource(texture, subIndex, 1, &resourceData);
 
-	ID3D12DescriptorHeap* srvHeap = this->m_DescriptorHeaps[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV];
+	// 4: top
+	fileName = L"E:/Games/MineCraft/assets/minecraft/textures/blocks/furnace_top.png";
+	ThrowIfFailed(LoadWICTextureFromFileEx(device.Get(),
+		fileName, 0, D3D12_RESOURCE_FLAG_NONE,
+		WIC_LOADER_MIP_AUTOGEN, &texTemp, textureData,
+		resourceData
+	));
+	subIndex = 4;
+	CopyTextureSubresource(texture, subIndex, 1, &resourceData);
+
+	//if (subresourceData.size() < texTemp->GetDesc().MipLevels)
+	//{
+	//	GenerateMips(texture);
+	//}
+
+	texture.CreateViews();
+
+	// Add the texture resource to the texture cache.
+	std::lock_guard<std::mutex> lock(ms_TextureCacheMutex);
+	ms_TextureCache[name] = texTemp.Get();
 
 	return true;
 }
@@ -848,6 +874,13 @@ void CommandList::SetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, ID3D12D
 		m_DescriptorHeaps[heapType] = heap;
 		BindDescriptorHeaps();
 	}
+}
+
+void CommandList::SetName(const wchar_t * name)
+{
+	ComPtr<ID3D12DeviceChild> obj;
+	if (SUCCEEDED(m_d3d12CommandList.As(&obj)))
+		obj->SetName(name);
 }
 
 void CommandList::BindDescriptorHeaps()

@@ -133,7 +133,7 @@ public:
 	 */
 	void LoadTextureFromFile(Texture& texture, const std::wstring& fileName);
 
-	bool CreateCubeTexture(Texture& texture);
+	bool CreateCubeTexture(const wchar_t* name, Texture& texture);
 
 	//void CreateTexture(DXGI_FORMAT format, UINT width, UINT height, UINT arraySize = 1, UINT mipLevel = 1,
 	//	TEXTURE_SRV_TYPE srvtype = TEXTURE_SRV_TYPE_2D, TEXTURE_USAGE usage = TEXTURE_USAGE_SRV, TEXTURE_ALL_MIPS_USE mipuse = TEXTURE_ALL_MIPS_USE_NONE,
@@ -343,6 +343,8 @@ public:
 	{
 		return m_GenerateMipsCommandList;
 	}
+
+	void SetName(const wchar_t* name);
 
 protected:
 

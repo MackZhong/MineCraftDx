@@ -116,9 +116,10 @@ bool TexturedCube::LoadContent()
 
 	// Load some textures
 	commandList->LoadTextureFromFile(m_DefaultTexture, L"Textures/DefaultWhite.bmp");
+	m_DefaultTexture.SetName(L"Default Texture");
 	//commandList->LoadTextureFromFile(m_MonaLisaTexture, L"Textures/Mona_Lisa.jpg");
 
-	commandList->CreateCubeTexture(m_MonaLisaTexture);
+	commandList->CreateCubeTexture(L"CubeTextures", m_MonaLisaTexture);
 
 	// Load the vertex shader.
 	ComPtr<ID3DBlob> vertexShaderBlob;
@@ -155,9 +156,10 @@ bool TexturedCube::LoadContent()
 
 	CD3DX12_STATIC_SAMPLER_DESC linearRepeatSampler(0, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR);
 	CD3DX12_STATIC_SAMPLER_DESC anisotropicSampler(0, D3D12_FILTER_ANISOTROPIC);
+	CD3DX12_STATIC_SAMPLER_DESC pointSampler(0, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_POINT);
 
 	CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDescription;
-	rootSignatureDescription.Init_1_1(RootParameters::NumRootParameters, rootParameters, 1, &linearRepeatSampler, rootSignatureFlags);
+	rootSignatureDescription.Init_1_1(RootParameters::NumRootParameters, rootParameters, 1, &pointSampler, rootSignatureFlags);
 
 	m_RootSignature.SetRootSignatureDesc(rootSignatureDescription.Desc_1_1, featureData.HighestVersion);
 
@@ -177,7 +179,7 @@ bool TexturedCube::LoadContent()
 	rtvFormats.RTFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 
 	pipelineStateStream.pRootSignature = m_RootSignature.GetRootSignature().Get();
-	pipelineStateStream.InputLayout = { VertexPositionNormalTexture::InputElements, VertexPositionNormalTexture::InputElementCount };
+	pipelineStateStream.InputLayout = { CubeVertexPositionNormalTexture::InputElements, CubeVertexPositionNormalTexture::InputElementCount };
 	pipelineStateStream.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	pipelineStateStream.VS = CD3DX12_SHADER_BYTECODE(vertexShaderBlob.Get());
 	pipelineStateStream.PS = CD3DX12_SHADER_BYTECODE(pixelShaderBlob.Get());
@@ -187,6 +189,7 @@ bool TexturedCube::LoadContent()
 	D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = {
 		sizeof(PipelineStateStream), &pipelineStateStream
 	};
+
 	ThrowIfFailed(device->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_PipelineState)));
 
 	auto fenceValue = commandQueue->ExecuteCommandList(commandList);
@@ -245,11 +248,12 @@ void TexturedCube::OnUpdate(UpdateEventArgs& e)
 
 		wchar_t buffer[512];
 		swprintf_s(buffer, L"%s - FPS: %f\n", this->m_pWindow->GetWindowName().c_str(), fps);
-		 this->m_pWindow->SetWindowTitle(buffer);
+		this->m_pWindow->SetWindowTitle(buffer);
 
 		frameCount = 0;
 		totalTime = 0.0;
 	}
+
 
 	// Update the camera.
 	float speedMultipler = (m_Shift ? 16.0f : 4.0f);
@@ -281,6 +285,17 @@ void TexturedCube::OnUpdate(UpdateEventArgs& e)
 	const float radius = 8.0f;
 	const float offset = 2.0f * XM_PI / numPointLights;
 	const float offset2 = offset + (offset / 2.0f);
+
+	// Update the cube
+	static float cubeRotationTime = 0.0f;
+	if (m_AnimateLights)
+	{
+		cubeRotationTime += static_cast<float>(e.ElapsedTime) * 0.5f * XM_PI;
+	}
+	XMMATRIX rotationMatrix = XMMatrixRotationY(cubeRotationTime)/* * XMMatrixRotationZ(cubeRotationTime)*/;
+	XMMATRIX translationMatrix = XMMatrixTranslation(4.0f, 4.0f, 4.0f);
+	XMMATRIX scaleMatrix = XMMatrixScaling(4.0f, 4.0f, 4.0f);
+	m_CubeMesh->World = rotationMatrix * scaleMatrix * translationMatrix;
 
 	// Setup the light buffers.
 	m_PointLights.resize(numPointLights);
@@ -418,15 +433,11 @@ void TexturedCube::OnRender(RenderEventArgs& e)
 	//m_SphereMesh->Draw(*commandList);
 
 	// Draw a cube
-	XMMATRIX translationMatrix = XMMatrixTranslation(4.0f, 4.0f, 4.0f);
-	XMMATRIX rotationMatrix = XMMatrixRotationY(XMConvertToRadians(45.0f));
-	XMMATRIX scaleMatrix = XMMatrixScaling(4.0f, 4.0f, 4.0f);
-	XMMATRIX worldMatrix = scaleMatrix * rotationMatrix * translationMatrix;
 	XMMATRIX viewMatrix = m_Camera.get_ViewMatrix();
 	XMMATRIX viewProjectionMatrix = viewMatrix * m_Camera.get_ProjectionMatrix();
 
 	Mat matrices;
-	ComputeMatrices(worldMatrix, viewMatrix, viewProjectionMatrix, matrices);
+	ComputeMatrices(m_CubeMesh->World, viewMatrix, viewProjectionMatrix, matrices);
 
 	commandList->SetGraphicsDynamicConstantBuffer(RootParameters::MatricesCB, matrices);
 	commandList->SetGraphicsDynamicConstantBuffer(RootParameters::MaterialCB, Material::White);
@@ -530,7 +541,7 @@ void TexturedCube::OnRender(RenderEventArgs& e)
 	{
 		lightMaterial.Emissive = l.Color;
 		XMVECTOR lightPos = XMLoadFloat4(&l.PositionWS);
-		worldMatrix = XMMatrixTranslationFromVector(lightPos);
+		XMMATRIX worldMatrix = XMMatrixTranslationFromVector(lightPos);
 		ComputeMatrices(worldMatrix, viewMatrix, viewProjectionMatrix, matrices);
 
 		commandList->SetGraphicsDynamicConstantBuffer(RootParameters::MatricesCB, matrices);
@@ -547,8 +558,8 @@ void TexturedCube::OnRender(RenderEventArgs& e)
 		XMVECTOR up = XMVectorSet(0, 1, 0, 0);
 
 		// Rotate the cone so it is facing the Z axis.
-		rotationMatrix = XMMatrixRotationX(XMConvertToRadians(-90.0f));
-		worldMatrix = rotationMatrix * LookAtMatrix(lightPos, lightDir, up);
+		XMMATRIX rotationMatrix = XMMatrixRotationX(XMConvertToRadians(-90.0f));
+		XMMATRIX worldMatrix = rotationMatrix * LookAtMatrix(lightPos, lightDir, up);
 
 		ComputeMatrices(worldMatrix, viewMatrix, viewProjectionMatrix, matrices);
 

@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "D3D12TexturedCub.h"
 #include "Application.h"
 #include "TexturedCube.h"
 

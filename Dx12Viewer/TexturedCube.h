@@ -12,7 +12,7 @@ protected:
 	std::unique_ptr<Mesh> m_ConeMesh;
 
 	Texture m_DefaultTexture;
-	    Texture m_MonaLisaTexture;
+	Texture m_MonaLisaTexture;
 
 	// Depth buffer.
 	Texture m_DepthBuffer;
@@ -60,50 +60,50 @@ protected:
 public:
 	TexturedCube(const std::wstring& name, int width, int height, bool vSync = false);
 	~TexturedCube();
-	
-    /**
-     *  Load content required for the demo.
-     */
-    virtual bool LoadContent() override;
 
-    /**
-     *  Unload demo specific content that was loaded in LoadContent.
-     */
-    virtual void UnloadContent() override;
+	/**
+	 *  Load content required for the demo.
+	 */
+	virtual bool LoadContent() override;
+
+	/**
+	 *  Unload demo specific content that was loaded in LoadContent.
+	 */
+	virtual void UnloadContent() override;
 
 protected:
-	    /**
-     *  Update the game logic.
-     */
-    virtual void OnUpdate(UpdateEventArgs& e) override;
+	/**
+ *  Update the game logic.
+ */
+	virtual void OnUpdate(UpdateEventArgs& e) override;
 
-    /**
-     *  Render stuff.
-     */
-    virtual void OnRender(RenderEventArgs& e) override;
+	/**
+	 *  Render stuff.
+	 */
+	virtual void OnRender(RenderEventArgs& e) override;
 
-    /**
-     * Invoked by the registered window when a key is pressed
-     * while the window has focus.
-     */
-    virtual void OnKeyPressed(KeyEventArgs& e) override;
+	/**
+	 * Invoked by the registered window when a key is pressed
+	 * while the window has focus.
+	 */
+	virtual void OnKeyPressed(KeyEventArgs& e) override;
 
-    /**
-     * Invoked when a key on the keyboard is released.
-     */
-    virtual void OnKeyReleased(KeyEventArgs& e);
+	/**
+	 * Invoked when a key on the keyboard is released.
+	 */
+	virtual void OnKeyReleased(KeyEventArgs& e);
 
-    /**
-     * Invoked when the mouse is moved over the registered window.
-     */
-    virtual void OnMouseMoved(MouseMotionEventArgs& e);
+	/**
+	 * Invoked when the mouse is moved over the registered window.
+	 */
+	virtual void OnMouseMoved(MouseMotionEventArgs& e);
 
-    /**
-     * Invoked when the mouse wheel is scrolled while the registered window has focus.
-     */
-    virtual void OnMouseWheel(MouseWheelEventArgs& e) override;
+	/**
+	 * Invoked when the mouse wheel is scrolled while the registered window has focus.
+	 */
+	virtual void OnMouseWheel(MouseWheelEventArgs& e) override;
 
-    virtual void OnResize(ResizeEventArgs& e) override; 
+	virtual void OnResize(ResizeEventArgs& e) override;
 
 	// Helper functions
 	// Transition a resource

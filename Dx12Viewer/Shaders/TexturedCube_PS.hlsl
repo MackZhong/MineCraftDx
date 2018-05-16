@@ -74,8 +74,8 @@ ConstantBuffer<LightProperties> LightPropertiesCB : register( b1 );
 
 StructuredBuffer<PointLight> PointLights : register( t0 );
 StructuredBuffer<SpotLight> SpotLights : register( t1 );
-Texture2D DiffuseTexture            : register( t2 );
-SamplerState LinearRepeatSampler    : register(s0);
+//Texture2D DiffuseTexture            : register( t2 );
+//SamplerState LinearRepeatSampler    : register(s0);
 
 float DoDiffuse( float3 N, float3 L )
 {
@@ -171,19 +171,19 @@ LightResult DoLighting( float3 P, float3 N )
 
     return totalResult;
 }
-
-float4 main( PixelShaderInput IN ) : SV_Target
-{
-    LightResult lit = DoLighting( IN.PositionVS.xyz, normalize( IN.NormalVS ) );
-
-    float4 emissive = MaterialCB.Emissive;
-    float4 ambient = MaterialCB.Ambient;
-    float4 diffuse = MaterialCB.Diffuse * lit.Diffuse;
-    float4 specular = MaterialCB.Specular * lit.Specular;
-    float4 texColor = DiffuseTexture.Sample( LinearRepeatSampler, IN.TexCoord );
-
-    return ( emissive + ambient + diffuse + specular ) * texColor;
-}
+//
+//float4 main( PixelShaderInput IN ) : SV_Target
+//{
+//    LightResult lit = DoLighting( IN.PositionVS.xyz, normalize( IN.NormalVS ) );
+//
+//    float4 emissive = MaterialCB.Emissive;
+//    float4 ambient = MaterialCB.Ambient;
+//    float4 diffuse = MaterialCB.Diffuse * lit.Diffuse;
+//    float4 specular = MaterialCB.Specular * lit.Specular;
+//    float4 texColor = DiffuseTexture.Sample( LinearRepeatSampler, IN.TexCoord );
+//
+//    return ( emissive + ambient + diffuse + specular ) * texColor;
+//}
 
 struct CubeShaderInput
 {
@@ -192,8 +192,8 @@ struct CubeShaderInput
     float3 TexCoord   : TEXCOORD;
 };
 
-Texture2DArray CubeTexture			: register(t3);
-SamplerState CubeSampler			: register(s1);
+Texture2DArray CubeTexture			: register(t2);
+SamplerState CubeSampler			: register(s0);
 
 float4 CubePS( CubeShaderInput IN ) : SV_Target
 {

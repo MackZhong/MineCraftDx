@@ -97,6 +97,7 @@ std::shared_ptr<CommandList> CommandQueue::GetCommandList()
     {
         // Otherwise create a new command list.
         commandList = std::make_shared<CommandList>(m_CommandListType);
+		commandList->SetName(L"CommandList1");
     }
 
     return commandList;

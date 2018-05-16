@@ -21,16 +21,7 @@
     <ClCompile Include="Main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="D3D12TexturedCub.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="pch.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DxFrame.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DxApplication.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="TexturedCube.cpp">
@@ -42,18 +33,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="d3dx12.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="D3D12TexturedCub.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DirectXHelper.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DxFrame.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DxApplication.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TexturedCube.h">
